@@ -2986,6 +2986,12 @@ endMap()
 
     if(gametype == "sd" || gametype == "re")
     {
+        if(gametype == "sd")
+        {
+            if(isdefined(level.bombmodel))
+                level.bombmodel stopLoopSound();
+        }
+        
         if(game["alliedscore"] == game["axisscore"])
             text = &"MPSCRIPT_THE_GAME_IS_A_TIE";
         else if(game["alliedscore"] > game["axisscore"])

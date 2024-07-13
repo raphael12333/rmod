@@ -196,7 +196,8 @@ startRound()
 			wait level.graceperiod;
 
 			level.roundstarted = true;
-			level.clock.color = (1, 1, 1);
+			if(!level.bombplanted)
+				level.clock.color = (1, 1, 1);
 
 			// Players on a team but without a weapon show as dead since they can not get in this round
 			players = getentarray("player", "classname");
@@ -224,12 +225,12 @@ startRound()
 
 	if(!level.exist[game["attackers"]] || !level.exist[game["defenders"]])
 	{
-		level thread hud_announce(&"SD_TIMEHASEXPIRED");
+		announcement(&"SD_TIMEHASEXPIRED");
 		level thread endRound("draw", true);
 		return;
 	}
 
-	level thread hud_announce(&"SD_TIMEHASEXPIRED");
+	announcement(&"SD_TIMEHASEXPIRED");
 	level thread endRound(game["defenders"], true);
 }
 
@@ -247,12 +248,12 @@ checkMatchStart()
 	{
 		if(!game["matchstarted"])
 		{
-			level thread hud_announce(&"SD_MATCHSTARTING");
+			announcement(&"SD_MATCHSTARTING");
 			level thread endRound("reset");
 		}
 		else
 		{
-			level thread hud_announce(&"SD_MATCHRESUMING");
+			announcement(&"SD_MATCHRESUMING");
 			level thread endRound("draw");
 		}
 
@@ -429,19 +430,19 @@ updateTeamStatus()
 	{
 		if(!level.bombplanted)
 		{
-			level thread hud_announce(&"SD_ROUNDDRAW");
+			announcement(&"SD_ROUNDDRAW");
 			level thread endRound("draw");
 			return;
 		}
 
 		if(game["attackers"] == "allies")
 		{
-			level thread hud_announce(&"SD_ALLIEDMISSIONACCOMPLISHED");
+			announcement(&"SD_ALLIEDMISSIONACCOMPLISHED");
 			level thread endRound("allies");
 			return;
 		}
 
-		level thread hud_announce(&"SD_AXISMISSIONACCOMPLISHED");
+		announcement(&"SD_AXISMISSIONACCOMPLISHED");
 		level thread endRound("axis");
 		return;
 	}
@@ -451,7 +452,7 @@ updateTeamStatus()
 		// no bomb planted, axis win
 		if(!level.bombplanted)
 		{
-			level thread hud_announce(&"SD_ALLIESHAVEBEENELIMINATED");
+			announcement(&"SD_ALLIESHAVEBEENELIMINATED");
 			level thread endRound("axis");
 			return;
 		}
@@ -462,12 +463,12 @@ updateTeamStatus()
 		// allies just died and axis have planted the bomb
 		if(level.exist["axis"])
 		{
-			level thread hud_announce(&"SD_ALLIESHAVEBEENELIMINATED");
+			announcement(&"SD_ALLIESHAVEBEENELIMINATED");
 			level thread endRound("axis");
 			return;
 		}
 
-		level thread hud_announce(&"SD_AXISMISSIONACCOMPLISHED");
+		announcement(&"SD_AXISMISSIONACCOMPLISHED");
 		level thread endRound("axis");
 		return;
 	}
@@ -477,7 +478,7 @@ updateTeamStatus()
 		// no bomb planted, allies win
 		if(!level.bombplanted)
 		{
-			level thread hud_announce(&"SD_AXISHAVEBEENELIMINATED");
+			announcement(&"SD_AXISHAVEBEENELIMINATED");
 			level thread endRound("allies");
 			return;
  		}
@@ -488,12 +489,12 @@ updateTeamStatus()
 		// axis just died and allies have planted the bomb
 		if(level.exist["allies"])
 		{
-			level thread hud_announce(&"SD_AXISHAVEBEENELIMINATED");
+			announcement(&"SD_AXISHAVEBEENELIMINATED");
 			level thread endRound("allies");
 			return;
 		}
 		
-		level thread hud_announce(&"SD_ALLIEDMISSIONACCOMPLISHED");
+		announcement(&"SD_ALLIEDMISSIONACCOMPLISHED");
 		level thread endRound("allies");
 		return;
 	}	
@@ -619,7 +620,7 @@ bombzone_think(bombzone_other)
 					lpselfnum = other getEntityNumber();
 					logPrint("A;" + lpselfnum + ";" + game["attackers"] + ";" + other.name + ";" + "bomb_plant" + "\n");
 					
-					level thread hud_announce(&"SD_EXPLOSIVESPLANTED");
+					announcement(&"SD_EXPLOSIVESPLANTED");
 										
 					players = getentarray("player", "classname");
 					for(i = 0; i < players.size; i++)
@@ -667,6 +668,12 @@ bomb_countdown()
 	// set the countdown time
 	countdowntime = 60;
 
+	if(isDefined(level.clock))
+	{
+		level.clock setTimer(countdowntime);
+		level.clock.color = (1, 0, 0);
+	}
+
 	wait countdowntime;
 		
 	// bomb timer is up
@@ -688,6 +695,9 @@ bomb_countdown()
 	self delete(); // delete the defuse trigger
 	level.bombmodel stopLoopSound();
 	level.bombmodel delete();
+
+	if(isDefined(level.clock))
+		level.clock destroy();
 
 	playfx(level._effect["bombexplosion"], origin);
 	radiusDamage(origin, range, maxdamage, mindamage);
@@ -766,7 +776,10 @@ bomb_think()
 					level.bombmodel stopLoopSound();
 					self delete();
 
-					level thread hud_announce(&"SD_EXPLOSIVESDEFUSED");
+					if(isDefined(level.clock))
+						level.clock destroy();
+
+					announcement(&"SD_EXPLOSIVESDEFUSED");
 					
 					lpselfnum = other getEntityNumber();
 					logPrint("A;" + lpselfnum + ";" + game["defenders"] + ";" + other.name + ";" + "bomb_defuse" + "\n");
@@ -803,30 +816,6 @@ check_bomb(trigger)
 		wait 0.05;
 
 	self.defuseicon destroy();
-}
-
-hud_announce(text)
-{
-	level notify("kill_hud_announce");
-	level endon("kill_hud_announce");
-
-	if(!isdefined(level.announce))
-	{
-		level.announce = newHudElem();
-		level.announce.alignX = "center";
-		level.announce.alignY = "middle";
-		level.announce.x = 320;
-		level.announce.y = 176;
-	}	
-	level.announce setText(text);
-
-	wait 4;
-	level.announce fadeOverTime(1);
-
-	wait .9;
-
-	if(isdefined(level.announce))
-		level.announce destroy();	
 }
 
 addBotClients()

@@ -1495,11 +1495,15 @@ playerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vP
 
 _finishPlayerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc)
 {
+    if(getCvar("g_gametype") != "tdm")
+    {
+        if((isBoltWeapon(sWeapon) || isPistol(sWeapon)) || sMeansOfDeath == "MOD_MELEE")
+            iDamage = 100;
+    }
+
     victim_will_die = false;
     if(self.health - iDamage <= 0)
-    {
         victim_will_die = true;
-    }
 
     eAttacker thread showDamageFeedback(iDamage, victim_will_die);
     if(victim_will_die)
@@ -1519,6 +1523,31 @@ _finishPlayerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWea
     }
 
     self finishPlayerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc);
+}
+
+isBoltWeapon(sWeapon)
+{
+    switch(sWeapon)
+    {
+        case "kar98k_mp":
+        case "kar98k_sniper_mp":
+        case "mosin_nagant_mp":
+        case "mosin_nagant_sniper_mp":
+        case "springfield_mp":
+        case "enfield_mp":
+            return true;
+    }
+    return false;
+}
+isPistol(sWeapon)
+{
+    switch(sWeapon)
+    {
+        case "luger_mp":
+        case "colt_mp":
+            return true;
+    }
+    return false;
 }
 
 showDamageFeedback(iDamage, victim_will_die)

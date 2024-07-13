@@ -548,6 +548,8 @@ startGameType()
             precacheShader("gfx/hud/hud@objective_bel_down.tga");
         }
 
+        precacheShader("gfx/hud/damage_feedback.dds");
+
         if(gametype == "sd")
         {
             precacheModel("xmodel/mp_bomb1_defuse");
@@ -1430,7 +1432,7 @@ playerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vP
             if(iDamage < 1)
                 iDamage = 1;
 
-            self finishPlayerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc);
+            self _finishPlayerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc);
         }
         else
         {
@@ -1442,7 +1444,7 @@ playerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vP
             if(iDamage < 1)
                 iDamage = 1;
 
-            eAttacker finishPlayerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc);
+            eAttacker _finishPlayerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc);
             eAttacker.reflectdamage = undefined;
         }
     }
@@ -1457,7 +1459,7 @@ playerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vP
     if(gametype == "dm")
     {
         // Apply the damage to the player
-        self finishPlayerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc);            
+        self _finishPlayerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc);            
     }
 
     if(self.sessionstate != "dead")
@@ -1480,8 +1482,8 @@ playerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vP
             lpattackerteam = "world";
         }
 
-        if(isdefined(reflect)) 
-        {  
+        if(isdefined(reflect))
+        {
             lpattacknum = lpselfnum;
             lpattackname = lpselfname;
             lpattackerteam = lpattackerteam;
@@ -1489,6 +1491,66 @@ playerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vP
 
         logPrint("D;" + lpselfnum + ";" + lpselfteam + ";" + lpselfname + ";" + lpattacknum + ";" + lpattackerteam + ";" + lpattackname + ";" + sWeapon + ";" + iDamage + ";" + sMeansOfDeath + ";" + sHitLoc + "\n");
     }
+}
+
+_finishPlayerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc)
+{
+    victim_will_die = false;
+    if(self.health - iDamage <= 0)
+    {
+        victim_will_die = true;
+    }
+
+    eAttacker thread showDamageFeedback(iDamage, victim_will_die);
+    if(victim_will_die)
+    {
+        primary = self getWeaponSlotWeapon("primary");
+        primaryb = self getWeaponSlotWeapon("primaryb");
+        pistol = self getWeaponSlotWeapon("pistol");
+        grenade = self getWeaponSlotWeapon("grenade");
+        if(isDefined(primary))
+            self dropItem(primary);
+        if(isDefined(primaryb))
+            self dropItem(primaryb);
+        if(isDefined(pistol))
+            self dropItem(pistol);
+        if(isDefined(grenade))
+            self dropItem(grenade);
+    }
+
+    self finishPlayerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc);
+}
+
+showDamageFeedback(iDamage, victim_will_die)
+{
+    self endon("spawned");
+    self endon("disconnect");
+    destroyDamageFeedback();
+
+    if(victim_will_die)
+        color = (0, 1, 0);
+    else
+        color = (1, 0, 0);
+
+    self.damageFeedback = newClientHudElem(self);
+    self.damageFeedback.alignX = "center";
+    self.damageFeedback.alignY = "middle";
+    self.damageFeedback.x = 320;
+    self.damageFeedback.y = 240;
+    self.damageFeedback.alpha = 1;
+    self.damageFeedback.color = color;
+    self.damageFeedback setShader("gfx/hud/damage_feedback.dds", 24, 24);
+
+    self.damageFeedback fadeOverTime(1);
+    self.damageFeedback.alpha = 0;
+
+    wait 0.3;
+    destroyDamageFeedback();
+}
+destroyDamageFeedback()
+{
+    if(isDefined(self.damageFeedback))
+        self.damageFeedback destroy();
 }
 
 playerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc)
@@ -2808,23 +2870,10 @@ endRound(roundwinner, timeexpired)
             for(i = 0; i < players.size; i++)
             {
                 player = players[i];
-
-                if(gametype == "sd")
+                if(!isdefined(player.killcam))
                 {
-                    if((player.sessionstate != "playing") && (player getEntityNumber() != level.playercam) && !isdefined(player.killcam))
-                    {
-                        player thread roundcam(delay, roundwinner);
-                        viewers++;
-                    }
-                }
-                else if(gametype == "re")
-                {
-                    //if((player.sessionstate != "playing") && (player getEntityNumber() != level.playercam) && !isdefined(player.killcam))
-                    if(!isdefined(player.killcam))
-                    {
-                        player thread roundcam(delay,roundwinner);
-                        viewers++;
-                    }
+                    player thread roundcam(delay, roundwinner);
+                    viewers++;
                 }
             }
 

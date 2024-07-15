@@ -356,6 +356,14 @@ modeltype()
 precache()
 {
     precacheHeadIcon("gfx/hud/headicon@quickmessage");	//TEMP
+
+    // Always precache bolt-action rifles
+    precacheItem("mosin_nagant_mp");
+    precacheItem("mosin_nagant_sniper_mp");
+    precacheItem("kar98k_mp");
+    precacheItem("kar98k_sniper_mp");
+    precacheItem("enfield_mp");
+    precacheItem("springfield_mp");
     
     switch(game["allies"])
     {
@@ -597,6 +605,17 @@ isPistolOrGrenade(weapon)
 
 restrict(response)
 {
+    switch (response) // Don't restrict bolt-action rifles
+    {
+        case "kar98k_mp":
+        case "kar98k_sniper_mp":
+        case "mosin_nagant_mp":
+        case "mosin_nagant_sniper_mp":
+        case "enfield_mp":
+        case "springfield_mp":
+            return response;
+    }
+
     if(self.pers["team"] == "allies")
     {
         switch(game["allies"])		
@@ -776,133 +795,133 @@ restrict(response)
 
 restrict_anyteam(response)
 {
-            switch(response)		
-            {
-            case "m1carbine_mp":
-                if(!getcvar("scr_allow_m1carbine"))
-                {
-                    self iprintln(&"MPSCRIPT_M1A1_CARBINE_IS_A_RESTRICTED");
-                    response = "restricted";
-                }
-                break;
-                
-            case "m1garand_mp":
-                if(!getcvar("scr_allow_m1garand"))
-                {
-                    self iprintln(&"MPSCRIPT_M1_GARAND_IS_A_RESTRICTED");
-                    response = "restricted";
-                }
-                break;
-                
-            case "thompson_mp":
-                if(!getcvar("scr_allow_thompson"))
-                {
-                    self iprintln(&"MPSCRIPT_THOMPSON_IS_A_RESTRICTED");
-                    response = "restricted";
-                }
-                break;
-                
-            case "bar_mp":
-                if(!getcvar("scr_allow_bar"))
-                {
-                    self iprintln(&"MPSCRIPT_BAR_IS_A_RESTRICTED_WEAPON");
-                    response = "restricted";
-                }
-                break;
-                
-            case "springfield_mp":
-                if(!getcvar("scr_allow_springfield"))
-                {
-                    self iprintln(&"MPSCRIPT_SPRINGFIELD_IS_A_RESTRICTED");
-                    response = "restricted";
-                }
-                break;
+    switch(response)		
+    {
+    case "m1carbine_mp":
+        if(!getcvar("scr_allow_m1carbine"))
+        {
+            self iprintln(&"MPSCRIPT_M1A1_CARBINE_IS_A_RESTRICTED");
+            response = "restricted";
+        }
+        break;
+        
+    case "m1garand_mp":
+        if(!getcvar("scr_allow_m1garand"))
+        {
+            self iprintln(&"MPSCRIPT_M1_GARAND_IS_A_RESTRICTED");
+            response = "restricted";
+        }
+        break;
+        
+    case "thompson_mp":
+        if(!getcvar("scr_allow_thompson"))
+        {
+            self iprintln(&"MPSCRIPT_THOMPSON_IS_A_RESTRICTED");
+            response = "restricted";
+        }
+        break;
+        
+    case "bar_mp":
+        if(!getcvar("scr_allow_bar"))
+        {
+            self iprintln(&"MPSCRIPT_BAR_IS_A_RESTRICTED_WEAPON");
+            response = "restricted";
+        }
+        break;
+        
+    case "springfield_mp":
+        if(!getcvar("scr_allow_springfield"))
+        {
+            self iprintln(&"MPSCRIPT_SPRINGFIELD_IS_A_RESTRICTED");
+            response = "restricted";
+        }
+        break;
 
-            case "enfield_mp":
-                if(!getcvar("scr_allow_enfield"))
-                {
-                    self iprintln(&"MPSCRIPT_LEEENFIELD_IS_A_RESTRICTED");
-                    response = "restricted";
-                }
-                break;
+    case "enfield_mp":
+        if(!getcvar("scr_allow_enfield"))
+        {
+            self iprintln(&"MPSCRIPT_LEEENFIELD_IS_A_RESTRICTED");
+            response = "restricted";
+        }
+        break;
 
-            case "sten_mp":
-                if(!getcvar("scr_allow_sten"))
-                {
-                    self iprintln(&"MPSCRIPT_STEN_IS_A_RESTRICTED");
-                    response = "restricted";
-                }
-                break;
+    case "sten_mp":
+        if(!getcvar("scr_allow_sten"))
+        {
+            self iprintln(&"MPSCRIPT_STEN_IS_A_RESTRICTED");
+            response = "restricted";
+        }
+        break;
 
-            case "bren_mp":
-                if(!getcvar("scr_allow_bren"))
-                {
-                    self iprintln(&"MPSCRIPT_BREN_LMG_IS_A_RESTRICTED");
-                    response = "restricted";
-                }
-                break;
+    case "bren_mp":
+        if(!getcvar("scr_allow_bren"))
+        {
+            self iprintln(&"MPSCRIPT_BREN_LMG_IS_A_RESTRICTED");
+            response = "restricted";
+        }
+        break;
 
-            case "mosin_nagant_mp":
-                if(!getcvar("scr_allow_nagant"))
-                {
-                    self iprintln(&"MPSCRIPT_MOSINNAGANT_IS_A_RESTRICTED");
-                    response = "restricted";
-                }
-                break;
+    case "mosin_nagant_mp":
+        if(!getcvar("scr_allow_nagant"))
+        {
+            self iprintln(&"MPSCRIPT_MOSINNAGANT_IS_A_RESTRICTED");
+            response = "restricted";
+        }
+        break;
 
-            case "ppsh_mp":
-                if(!getcvar("scr_allow_ppsh"))
-                {
-                    self iprintln(&"MPSCRIPT_PPSH_IS_A_RESTRICTED");
-                    response = "restricted";
-                }
-                break;
+    case "ppsh_mp":
+        if(!getcvar("scr_allow_ppsh"))
+        {
+            self iprintln(&"MPSCRIPT_PPSH_IS_A_RESTRICTED");
+            response = "restricted";
+        }
+        break;
 
-            case "mosin_nagant_sniper_mp":
-                if(!getcvar("scr_allow_nagantsniper"))
-                {
-                    self iprintln(&"MPSCRIPT_SCOPED_MOSINNAGANT_IS");
-                    response = "restricted";
-                }
-                break;
+    case "mosin_nagant_sniper_mp":
+        if(!getcvar("scr_allow_nagantsniper"))
+        {
+            self iprintln(&"MPSCRIPT_SCOPED_MOSINNAGANT_IS");
+            response = "restricted";
+        }
+        break;
 
-            case "kar98k_mp":
-                if(!getcvar("scr_allow_kar98k"))
-                {
-                    self iprintln(&"MPSCRIPT_KAR98K_IS_A_RESTRICTED");
-                    response = "restricted";
-                }
-                break;
+    case "kar98k_mp":
+        if(!getcvar("scr_allow_kar98k"))
+        {
+            self iprintln(&"MPSCRIPT_KAR98K_IS_A_RESTRICTED");
+            response = "restricted";
+        }
+        break;
 
-            case "mp40_mp":
-                if(!getcvar("scr_allow_mp40"))
-                {
-                    self iprintln(&"MPSCRIPT_MP40_IS_A_RESTRICTED");
-                    response = "restricted";
-                }
-                break;
+    case "mp40_mp":
+        if(!getcvar("scr_allow_mp40"))
+        {
+            self iprintln(&"MPSCRIPT_MP40_IS_A_RESTRICTED");
+            response = "restricted";
+        }
+        break;
 
-            case "mp44_mp":
-                if(!getcvar("scr_allow_mp44"))
-                {
-                    self iprintln(&"MPSCRIPT_MP44_IS_A_RESTRICTED");
-                    response = "restricted";
-                }
-                break;
+    case "mp44_mp":
+        if(!getcvar("scr_allow_mp44"))
+        {
+            self iprintln(&"MPSCRIPT_MP44_IS_A_RESTRICTED");
+            response = "restricted";
+        }
+        break;
 
-            case "kar98k_sniper_mp":
-                if(!getcvar("scr_allow_kar98ksniper"))
-                {
-                    self iprintln(&"MPSCRIPT_SCOPED_KAR98K_IS_A_RESTRICTED");
-                    response = "restricted";
-                }
-                break;
+    case "kar98k_sniper_mp":
+        if(!getcvar("scr_allow_kar98ksniper"))
+        {
+            self iprintln(&"MPSCRIPT_SCOPED_KAR98K_IS_A_RESTRICTED");
+            response = "restricted";
+        }
+        break;
 
-            default:
-                self iprintln(&"MPSCRIPT_UNKNOWN_WEAPON_SELECTED");
-                response = "restricted";
-                break;
-            }
+    default:
+        self iprintln(&"MPSCRIPT_UNKNOWN_WEAPON_SELECTED");
+        response = "restricted";
+        break;
+    }
     return response;
 }
 
@@ -1790,3 +1809,236 @@ useAn(weapon)
 
     return result;
 }
+
+// From pak9
+CountPlayers()
+{
+    //chad
+    players = getentarray("player", "classname");
+    allies = 0;
+    axis = 0;
+    for(i = 0; i < players.size; i++)
+    {
+        if((isdefined(players[i].pers["team"])) && (players[i].pers["team"] == "allies"))
+            allies++;
+        else if((isdefined(players[i].pers["team"])) && (players[i].pers["team"] == "axis"))
+            axis++;
+    }
+    players["allies"] = allies;
+    players["axis"] = axis;
+    return players;
+}
+
+TeamBalance_Check()
+{
+    level endon("intermission");
+    
+    if(level.teambalance > 0)
+    {
+        level.team["allies"] = 0;
+        level.team["axis"] = 0;
+        players = getentarray("player", "classname");
+        for(i = 0; i < players.size; i++)
+        {
+            if((isdefined(players[i].pers["team"])) && (players[i].pers["team"] == "allies"))
+                level.team["allies"]++;
+            else if((isdefined(players[i].pers["team"])) && (players[i].pers["team"] == "axis"))
+                level.team["axis"]++;
+        }
+        //iprintlnbold ("ALLIES: " + level.team["allies"] + " AXIS: " + level.team["axis"]);
+        
+        if (level.team["allies"] > (level.team["axis"] + level.teambalance))
+        {
+            // TOO MANY ALLIES
+            iprintlnbold ("Teams will be auto-balanced in 15 seconds");
+            wait 15;
+            level TeamBalance();
+            return;
+        }
+        else if (level.team["axis"] > (level.team["allies"] + level.teambalance))
+        {
+            // TOO MANY AXIS
+            iprintlnbold ("Teams will be auto-balanced in 15 seconds");
+            wait 15;
+            level TeamBalance();
+            return;
+        }
+        
+        // TEAMS ARE EVEN ALREADY
+        println ("TEAMBALANCE DEBUGGER ### TEAMS ARE EVEN - TEAMS WILL REMAIN THE SAME NEXT ROUND");
+        game["BalanceTeamsNextRound"] = false;
+    }
+}
+
+TeamBalance()
+{
+    wait 0.5;
+    iprintln ("Auto-balancing teams");
+    //Create/Clear the team arrays
+    AlliedPlayers = [];
+    AxisPlayers = [];
+    
+    // Populate the team arrays
+    players = getentarray("player", "classname");
+    for(i = 0; i < players.size; i++)
+    {
+        if (!isdefined (players[i].pers["teamTime"]))
+            players[i].pers["teamTime"] = 0;
+        if((isdefined(players[i].pers["team"])) && (players[i].pers["team"] == "allies"))
+            AlliedPlayers[AlliedPlayers.size] = players[i];
+        else if((isdefined(players[i].pers["team"])) && (players[i].pers["team"] == "axis"))
+            AxisPlayers[AxisPlayers.size] = players[i];
+    }
+    while ( (AlliedPlayers.size > (AxisPlayers.size + 1)) || (AxisPlayers.size > (AlliedPlayers.size + 1)) )
+    {	
+        if (AlliedPlayers.size > (AxisPlayers.size + 1))
+        {
+            game["BalanceTeamsNextRound"] = false;
+            // Move the player that's been on the team the shortest ammount of time (highest teamTime value)
+            for (j=0;j<AlliedPlayers.size;j++)
+            {
+                if (!isdefined (MostRecent))
+                    MostRecent = AlliedPlayers[j];
+                else if (AlliedPlayers[j].pers["teamTime"] > MostRecent.pers["teamTime"])
+                    MostRecent = AlliedPlayers[j];
+            }
+            MostRecent ChangeTeam("axis");
+            //AlliedPlayers[randomint(AlliedPlayers.size)] ChangeTeam("axis");
+        }
+        else if (AxisPlayers.size > (AlliedPlayers.size + 1))
+        {
+            game["BalanceTeamsNextRound"] = false;
+            // Move the player that's been on the team the shortest ammount of time (highest teamTime value)
+            for (j=0;j<AxisPlayers.size;j++)
+            {
+                if (!isdefined (MostRecent))
+                    MostRecent = AxisPlayers[j];
+                else if (AxisPlayers[j].pers["teamTime"] > MostRecent.pers["teamTime"])
+                    MostRecent = AxisPlayers[j];
+            }
+            MostRecent ChangeTeam("allies");
+        }
+        MostRecent = undefined;
+        wait 0.5;
+        
+        AlliedPlayers = [];
+        AxisPlayers = [];
+        
+        players = getentarray("player", "classname");
+        for(i = 0; i < players.size; i++)
+        {
+            if((isdefined(players[i].pers["team"])) && (players[i].pers["team"] == "allies"))
+                AlliedPlayers[AlliedPlayers.size] = players[i];
+            else if((isdefined(players[i].pers["team"])) && (players[i].pers["team"] == "axis"))
+                AxisPlayers[AxisPlayers.size] = players[i];
+        }
+    }
+    level notify ("Teams Balanced");
+}
+
+TeamBalance_Check_Roundbased()
+{
+    wait 1;
+    if(level.teambalance > 0)
+    {
+        level.team["allies"] = 0;
+        level.team["axis"] = 0;
+        players = getentarray("player", "classname");
+        for(i = 0; i < players.size; i++)
+        {
+            if((isdefined(players[i].pers["team"])) && (players[i].pers["team"] == "allies"))
+                level.team["allies"]++;
+            else if((isdefined(players[i].pers["team"])) && (players[i].pers["team"] == "axis"))
+                level.team["axis"]++;
+        }
+        
+        if (level.team["allies"] > (level.team["axis"] + level.teambalance))
+        {
+            // TOO MANY ALLIES
+            iprintlnbold ("Teams will be auto-balanced next round");
+            game["BalanceTeamsNextRound"] = true;
+            return;
+        }
+        else if (level.team["axis"] > (level.team["allies"] + level.teambalance))
+        {
+            // TOO MANY AXIS
+            iprintlnbold ("Teams will be auto-balanced next round");
+            game["BalanceTeamsNextRound"] = true;
+            return;
+        }
+        
+        // TEAMS ARE EVEN ALREADY
+        println ("TEAMBALANCE DEBUGGER ### TEAMS ARE EVEN - TEAMS WILL REMAIN THE SAME NEXT ROUND");
+        game["BalanceTeamsNextRound"] = false;
+    }
+}
+
+ChangeTeam(team)
+{
+    if (self.sessionstate != "dead")
+    {
+        // Set a flag on the player to they aren't robbed points for dying - the callback will remove the flag
+        self.autobalance = true;
+        // Suicide the player so they can't hit escape and fail the team balance
+        self suicide();
+    }
+
+    self.pers["team"] = team;
+    self.pers["teamTime"] = (gettime() / 1000);
+    self.sessionteam = self.pers["team"];
+    self.freerespawn = true; //for HQ Gametype
+    if (!isdefined (game["timepassed"]))
+        self.pers["teamTime"] = ((getTime() - level.starttime) / 1000);
+    else
+        self.pers["teamTime"] = game["timepassed"] + ((getTime() - level.starttime) / 1000) / 60.0;
+    self.pers["weapon"] = undefined;
+    self.pers["weapon1"] = undefined;
+    self.pers["weapon2"] = undefined;
+    self.pers["spawnweapon"] = undefined;
+    self.pers["savedmodel"] = undefined;
+    
+    // update spectator permissions immediately on change of team
+    //self SetSpectatePermissions();
+    
+    self setClientCvar("ui_weapontab", "1");
+    self thread TeamBalance_NotifyPlayer();
+    if(self.pers["team"] == "allies")
+    {
+        self setClientCvar("g_scriptMainMenu", game["menu_weapon_allies"]);
+        self openMenu(game["menu_weapon_allies"]);
+    }
+    else
+    {
+        self setClientCvar("g_scriptMainMenu", game["menu_weapon_axis"]);
+        self openMenu(game["menu_weapon_axis"]);
+    }
+}
+
+TeamBalance_NotifyPlayer()
+{
+    if (!isdefined (self.autobalance_notify))
+    {
+        self.autobalance_notify = newClientHudElem(self);
+        self.autobalance_notify.alignX = "center";
+        self.autobalance_notify.alignY = "middle";
+        self.autobalance_notify.x = 320;
+        self.autobalance_notify.y = 50;
+        self.autobalance_notify.archived = false;
+        self.autobalance_notify.fontScale = 1.5;
+        if (self.pers["team"] == "allies")
+        {
+            if (game["allies"] == "american")
+                self.autobalance_notify settext(&"You were moved to American to balance the teams");
+            else if (game["allies"] == "british")
+                self.autobalance_notify settext(&"You were moved to British to balance the teams");
+            else if (game["allies"] == "russian")
+                self.autobalance_notify settext(&"You were moved to Russian to balance the teams");
+        }
+        else
+            self.autobalance_notify settext(&"You were moved to German to balance the teams");
+    }
+    wait 5;
+    if ( (isdefined (self)) && (isdefined (self.autobalance_notify)) )
+        self.autobalance_notify destroy();
+}
+// end

@@ -178,6 +178,9 @@ startGame()
 	level.starttime = getTime();
 	thread startRound();
 
+	if ( (level.teambalance > 0) && (!game["BalanceTeamsNextRound"]) )
+		level thread maps\mp\gametypes\_teams::TeamBalance_Check_Roundbased();
+
 	for(;;)
 	{
 		checkTimeLimit();
@@ -401,6 +404,14 @@ updateScriptCvars()
 		{
 			level.allowvote = allowvote;
 			setcvar("scr_allow_vote", allowvote);
+		}
+
+		teambalance = getCvarInt("scr_teambalance");
+		if (level.teambalance != teambalance)
+		{
+			level.teambalance = getCvarInt("scr_teambalance");
+			if (level.teambalance > 0)
+				level thread maps\mp\gametypes\_teams::TeamBalance_Check_Roundbased();
 		}
 
 		wait 1;

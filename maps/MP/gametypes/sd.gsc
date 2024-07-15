@@ -167,6 +167,9 @@ startGame()
 {
     level.starttime = getTime();
     thread startRound();
+
+    if ( (level.teambalance > 0) && (!game["BalanceTeamsNextRound"]) )
+        level thread maps\mp\gametypes\_teams::TeamBalance_Check_Roundbased();
     
     for(;;)
     {
@@ -197,7 +200,8 @@ startRound()
 
             level.roundstarted = true;
             if(!level.bombplanted)
-                level.clock.color = (1, 1, 1);
+                if(isDefined(level.clock))
+                    level.clock.color = (1, 1, 1);
 
             // Players on a team but without a weapon show as dead since they can not get in this round
             players = getentarray("player", "classname");
@@ -392,6 +396,14 @@ updateScriptCvars()
         {
             level.allowvote = allowvote;
             setcvar("scr_allow_vote", allowvote);
+        }
+
+        teambalance = getCvarInt("scr_teambalance");
+        if (level.teambalance != teambalance)
+        {
+            level.teambalance = getCvarInt("scr_teambalance");
+            if (level.teambalance > 0)
+                level thread maps\mp\gametypes\_teams::TeamBalance_Check_Roundbased();
         }
 
         wait 1;
@@ -620,7 +632,7 @@ bombzone_think(bombzone_other)
                     lpselfnum = other getEntityNumber();
                     logPrint("A;" + lpselfnum + ";" + game["attackers"] + ";" + other.name + ";" + "bomb_plant" + "\n");
                     
-                    announcement(&"SD_EXPLOSIVESPLANTED");
+                    level thread hud_announce(&"SD_EXPLOSIVESPLANTED");
                                         
                     players = getentarray("player", "classname");
                     for(i = 0; i < players.size; i++)
@@ -816,6 +828,31 @@ check_bomb(trigger)
         wait 0.05;
 
     self.defuseicon destroy();
+}
+
+hud_announce(text)
+{
+    level notify("kill_hud_announce");
+    level endon("kill_hud_announce");
+
+    if(!isdefined(level.announce))
+    {
+        level.announce = newHudElem();
+        level.announce.alignX = "center";
+        level.announce.alignY = "middle";
+        level.announce.x = 320;
+        level.announce.y = 90;
+        level.announce.fontScale = 1.4;
+    }	
+    level.announce setText(text);
+
+    wait 4;
+    level.announce fadeOverTime(1);
+
+    wait .9;
+
+    if(isdefined(level.announce))
+        level.announce destroy();	
 }
 
 addBotClients()

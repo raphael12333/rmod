@@ -165,6 +165,21 @@ main()
                 setcvar("scr_roundcam", "0");
         }
 
+        if(gametype == "sd" || gametype == "re" || gametype == "tdm")
+        {
+            if(getCvar("scr_teambalance") == "")		// Auto Team Balancing
+                setCvar("scr_teambalance", "0");
+            level.teambalance = getCvarInt("scr_teambalance");
+            if(gametype == "tdm")
+            {
+                level.teambalancetimer = 0;
+            }
+            else
+            {
+                level.lockteams = false;
+            }
+        }
+
         if(getcvar("scr_drawfriend") == "")		// Draws a team icon over teammates
             setcvar("scr_drawfriend", "0");
         level.drawfriend = getcvarint("scr_drawfriend");
@@ -249,6 +264,9 @@ main()
 
     if(gametype == "sd" || gametype == "re")
     {
+        if (!isdefined (game["BalanceTeamsNextRound"]))
+            game["BalanceTeamsNextRound"] = false;
+
         level.exist["allies"] = 0;
         level.exist["axis"] = 0;
         level.exist["teams"] = false;
@@ -362,14 +380,23 @@ startGameType()
             game["allies"] = getcvar("scr_allies");	
         if(getcvar("scr_axis") != "")
             game["axis"] = getcvar("scr_axis");
-        
-        if(gametype == "bel")
+
+        if(getCvar("g_gametype") != "tdm")
         {
-            game["menu_team"] = "team_germanonly";
-    
-            game["menu_weapon_all"] = "weapon_" + game["allies"] + game["axis"];
-            game["menu_weapon_allies_only"] = "weapon_" + game["allies"];
-            game["menu_weapon_axis_only"] = "weapon_" + game["axis"];
+            if(gametype == "bel")
+            {
+                game["menu_team"] = "team_germanonly";
+        
+                game["menu_weapon_all"] = "weapon_" + game["allies"] + game["axis"];
+                game["menu_weapon_allies_only"] = "weapon_" + game["allies"];
+                game["menu_weapon_axis_only"] = "weapon_" + game["axis"];
+            }
+            else
+            {
+                game["menu_team"] = "team_" + game["allies"] + game["axis"];
+                game["menu_weapon_allies"] = "weapon_bolt";
+                game["menu_weapon_axis"] = "weapon_bolt";
+            }
         }
         else
         {
@@ -377,6 +404,7 @@ startGameType()
             game["menu_weapon_allies"] = "weapon_" + game["allies"];
             game["menu_weapon_axis"] = "weapon_" + game["axis"];
         }
+
         game["menu_viewmap"] = "viewmap";
         game["menu_callvote"] = "callvote";
         game["menu_quickcommands"] = "quickcommands";
@@ -550,11 +578,16 @@ startGameType()
 
         precacheShader("gfx/hud/damage_feedback.dds");
 
-        if(gametype == "sd")
-        {
+        /*
+        1.1 issue: map_rotate to same map from dm to sd = bomb precache error
+        The cause maybe lies in SV_SpawnServer, see cod2rev G_GetSavePersist
+        Always precache these two models for now
+        */
+        /*if(gametype == "sd")
+        {*/
             precacheModel("xmodel/mp_bomb1_defuse");
             precacheModel("xmodel/mp_bomb1");
-        }
+        //}
 
         if(gametype == "dm" || gametype == "tdm")
         {
@@ -625,6 +658,8 @@ startGameType()
         thread maps\mp\gametypes\bel::startGame();
         thread maps\mp\gametypes\bel::updateScriptCvars();            
     }
+
+    mapvote::init();
 }
 
 playerConnect()
@@ -799,6 +834,11 @@ playerConnect()
                         break;
                     }
                 case "autoassign":
+                    if(gametype == "sd" || gametype == "re")
+                    {
+                        if (level.lockteams)
+                            break;
+                    }
                     if(response == "autoassign")
                     {
                         if(gametype == "sd" || gametype == "re" || gametype == "tdm")
@@ -835,6 +875,7 @@ playerConnect()
                                 response = "allies";
                             else
                                 response = "axis";
+                            skipbalancecheck = true;
                         }
                         else if(gametype == "dm")
                         {
@@ -846,6 +887,67 @@ playerConnect()
 
                     if(response == self.pers["team"] && self.sessionstate == "playing")
                         break;
+                    
+                    if(gametype == "sd" || gametype == "re" || gametype == "tdm")
+                    {
+                        //Check if the teams will become unbalanced when the player goes to this team...
+                        //------------------------------------------------------------------------------
+                        if ( (level.teambalance > 0) && (!isdefined (skipbalancecheck)) )
+                        {
+                            //Get a count of all players on Axis and Allies
+                            players = maps\mp\gametypes\_teams::CountPlayers();
+                            
+                            if (self.sessionteam != "spectator")
+                            {
+                                if (((players[response] + 1) - (players[self.pers["team"]] - 1)) > level.teambalance)
+                                {
+                                    if (response == "allies")
+                                    {
+                                        if (game["allies"] == "american")
+                                            self iprintlnbold("Joining American would result in an unbalanced number of players on that team.");
+                                        else if (game["allies"] == "british")
+                                            self iprintlnbold("Joining British would result in an unbalanced number of players on that team.");
+                                        else if (game["allies"] == "russian")
+                                            self iprintlnbold("Joining Russian would result in an unbalanced number of players on that team.");
+                                    }
+                                    else
+                                        self iprintlnbold("Joining German would result in an unbalanced number of players on that team.");
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                if (response == "allies")
+                                    otherteam = "axis";
+                                else
+                                    otherteam = "allies";
+                                if (((players[response] + 1) - players[otherteam]) > level.teambalance)
+                                {
+                                    if (response == "allies")
+                                    {
+                                        if (game["allies"] == "american")
+                                            self iprintlnbold("Joining American would result in an unbalanced number of players on that team. Try joining German.");
+                                        else if (game["allies"] == "british")
+                                            self iprintlnbold("Joining British would result in an unbalanced number of players on that team. Try joining German.");
+                                        else if (game["allies"] == "russian")
+                                            self iprintlnbold("Joining Russian would result in an unbalanced number of players on that team. Try joining German.");
+                                    }
+                                    else
+                                    {
+                                        if (game["allies"] == "american")
+                                            self iprintlnbold("Joining German would result in an unbalanced number of players on that team. Try joining American.");
+                                        else if (game["allies"] == "british")
+                                            self iprintlnbold("Joining German would result in an unbalanced number of players on that team. Try joining British.");
+                                        else if (game["allies"] == "russian")
+                                            self iprintlnbold("Joining German would result in an unbalanced number of players on that team. Try joining Russian.");
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                        skipbalancecheck = undefined;
+                        //------------------------------------------------------------------------------
+                    }
                     
                     if(response != self.pers["team"] && self.sessionstate == "playing")
                         self suicide();
@@ -1262,6 +1364,12 @@ playerConnect()
                     }
                 }
             }
+
+            if(gametype == "sd" || gametype == "re" || gametype == "tdm")
+            {
+                if (isdefined (self.autobalance_notify))
+                    self.autobalance_notify destroy();
+            }
         }
         else if(menu == game["menu_viewmap"])
         {
@@ -1497,7 +1605,7 @@ _finishPlayerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWea
 {
     if(getCvar("g_gametype") != "tdm")
     {
-        if((isBoltWeapon(sWeapon) || isPistol(sWeapon)) || sMeansOfDeath == "MOD_MELEE")
+        if((isBoltActionRifle(sWeapon) || isPistol(sWeapon)) || sMeansOfDeath == "MOD_MELEE")
             iDamage = 100;
     }
 
@@ -1525,7 +1633,7 @@ _finishPlayerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWea
     self finishPlayerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc);
 }
 
-isBoltWeapon(sWeapon)
+isBoltActionRifle(sWeapon)
 {
     switch(sWeapon)
     {
@@ -1642,14 +1750,17 @@ playerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLo
     {
         self.headicon = "";
     }
-    if(gametype == "sd" || gametype == "re")
+    if (!isdefined (self.autobalance))
     {
-        self.pers["deaths"]++;
-        self.deaths = self.pers["deaths"];
-    }
-    else
-    {
-        self.deaths++;        
+        if(gametype == "sd" || gametype == "re")
+        {
+            self.pers["deaths"]++;
+            self.deaths = self.pers["deaths"];
+        }
+        else
+        {
+            self.deaths++;        
+        }
     }
 
     if(gametype == "bel")
@@ -1714,14 +1825,17 @@ playerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLo
             {
                 doKillcam = false;
 
-                if(gametype == "dm" || gametype == "tdm")
+                if (!isdefined (self.autobalance))
                 {
-                    attacker.score--;
-                }
-                else
-                {
-                    attacker.pers["score"]--;
-                    attacker.score = attacker.pers["score"];
+                    if(gametype == "dm" || gametype == "tdm")
+                    {
+                        attacker.score--;
+                    }
+                    else
+                    {
+                        attacker.pers["score"]--;
+                        attacker.score = attacker.pers["score"];
+                    }
                 }
 
                 if(gametype == "sd" || gametype == "re" || gametype == "tdm")
@@ -1896,7 +2010,8 @@ playerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLo
     }
 
     // Make the player drop his weapon
-    self dropItem(self getcurrentweapon());
+    if (!isdefined (self.autobalance))
+        self dropItem(self getcurrentweapon());
 
     if(gametype == "sd" || gametype == "re")
     {
@@ -1930,7 +2045,9 @@ playerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLo
         self maps\mp\gametypes\tdm::dropHealth();
     }
 
-    body = self cloneplayer();
+    if (!isdefined (self.autobalance))
+        body = self cloneplayer();
+    self.autobalance = undefined;
 
     if(gametype == "sd")
     {
@@ -2999,6 +3116,13 @@ endRound(roundwinner, timeexpired)
         game["timeleft"] = level.timelimit - timepassed;
     }
 
+    if ( (level.teambalance > 0) && (game["BalanceTeamsNextRound"]) )
+    {
+        level.lockteams = true;
+        level thread maps\mp\gametypes\_teams::TeamBalance();
+        level waittill ("Teams Balanced");
+        wait 4;
+    }
     map_restart(true);
 }
 
@@ -3133,7 +3257,10 @@ endMap()
         }
     }
 
-    wait 10;
+    wait 5.5;
+
+    mapvote::start();
+    
     exitLevel(false);
 }
 

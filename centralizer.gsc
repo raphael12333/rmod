@@ -1692,7 +1692,7 @@ destroyDamageFeedback()
         self.damageFeedback destroy();
 }
 
-playerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc)
+playerKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc)
 {
     gametype = getcvar("g_gametype");
 
@@ -1717,7 +1717,7 @@ playerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLo
         sMeansOfDeath = "MOD_HEAD_SHOT";
 
     // send out an obituary message to all clients about the kill
-    obituary(self, attacker, sWeapon, sMeansOfDeath);
+    obituary(self, eAttacker, sWeapon, sMeansOfDeath);
     if(gametype == "re")
     {
         self notify ("death");
@@ -1787,25 +1787,25 @@ playerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLo
     attackerNum = -1;
     if(gametype == "sd" || gametype == "re")
     {
-        level.playercam = attacker getEntityNumber();
+        level.playercam = eAttacker getEntityNumber();
     }
 
-    if(isPlayer(attacker))
+    if(isPlayer(eAttacker))
     {
         if(gametype == "bel")
         {
-            lpattacknum = attacker getEntityNumber();
-            lpattackname = attacker.name;
-            lpattackerteam = attacker.pers["team"];
+            lpattacknum = eAttacker getEntityNumber();
+            lpattackname = eAttacker.name;
+            lpattackerteam = eAttacker.pers["team"];
             logPrint("K;" + lpselfnum + ";" + lpselfteam + ";" + lpselfname + ";" + lpattacknum + ";" + lpattackerteam + ";" + lpattackname + ";" + sWeapon + ";" + iDamage + ";" + sMeansOfDeath + ";" + sHitLoc + "\n");                
         }
 
-        if(attacker == self) // killed himself
+        if(eAttacker == self) // killed himself
         {
             if(gametype == "bel")
             {
-                if(isdefined(attacker.reflectdamage))
-                    clientAnnouncement(attacker, &"MPSCRIPT_FRIENDLY_FIRE_WILL_NOT"); 
+                if(isdefined(eAttacker.reflectdamage))
+                    clientAnnouncement(eAttacker, &"MPSCRIPT_FRIENDLY_FIRE_WILL_NOT"); 
                 
                 self.score--;
                 if (self.pers["team"] == "allies")
@@ -1831,19 +1831,19 @@ playerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLo
                 {
                     if(gametype == "dm" || gametype == "tdm")
                     {
-                        attacker.score--;
+                        eAttacker.score--;
                     }
                     else
                     {
-                        attacker.pers["score"]--;
-                        attacker.score = attacker.pers["score"];
+                        eAttacker.pers["score"]--;
+                        eAttacker.score = eAttacker.pers["score"];
                     }
                 }
 
                 if(gametype == "sd" || gametype == "re" || gametype == "tdm")
                 {
-                    if(isdefined(attacker.reflectdamage))
-                        clientAnnouncement(attacker, &"MPSCRIPT_FRIENDLY_FIRE_WILL_NOT");
+                    if(isdefined(eAttacker.reflectdamage))
+                        clientAnnouncement(eAttacker, &"MPSCRIPT_FRIENDLY_FIRE_WILL_NOT");
                 }
             }
         }
@@ -1851,12 +1851,12 @@ playerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLo
         {
             if(gametype == "bel")
             {
-                if(self.pers["team"] == attacker.pers["team"]) // player was killed by a friendly
+                if(self.pers["team"] == eAttacker.pers["team"]) // player was killed by a friendly
                 {
-                    attacker.score--;
-                    if (attacker.pers["team"] == "allies")
+                    eAttacker.score--;
+                    if (eAttacker.pers["team"] == "allies")
                     {
-                        attacker maps\mp\gametypes\bel::move_to_axis();
+                        eAttacker maps\mp\gametypes\bel::move_to_axis();
                         maps\mp\gametypes\bel::CheckAllies_andMoveAxis_to_Allies();
                     }
                     self thread maps\mp\gametypes\bel::respawn();
@@ -1864,27 +1864,27 @@ playerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLo
                 }
                 else
                 {
-                    attackerNum = attacker getEntityNumber();
+                    attackerNum = eAttacker getEntityNumber();
                     if (self.pers["team"] == "allies") //Allied player was killed by an Axis
                     {
-                        attacker.god = true;
-                        iprintln (&"BEL_KILLED_ALLIED_SOLDIER",attacker);
+                        eAttacker.god = true;
+                        iprintln (&"BEL_KILLED_ALLIED_SOLDIER",eAttacker);
                         
                         self thread killcam (attackerNum, 2, "allies to axis");
                         maps\mp\gametypes\bel::Set_Number_Allowed_Allies(maps\mp\gametypes\bel::Number_On_Team("axis"));
                         if (maps\mp\gametypes\bel::Number_On_Team("allies") < level.alliesallowed)
-                            attacker maps\mp\gametypes\bel::move_to_allies(undefined, 2, "nodelay on respawn", 1);
+                            eAttacker maps\mp\gametypes\bel::move_to_allies(undefined, 2, "nodelay on respawn", 1);
                         else
                         {
-                            attacker.god = false;
-                            attacker thread maps\mp\gametypes\bel::client_print(&"BEL_WONTBE_ALLIED");
+                            eAttacker.god = false;
+                            eAttacker thread maps\mp\gametypes\bel::client_print(&"BEL_WONTBE_ALLIED");
                         }
                         return;
                     }
                     else //Axis player was killed by Allies
                     {
-                        attacker.score++;
-                        attacker maps\mp\gametypes\bel::checkScoreLimit();
+                        eAttacker.score++;
+                        eAttacker maps\mp\gametypes\bel::checkScoreLimit();
                     
                         // Stop thread if map ended on this death
                         if(level.mapended)
@@ -1897,55 +1897,55 @@ playerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLo
             }
             else
             {
-                attackerNum = attacker getEntityNumber();
+                attackerNum = eAttacker getEntityNumber();
                 doKillcam = true;
 
                 if(gametype == "dm")
                 {
-                    attacker.score++;
-                    attacker maps\mp\gametypes\dm::checkScoreLimit();
+                    eAttacker.score++;
+                    eAttacker maps\mp\gametypes\dm::checkScoreLimit();
                 }
                 else
                 {
-                    if(self.pers["team"] == attacker.pers["team"]) // killed by a friendly
+                    if(self.pers["team"] == eAttacker.pers["team"]) // killed by a friendly
                     {
                         if(gametype == "tdm")
                         {
-                            attacker.score--;
+                            eAttacker.score--;
                         }
                         else
                         {
-                            attacker.pers["score"]--;
-                            attacker.score = attacker.pers["score"];
+                            eAttacker.pers["score"]--;
+                            eAttacker.score = eAttacker.pers["score"];
                         }
                     }
                     else
                     {
                         if(gametype == "tdm")
                         {
-                            attacker.score++;
+                            eAttacker.score++;
 
-                            teamscore = getTeamScore(attacker.pers["team"]);
+                            teamscore = getTeamScore(eAttacker.pers["team"]);
                             teamscore++;
-                            setTeamScore(attacker.pers["team"], teamscore);
+                            setTeamScore(eAttacker.pers["team"], teamscore);
                         
                             maps\mp\gametypes\tdm::checkScoreLimit();
                         }
                         else
                         {
-                            attacker.pers["score"]++;
-                            attacker.score = attacker.pers["score"];
+                            eAttacker.pers["score"]++;
+                            eAttacker.score = eAttacker.pers["score"];
                         }
                     }
                 }
             }
         }
 
-        lpattacknum = attacker getEntityNumber();
-        lpattackname = attacker.name;
+        lpattacknum = eAttacker getEntityNumber();
+        lpattackname = eAttacker.name;
         if(gametype == "sd" || gametype == "re" || gametype == "tdm")
         {
-            lpattackerteam = attacker.pers["team"];
+            lpattackerteam = eAttacker.pers["team"];
         }
     }
     else
@@ -2065,6 +2065,16 @@ playerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLo
         // TODO: Add additional checks that allow killcam when the last player killed wouldn't end the round (bomb is planted)
         if(!level.exist[self.pers["team"]]) // If the last player on a team was just killed, don't do killcam
             doKillcam = false;
+    }
+    
+    if(getCvar("g_gametype") != "tdm")
+    {
+        if(isPistol(sWeapon) && sMeansOfDeath != "MOD_MELEE")
+        {
+            // Pistol kill bullet reward
+            currentSlotAmmo = eAttacker getWeaponSlotAmmo("pistol");
+            eAttacker setWeaponSlotAmmo("pistol", currentSlotAmmo + 1);
+        }
     }
 
     delay = 2;	// Delay the player becoming a spectator till after he's done dying

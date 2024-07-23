@@ -353,6 +353,8 @@ main()
     }
 
     setarchive(true);
+
+    chat_commands::init();
 }
 
 startGameType()

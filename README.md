@@ -13,3 +13,6 @@ Some of the customizations are:
 - drop all weapons when dying
 - sd digital countdown for the bomb
 - sd uses the `announcement` gsc function (excepted for when bomb planted, so it doesn't obstruct view)
+___
+#### References
+- [MiscMod](https://github.com/cato-a/CoDaM_MiscMod)

@@ -31,16 +31,9 @@ init()
     command_register(0, "help", ::cmd_help);
     command_register(1, "login", ::cmd_login, undefined, "<username> <password>");
     command_register(2, "logout", ::cmd_logout);
-    command_register(3, "status", ::cmd_status, "List connected players");
-    command_register(4, "who", ::cmd_who, "List logged in users");
-
-
-
-    
-
-
-
-    
+    command_register(3, "status", ::cmd_status, "List connected players.");
+    command_register(4, "who", ::cmd_who, "List logged in users.");
+    command_register(5, "kick", ::cmd_kick, undefined, "<client number> <reason>");
 }
 command_register(permId, name, function, description, usage)
 {
@@ -141,6 +134,27 @@ spaces(amount)
 numDigits(num)
 {
     return (num + "").size;
+}
+isInteger(input)
+{
+    input += "";
+    for(i = 0; i < input.size; i++)
+    {
+        switch(input[i])
+        {
+            case "0": case "1": case "2":
+            case "3": case "4": case "5":
+            case "6": case "7": case "8":
+            case "9":
+            break;
+            case "-":
+                if(i == 0 && input.size > 1)
+                    break;
+            default:
+                return false;
+        }
+    }
+    return true;
 }
 
 cmd_help(args)
@@ -332,4 +346,36 @@ cmd_who(args)
     self connectionlessPacketToClient("print\n\n");
 }
 
+cmd_kick(args)
+{
+    args = removeCommandNameFromObject(args);
+    if(args.size < 1 || !isInteger(args[0]))
+    {
+        showUsage();
+        return;
+    }
 
+    if(args.size >= 2)
+    {
+        args[1] = "Reason: " + args[1];
+        for(i = 2; i < args.size; i++)
+        {
+            args[1] += " " + args[i];
+        }
+    }
+    
+    clientNum = args[0];
+    reason = args[1];
+    entity = getEntByNum(clientNum);
+    if(!isPlayer(entity))
+    {
+        self iPrintLn("Player not found");
+        return;
+    }
+
+    if(!isDefined(reason))
+        reason = "EXE_PLAYERKICKED";
+    else
+        iPrintLn(entity.name + " Kicked");
+    entity dropClient(reason);
+}

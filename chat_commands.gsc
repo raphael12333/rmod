@@ -31,10 +31,9 @@ init()
     command_register(0, "help", ::cmd_help);
     command_register(1, "login", ::cmd_login, undefined, "<username> <password>");
     command_register(2, "logout", ::cmd_logout);
+    command_register(3, "status", ::cmd_status, "List connected players");
+    
 
-    /*command_register(3, "test", ::cmd_test);
-    command_register(4, "dummy1111111", ::cmd_dummy, "Do dummy ok.");
-    command_register(5, "dummy2", ::cmd_dummy, "Do dummy ok.", "<none>");*/
 
 
     
@@ -117,25 +116,16 @@ removeCommandNameFromObject(object)
     return object;
 }
 
-/*
-message_player(message)
-{
-    sendCommandToClient(self getEntityNumber(), "i \"" + message + "\"");
-}*/
 showUsage()
 {
     usage = level.chatCommands[self.lastChatCmd]["usage"];
     if(isDefined(usage))
         self iPrintLn("usage: " + level.chatCommand_prefix + self.lastChatCmd + " " + usage);
 }
-
-/*
-cmd_dummy(args)
+informOutputLocation()
 {
+    self iPrintLn("See output in console");    
 }
-cmd_test(args)
-{
-}*/
 
 spaces(amount)
 {
@@ -144,9 +134,14 @@ spaces(amount)
         spaces += " ";
     return spaces;
 }
+numDigits(num)
+{
+    return (num + "").size;
+}
+
 cmd_help(args)
 {
-    self iPrintLn("See output in console");
+    informOutputLocation();
     wait .05;
     self connectionlessPacketToClient("print\n\n" + "Available commands:" + "\n\n");
     for(i = 0; i < level.chatCommands_help.size; i++)
@@ -157,7 +152,6 @@ cmd_help(args)
         if(userHasPermission(self, level.chatCommands[commandName]["permId"]))
         {
             message_line = "-" + commandName;
-            message_line_end = "\n";
             description = level.chatCommands[commandName]["description"];
             usage = level.chatCommands[commandName]["usage"];
             if(isDefined(description) || isDefined(usage))
@@ -173,11 +167,10 @@ cmd_help(args)
                     message_line += " ";
                 message_line += "Usage: " + level.chatCommand_prefix + commandName + " " + usage;
             }
-            if(i == level.chatCommands_help.size - 1)
-                message_line_end += "\n";
-            self connectionlessPacketToClient("print\n" + message_line + message_line_end);
+            self connectionlessPacketToClient("print\n" + message_line + "\n");
         }
     }
+    self connectionlessPacketToClient("print\n\n");
 }
 
 cmd_login(args)
@@ -226,7 +219,55 @@ cmd_logout(args)
     }
 }
 
+cmd_status(args)
+{
+    informOutputLocation();
+    wait .05;
+    self connectionlessPacketToClient("print\n\n" + "Connected players:" + "\n\n");
+    self connectionlessPacketToClient("print\n" + "num score ping name" + "\n");
+    self connectionlessPacketToClient("print\n" + "--- ----- ---- ---------------" + "\n");
 
+    maxClients = getCvarInt("sv_maxclients");
+    for(i = 0; i < maxclients; i++)
+    {
+        player = getEntByNum(i);
+        if(isDefined(player))
+        {
+            message_line = "";
 
+            playerEntityNumber = player getEntityNumber();
+            playerEntityNumber_numDigits = numDigits(playerEntityNumber);
+            padding = 3 - playerEntityNumber_numDigits;
+            for(j = 0; j < padding; j++)
+            {
+                message_line += " ";
+            }
+            message_line += playerEntityNumber;
+            message_line += " ";
 
+            playerScore_numDigits = numDigits(player.score);
+            padding = 5 - playerScore_numDigits;
+            for(j = 0; j < padding; j++)
+            {
+                message_line += " ";
+            }
+            message_line += player.score;
+            message_line += " ";
 
+            playerPing = player getPing();
+            playerPing_numDigits = numDigits(playerPing);
+            padding = 4 - playerPing_numDigits;
+            for(j = 0; j < padding; j++)
+            {
+                message_line += " ";
+            }
+            message_line += playerPing;
+            message_line += " ";
+
+            message_line += player.name;
+            
+            self connectionlessPacketToClient("print\n" + message_line + "\n");
+        }
+    }
+    self connectionlessPacketToClient("print\n\n");
+}

@@ -28,16 +28,18 @@ init()
         }
     }
 
-    command_register(0, "help",     ::cmd_help);
-    command_register(1, "login",    ::cmd_login,    undefined,                      "<username> <password>");
-    command_register(2, "logout",   ::cmd_logout);
-    command_register(3, "status",   ::cmd_status,   "List connected players.");
-    command_register(4, "who",      ::cmd_who,      "List logged in users.");
-    command_register(5, "kick",     ::cmd_kick,     undefined,                      "<client number> [reason]");
-    command_register(6, "ban",      ::cmd_ban,      undefined,                      "(-i <IP address> | -n <client number>) [-r reason] [-d duration]");
-    command_register(7, "unban",    ::cmd_unban,    undefined,                      "-i <IP address>");
-    command_register(8, "pm",       ::cmd_pm,       undefined,                      "<client number> <message>");
-    command_register(9, "re",       ::cmd_re,       "Reply to PM",                  "<message>");
+    command_register(0,     "help",     ::cmd_help);
+    command_register(1,     "login",    ::cmd_login,    undefined,                      "<username> <password>");
+    command_register(2,     "logout",   ::cmd_logout);
+    command_register(3,     "status",   ::cmd_status,   "List connected players.");
+    command_register(4,     "who",      ::cmd_who,      "List logged in users.");
+    command_register(5,     "kick",     ::cmd_kick,     undefined,                      "<client number> [reason]");
+    command_register(6,     "ban",      ::cmd_ban,      undefined,                      "(-i <IP address> | -n <client number>) [-r reason] [-d duration]");
+    command_register(7,     "unban",    ::cmd_unban,    undefined,                      "-i <IP address>");
+    command_register(8,     "pm",       ::cmd_pm,       undefined,                      "<client number> <message>");
+    command_register(9,     "re",       ::cmd_re,       "Reply to PM",                  "<message>");
+    command_register(10,    "movespec", ::cmd_movespec, "Move a player to spectator",   "<client number>");
+
 }
 command_register(permId, name, function, description, usage)
 {
@@ -466,4 +468,25 @@ cmd_re(args)
 
     message_player(self, "PM ^1>>^7 " + entity.name + "^7: " + message);
     message_player(entity, "PM ^2<<^7 " + self.name + "^7: " + message);
+}
+
+cmd_movespec(args)
+{
+    if (args.size < 2 || !isInteger(args[1]))
+    {
+        showUsage(args[0]);
+        return;
+    }
+
+    clientNum = args[1];
+    entity = getEntByNum(clientNum);
+    if (!isPlayer(entity))
+    {
+        self iPrintLn("Player not found");
+        return;
+    }
+    entity.pers["team"] = "spectator";
+    entity.sessionteam = "spectator";
+    entity centralizer::spawnSpectator();
+    iPrintLn(entity.name + " ^7moved to spectator");
 }

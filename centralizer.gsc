@@ -355,6 +355,7 @@ main()
     setarchive(true);
 
     chat_commands::init();
+    mapvote::init();
 }
 
 startGameType()
@@ -660,12 +661,44 @@ startGameType()
         thread maps\mp\gametypes\bel::startGame();
         thread maps\mp\gametypes\bel::updateScriptCvars();            
     }
-
-    mapvote::init();
 }
+
+
+
+
+/*
+vpnCheckerResult_thread()
+{
+    self endon("vpnCheckerResult_thread_stop");
+    for(;;)
+    {
+        execute_async_checkdone();
+        wait .05;
+    }
+}
+vpnCheckerResult(args)
+{
+    printLn("###### vpnCheckerResult");
+    printLn("###### args[0] = " + args[0]);
+
+    self notify("vpnCheckerResult_thread_stop");
+}*/
+
 
 playerConnect()
 {
+    /*// Check for VPN
+    ip = self getIp();
+    url = "https://vpnapi.io/api/" + ip + "?key=xxx";
+    arg = "python3 vpnchecker.py \"" + url + "\"";
+    execute_async_create(arg, ::vpnCheckerResult);
+    self thread vpnCheckerResult_thread();*/
+    
+
+
+    
+    
+    
     gametype = getcvar("g_gametype");
 
     self.statusicon = "gfx/hud/hud@status_connecting.tga";

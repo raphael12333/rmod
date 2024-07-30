@@ -8,22 +8,22 @@ init()
     level.groups = [];
     level.users = [];
     level.perms = [];
-    if(getCvar("scr_chatcommands_groups") != "")
+    if (getCvar("chatcommands_groups") != "")
     {
-        strTok_param1 = getCvar("scr_chatcommands_groups");
+        strTok_param1 = getCvar("chatcommands_groups");
         level.groups = strTok(strTok_param1, ";");
     }
-    for(i = 0; i < level.groups.size; i++)
+    for (i = 0; i < level.groups.size; i++)
     {
-        if(getCvar("scr_chatcommands_users_" + level.groups[i]) != "")
+        if (getCvar("chatcommands_users_" + level.groups[i]) != "")
         {
-            strTok_param1 = getCvar("scr_chatcommands_users_" + level.groups[i]);
+            strTok_param1 = getCvar("chatcommands_users_" + level.groups[i]);
             level.users[level.groups[i]] = strTok(strTok_param1, " ");
         }
         
-        if(getCvar("scr_chatcommands_perms_" + level.groups[i]) != "")
+        if (getCvar("chatcommands_perms_" + level.groups[i]) != "")
         {
-            strTok_param1 = getCvar("scr_chatcommands_perms_" + level.groups[i]);
+            strTok_param1 = getCvar("chatcommands_perms_" + level.groups[i]);
             level.perms[level.groups[i]] = strTok(strTok_param1, ":");
         }
     }
@@ -33,7 +33,9 @@ init()
     command_register(2, "logout", ::cmd_logout);
     command_register(3, "status", ::cmd_status, "List connected players.");
     command_register(4, "who", ::cmd_who, "List logged in users.");
-    command_register(5, "kick", ::cmd_kick, undefined, "<client number> <reason>");
+    command_register(5, "kick", ::cmd_kick, undefined, "<client number> [reason]");
+    command_register(6, "ban", ::cmd_ban, undefined, "(-i <IP address> | -n <client number>) [-r reason] [-d duration]");
+    command_register(7, "unban", ::cmd_unban, undefined, "-i <IP address>");
 }
 command_register(permId, name, function, description, usage)
 {
@@ -45,21 +47,18 @@ command_register(permId, name, function, description, usage)
 }
 command_call(command_object)
 {
-    if(isDefined(level.chatCommands[command_object[0]]))
+    if (isDefined(level.chatCommands[command_object[0]]))
     {
         permId = level.chatCommands[command_object[0]]["permId"];
-        if(!userHasPermission(self, permId))
+        if (!userHasPermission(self, permId))
         {
             self iPrintLn("Access denied");
             return;
         }
-        self.lastChatCmd = command_object[0];
         self thread [[level.chatCommands[command_object[0]]["function"]]](command_object);
     }
     else
-    {
         self iPrintLn("Unknown chat command " + command_object[0]);
-    }
 }
 
 userHasPermission(user, permId)
@@ -68,7 +67,7 @@ userHasPermission(user, permId)
     if(!isDefined(groupName))
         groupName = "default";
     permsList = level.perms[groupName];
-    if(groupName != "default")
+    if (groupName != "default")
     {
         // Include default permissions for logged in user
         mergedArray = level.perms["default"];
@@ -80,7 +79,7 @@ userHasPermission(user, permId)
     if(!isDefined(permsList))
         return false;
 
-    for(i = 0; i < permsList.size; i++)
+    for (i = 0; i < permsList.size; i++)
     {
         if(permsList[i] == "*")
             return true;
@@ -89,7 +88,7 @@ userHasPermission(user, permId)
         else
         {
             range = strTok(permsList[i], "-");
-            if(range.size == 2)
+            if (range.size == 2)
             {
                 hi = (int)range[1];
                 lo = (int)range[0];
@@ -103,25 +102,15 @@ userHasPermission(user, permId)
     return false;
 }
 
-removeCommandNameFromObject(object)
+showUsage(commandName)
 {
-    for(i = 1; i < object.size; i++)
-    {
-        object[i-1] = object[i];
-    }
-    object[object.size - 1] = undefined;
-    return object;
-}
-
-showUsage()
-{
-    usage = level.chatCommands[self.lastChatCmd]["usage"];
+    usage = level.chatCommands[commandName]["usage"];
     if(isDefined(usage))
-        self iPrintLn("usage: " + level.chatCommand_prefix + self.lastChatCmd + " " + usage);
+        self iPrintLn("Usage: " + level.chatCommand_prefix + commandName + " " + usage);
 }
 informOutputLocation()
 {
-    self iPrintLn("See output in console");    
+    self iPrintLn("See output in console");
 }
 
 spaces(amount)
@@ -138,9 +127,9 @@ numDigits(num)
 isInteger(input)
 {
     input += "";
-    for(i = 0; i < input.size; i++)
+    for (i = 0; i < input.size; i++)
     {
-        switch(input[i])
+        switch (input[i])
         {
             case "0": case "1": case "2":
             case "3": case "4": case "5":
@@ -161,27 +150,27 @@ cmd_help(args)
 {
     informOutputLocation();
     wait .05;
-    self connectionlessPacketToClient("print\n\n" + "Send \"" + level.chatCommand_prefix + "\" + <command>" + "\n");
+    self connectionlessPacketToClient("print\n\n" + "Send \"" + level.chatCommand_prefix + "\" + command" + "\n");
     self connectionlessPacketToClient("print\n" + "E.g.: " + level.chatCommand_prefix + "status" + "\n");
     self connectionlessPacketToClient("print\n\n" + "Available commands:" + "\n\n");
-    for(i = 0; i < level.chatCommands_help.size; i++)
+    for (i = 0; i < level.chatCommands_help.size; i++)
     {
         commandName = level.chatCommands_help[i]["name"];
         if(commandName == "help")
             continue;
-        if(userHasPermission(self, level.chatCommands[commandName]["permId"]))
+        if (userHasPermission(self, level.chatCommands[commandName]["permId"]))
         {
             message_line = "-" + commandName;
             description = level.chatCommands[commandName]["description"];
             usage = level.chatCommands[commandName]["usage"];
-            if(isDefined(description) || isDefined(usage))
+            if (isDefined(description) || isDefined(usage))
             {
                 spc = spaces(15 - commandName.size);
                 message_line += spc;
             }
             if(isDefined(description))
                 message_line += description;
-            if(isDefined(usage))
+            if (isDefined(usage))
             {
                 if(isDefined(description))
                     message_line += " ";
@@ -195,27 +184,26 @@ cmd_help(args)
 
 cmd_login(args)
 {
-    args = removeCommandNameFromObject(args);
-    if(args.size != 2)
+    if (args.size != 3)
     {
-        showUsage();
+        showUsage(args[0]);
         return;
     }
 
-    input_username = args[0];
-    input_password = args[1];
-    for(i = 0; i < level.groups.size; i++)
+    input_username = args[1];
+    input_password = args[2];
+    for (i = 0; i < level.groups.size; i++)
     {
         group = level.groups[i];
         users = level.users[group];
-        if(isDefined(users))
+        if (isDefined(users))
         {
-            for(u = 0; u < users.size; u++)
+            for (j = 0; j < users.size; j++)
             {
-                user = strTok(users[u], ":");
-                if(user.size == 2)
+                user = strTok(users[j], ":");
+                if (user.size == 2)
                 {
-                    if(user[0] == input_username && user[1] == input_password)
+                    if (user[0] == input_username && user[1] == input_password)
                     {
                         self.pers["chatcommands_group"] = group;
                         self.pers["chatcommands_user"] = user[0];
@@ -231,7 +219,7 @@ cmd_login(args)
 }
 cmd_logout(args)
 {
-    if(isDefined(self.pers["chatcommands_group"]))
+    if (isDefined(self.pers["chatcommands_group"]))
     {
         self.pers["chatcommands_group"] = undefined;
         self.pers["chatcommands_user"] = undefined;
@@ -248,10 +236,10 @@ cmd_status(args)
     self connectionlessPacketToClient("print\n" + "--- ----- ---- ---------------" + "\n");
 
     maxClients = getCvarInt("sv_maxclients");
-    for(i = 0; i < maxclients; i++)
+    for (i = 0; i < maxclients; i++)
     {
         player = getEntByNum(i);
-        if(isDefined(player))
+        if (isDefined(player))
         {
             message_line = "";
 
@@ -259,18 +247,14 @@ cmd_status(args)
             numDigits = numDigits(playerEntityNumber);
             padding = 3 - numDigits;
             for(j = 0; j < padding; j++)
-            {
                 message_line += " ";
-            }
             message_line += playerEntityNumber;
             message_line += " ";
 
             numDigits = numDigits(player.score);
             padding = 5 - numDigits;
             for(j = 0; j < padding; j++)
-            {
                 message_line += " ";
-            }
             message_line += player.score;
             message_line += " ";
 
@@ -278,9 +262,7 @@ cmd_status(args)
             numDigits = numDigits(playerPing);
             padding = 4 - numDigits;
             for(j = 0; j < padding; j++)
-            {
                 message_line += " ";
-            }
             message_line += playerPing;
             message_line += " ";
 
@@ -300,12 +282,12 @@ cmd_who(args)
     self connectionlessPacketToClient("print\n" + "--- ------------- -------------- -------------------" + "\n");
 
     maxClients = getCvarInt("sv_maxclients");
-    for(i = 0; i < maxclients; i++)
+    for (i = 0; i < maxclients; i++)
     {
         player = getEntByNum(i);
-        if(isDefined(player))
+        if (isDefined(player))
         {
-            if(isDefined(player.pers["chatcommands_group"]))
+            if (isDefined(player.pers["chatcommands_group"]))
             {
                 message_line = "";
 
@@ -313,9 +295,7 @@ cmd_who(args)
                 numDigits = numDigits(playerEntityNumber);
                 padding = 3 - numDigits;
                 for(j = 0; j < padding; j++)
-                {
                     message_line += " ";
-                }
                 message_line += playerEntityNumber;
                 message_line += " ";
                 
@@ -323,18 +303,14 @@ cmd_who(args)
                 numChargs = player.pers["chatcommands_group"].size;
                 padding = 13 - numChargs;
                 for(j = 0; j < padding; j++)
-                {
                     message_line += " ";
-                }
                 message_line += " ";
 
                 message_line += player.pers["chatcommands_user"];
                 numChargs = player.pers["chatcommands_user"].size;
                 padding = 14 - numChargs;
                 for(j = 0; j < padding; j++)
-                {
                     message_line += " ";
-                }
                 message_line += " ";
                 
                 message_line += player.name;
@@ -348,26 +324,26 @@ cmd_who(args)
 
 cmd_kick(args)
 {
-    args = removeCommandNameFromObject(args);
-    if(args.size < 1 || !isInteger(args[0]))
+    if (args.size < 2 || !isInteger(args[1]))
     {
-        showUsage();
+        showUsage(args[0]);
         return;
     }
-
-    if(args.size >= 2)
+    
+    if (args.size >= 3)
     {
-        args[1] = "Reason: " + args[1];
-        for(i = 2; i < args.size; i++)
+        args[2] = "Kick reason: " + args[2];
+        for (i = 3; i < args.size; i++)
         {
-            args[1] += " " + args[i];
+            // Reason contains multiple words
+            args[2] += " " + args[i];
         }
     }
     
-    clientNum = args[0];
-    reason = args[1];
+    clientNum = args[1];
+    reason = args[2];
     entity = getEntByNum(clientNum);
-    if(!isPlayer(entity))
+    if (!isPlayer(entity))
     {
         self iPrintLn("Player not found");
         return;
@@ -375,7 +351,46 @@ cmd_kick(args)
 
     if(!isDefined(reason))
         reason = "EXE_PLAYERKICKED";
-    else
-        iPrintLn(entity.name + " Kicked");
     entity dropClient(reason);
+}
+cmd_ban(args)
+{
+    if (args.size < 3)
+    {
+        showUsage(args[0]);
+        self iPrintLn("Notes: Use \"h\" for hours or \"d\" for days\n");
+        return;
+    }
+
+    arg = "";
+
+    adminNum = self getEntityNumber();
+    param_adminNum = "-a " + adminNum;
+
+    arg += param_adminNum;
+    
+    for(i = 1; i < args.size; i++)
+        arg += " " + args[i];
+        
+    ban(arg);
+}
+cmd_unban(args)
+{
+    if (args.size < 3)
+    {
+        showUsage(args[0]);
+        return;
+    }
+
+    arg = "";
+
+    adminNum = self getEntityNumber();
+    param_adminNum = "-a " + adminNum;
+
+    arg += param_adminNum;
+    
+    for(i = 1; i < args.size; i++)
+        arg += " " + args[i];
+        
+    unban(arg);
 }

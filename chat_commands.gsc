@@ -28,14 +28,16 @@ init()
         }
     }
 
-    command_register(0, "help", ::cmd_help);
-    command_register(1, "login", ::cmd_login, undefined, "<username> <password>");
-    command_register(2, "logout", ::cmd_logout);
-    command_register(3, "status", ::cmd_status, "List connected players.");
-    command_register(4, "who", ::cmd_who, "List logged in users.");
-    command_register(5, "kick", ::cmd_kick, undefined, "<client number> [reason]");
-    command_register(6, "ban", ::cmd_ban, undefined, "(-i <IP address> | -n <client number>) [-r reason] [-d duration]");
-    command_register(7, "unban", ::cmd_unban, undefined, "-i <IP address>");
+    command_register(0, "help",     ::cmd_help);
+    command_register(1, "login",    ::cmd_login,    undefined,                      "<username> <password>");
+    command_register(2, "logout",   ::cmd_logout);
+    command_register(3, "status",   ::cmd_status,   "List connected players.");
+    command_register(4, "who",      ::cmd_who,      "List logged in users.");
+    command_register(5, "kick",     ::cmd_kick,     undefined,                      "<client number> [reason]");
+    command_register(6, "ban",      ::cmd_ban,      undefined,                      "(-i <IP address> | -n <client number>) [-r reason] [-d duration]");
+    command_register(7, "unban",    ::cmd_unban,    undefined,                      "-i <IP address>");
+    command_register(8, "pm",       ::cmd_pm,       undefined,                      "<client number> <message>");
+    command_register(9, "re",       ::cmd_re,       "Reply to PM",                  "<message>");
 }
 command_register(permId, name, function, description, usage)
 {
@@ -111,6 +113,10 @@ showUsage(commandName)
 informOutputLocation()
 {
     self iPrintLn("See output in console");
+}
+message_player(player, message)
+{
+    sendCommandToClient(player getEntityNumber(), "i \"" + message + "\"");
 }
 
 spaces(amount)
@@ -393,4 +399,71 @@ cmd_unban(args)
         arg += " " + args[i];
         
     unban(arg);
+}
+
+cmd_pm(args)
+{
+    if (args.size < 3 || !isInteger(args[1]))
+    {
+        showUsage(args[0]);
+        return;
+    }
+
+    clientNum = args[1];
+    entity = getEntByNum(clientNum);
+    if (!isPlayer(entity))
+    {
+        self iPrintLn("Player not found");
+        return;
+    }
+    
+    message = args[2];
+    if (args.size > 3)
+    {
+        for (i = 3; i < args.size; i++)
+        {
+            // Message contains multiple words
+            message += " " + args[i];
+        }
+    }
+    
+    message_player(self, "PM ^1>>^7 " + entity.name + "^7: " + message);
+    message_player(entity, "PM ^2<<^7 " + self.name + "^7: " + message);
+
+    self.pers["pm"] = clientNum;
+    entity.pers["pm"] = self getEntityNumber();
+}
+cmd_re(args)
+{
+    if (!isDefined(self.pers["pm"]))
+    {
+        self iPrintLn("No stored recipient");
+        return;
+    }
+
+    entity = getEntByNum(self.pers["pm"]);
+    if (!isPlayer(entity))
+    {
+        self iPrintLn("Player with num " + self.pers["pm"] + " not found");
+        return;
+    }
+
+    if (args.size == 1)
+    {
+        self iPrintLn("Recipient = " + entity.name);
+        return;
+    }
+
+    message = args[1];
+    if (args.size > 2)
+    {
+        for (i = 2; i < args.size; i++)
+        {
+            // Message contains multiple words
+            message += " " + args[i];
+        }
+    }
+
+    message_player(self, "PM ^1>>^7 " + entity.name + "^7: " + message);
+    message_player(entity, "PM ^2<<^7 " + self.name + "^7: " + message);
 }

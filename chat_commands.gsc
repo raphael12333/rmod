@@ -37,9 +37,9 @@ init()
     command_register(6,     "ban",      ::cmd_ban,      undefined,                      "(-i <IP address> | -n <client number>) [-r reason] [-d duration]");
     command_register(7,     "unban",    ::cmd_unban,    undefined,                      "-i <IP address>");
     command_register(8,     "pm",       ::cmd_pm,       undefined,                      "<client number> <message>");
-    command_register(9,     "re",       ::cmd_re,       "Reply to PM",                  "<message>");
-    command_register(10,    "movespec", ::cmd_movespec, "Move a player to spectator",   "<client number>");
-
+    command_register(9,     "re",       ::cmd_re,       "Reply to PM.",                  "<message>");
+    command_register(10,    "movespec", ::cmd_movespec, "Move a player to spectator.",   "<client number>");
+    command_register(11,    "endmatch", ::cmd_endmatch);
 }
 command_register(permId, name, function, description, usage)
 {
@@ -158,7 +158,7 @@ cmd_help(args)
 {
     informOutputLocation();
     wait .05;
-    self connectionlessPacketToClient("print\n\n" + "Send \"" + level.chatCommand_prefix + "\" + command" + "\n");
+    self connectionlessPacketToClient("print\n\n" + "To use chat commands, send \"" + level.chatCommand_prefix + "\" + command" + "\n");
     self connectionlessPacketToClient("print\n" + "E.g.: " + level.chatCommand_prefix + "status" + "\n");
     self connectionlessPacketToClient("print\n\n" + "Available commands:" + "\n\n");
     for (i = 0; i < level.chatCommands_help.size; i++)
@@ -489,4 +489,13 @@ cmd_movespec(args)
     entity.sessionteam = "spectator";
     entity centralizer::spawnSpectator();
     iPrintLn(entity.name + " ^7moved to spectator");
+}
+
+cmd_endmatch(args)
+{
+    announcement("Manually ending match");
+    wait 2;
+    for(i = 0; i < 5; i++)
+        announcement(" "); // Clear the iPrintLnBold earlier
+    centralizer::endMap();
 }

@@ -25,13 +25,9 @@ init()
 
 start()
 {
-    prepareMaps();
-
-    if(level.mapvote_currentchoices < level.mapvote_minchoices)
+    if (!prepareMaps())
         return;
-    if(level.mapvote_list.size == 0)
-        return;
-
+    
     setupHud();
     thread runMapVote();
 
@@ -45,8 +41,11 @@ prepareMaps()
     level.mapvote_list[0] = "Random";
 
     mapRotation = getCvar("sv_mapRotation");
-    if(mapRotation == "")
-        return;
+    if (mapRotation == "")
+    {
+        printLn("mapvote: sv_mapRotation cvar is empty");
+        return false;
+    }
     mapRotation = strTok(mapRotation, " ");
 
     _tmp = [];
@@ -71,8 +70,8 @@ prepareMaps()
             break;
 
             default:
-                printLn("####### prepareMaps() error");
-                i += 1;
+                printLn("mapvote: error in sv_mapRotation");
+                return false;
             break;
         }
     }
@@ -115,6 +114,7 @@ prepareMaps()
         level.mapvote_currentchoices++;
     }
     level.mapvote_list[level.mapvote_list.size] = "Replay";
+    return true;
 }
 
 setupHud()

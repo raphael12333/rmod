@@ -830,6 +830,12 @@ playerConnect()
         spawnSpectator();
     }
 
+    if (isDefined(self.pers["fov"]))
+    {
+        self setClientCvar("cg_fov", self.pers["fov"]);
+        return;
+    }
+
     for(;;)
     {
         self waittill("menuresponse", menu, response);
@@ -3306,7 +3312,7 @@ endMap()
 
     mapvote::start();
     
-    exitLevel(false);
+    exitLevel(false); // TODO: add a fix in libcod1 to make exitLevel(true) working
 }
 
 checkScoreLimit()

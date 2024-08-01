@@ -29,17 +29,18 @@ init()
     }
 
     command_register(0,     "help",     ::cmd_help);
-    command_register(1,     "login",    ::cmd_login,    undefined,                      "<username> <password>");
+    command_register(1,     "login",    ::cmd_login,        undefined,                      "<username> <password>");
     command_register(2,     "logout",   ::cmd_logout);
-    command_register(3,     "status",   ::cmd_status,   "List connected players.");
-    command_register(4,     "who",      ::cmd_who,      "List logged in users.");
-    command_register(5,     "kick",     ::cmd_kick,     undefined,                      "<client number> [reason]");
-    command_register(6,     "ban",      ::cmd_ban,      undefined,                      "(-i <IP address> | -n <client number>) [-r reason] [-d duration]");
-    command_register(7,     "unban",    ::cmd_unban,    undefined,                      "-i <IP address>");
-    command_register(8,     "pm",       ::cmd_pm,       undefined,                      "<client number> <message>");
-    command_register(9,     "re",       ::cmd_re,       "Reply to PM.",                  "<message>");
-    command_register(10,    "movespec", ::cmd_movespec, "Move a player to spectator.",   "<client number>");
+    command_register(3,     "status",   ::cmd_status,       "List connected players.");
+    command_register(4,     "who",      ::cmd_who,          "List logged in users.");
+    command_register(5,     "kick",     ::cmd_kick,         undefined,                      "<client number> [reason]");
+    command_register(6,     "ban",      ::cmd_ban,          undefined,                      "(-i <IP address> | -n <client number>) [-r reason] [-d duration]");
+    command_register(7,     "unban",    ::cmd_unban,        undefined,                      "-i <IP address>");
+    command_register(8,     "pm",       ::cmd_pm,           undefined,                      "<client number> <message>");
+    command_register(9,     "re",       ::cmd_re,           "Reply to PM.",                 "<message>");
+    command_register(10,    "movespec", ::cmd_movespec,     "Move a player to spectator.",  "<client number>");
     command_register(11,    "endmatch", ::cmd_endmatch);
+    command_register(12,    "fov",      ::cmd_fov,          "Change field of view.",        "<value number>");
 }
 command_register(permId, name, function, description, usage)
 {
@@ -493,9 +494,32 @@ cmd_movespec(args)
 
 cmd_endmatch(args)
 {
-    announcement("Manually ending match");
+    announcement("Manually ending match"); // TODO: Use a hudelem instead
     wait 2;
     for(i = 0; i < 5; i++)
         announcement(" "); // Clear the iPrintLnBold earlier
     centralizer::endMap();
+}
+
+cmd_fov(args)
+{
+    if (args.size < 2 || !isInteger(args[1]))
+    {
+        showUsage(args[0]);
+        return;
+    }
+
+    value = args[1];
+    valueMin = 80;
+    valueMax = 95;
+    if ((int)value < valueMin || (int)value > valueMax)
+    {
+        self iPrintLn("Value must be between " + valueMin + " and " + valueMax);
+        return;
+    }
+
+    self setClientCvar("cg_fov", value);
+    self.pers["fov"] = value;
+
+    self iPrintLn("FOV changed to " + value);
 }

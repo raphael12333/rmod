@@ -9,11 +9,9 @@ Some of the customizations are:
 - all bolt-action rifles menu (excepted for tdm and bel)
 - 1sk for bolt-action rifles, pistols and melee (excepted for tdm)
 - only 1 bullet in pistol and 1 grenade (excepted for tdm)
-- autobalance
+- autobalance (based on the 1.5 game version)
 - drop all weapons when dying
 - sd digital countdown for the bomb
 - sd uses the `announcement` gsc function (excepted for when bomb planted, so it doesn't obstruct view)
 - pistol 1sk kill bullet reward
-___
-#### References
-- [MiscMod](https://github.com/cato-a/CoDaM_MiscMod)
+- chat commands system (based on [MiscMod](https://github.com/cato-a/CoDaM_MiscMod))

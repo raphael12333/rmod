@@ -20,6 +20,9 @@ CodeCallback_PlayerCommand(command_object)
         }
         command_object[0] = index0;
 
+        if(command_object.size == 1 && command_object[0] == "")
+            return;
+
         // Check if arguments were passed in a single string
         if(command_object.size == 1)
         {

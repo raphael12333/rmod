@@ -8,22 +8,22 @@ init()
     level.groups = [];
     level.users = [];
     level.perms = [];
-    if (getCvar("chatcommands_groups") != "")
+    if (getCvar("scr_chatcommands_groups") != "")
     {
-        strTok_param1 = getCvar("chatcommands_groups");
+        strTok_param1 = getCvar("scr_chatcommands_groups");
         level.groups = strTok(strTok_param1, ";");
     }
     for (i = 0; i < level.groups.size; i++)
     {
-        if (getCvar("chatcommands_users_" + level.groups[i]) != "")
+        if (getCvar("scr_chatcommands_users_" + level.groups[i]) != "")
         {
-            strTok_param1 = getCvar("chatcommands_users_" + level.groups[i]);
+            strTok_param1 = getCvar("scr_chatcommands_users_" + level.groups[i]);
             level.users[level.groups[i]] = strTok(strTok_param1, " ");
         }
         
-        if (getCvar("chatcommands_perms_" + level.groups[i]) != "")
+        if (getCvar("scr_chatcommands_perms_" + level.groups[i]) != "")
         {
-            strTok_param1 = getCvar("chatcommands_perms_" + level.groups[i]);
+            strTok_param1 = getCvar("scr_chatcommands_perms_" + level.groups[i]);
             level.perms[level.groups[i]] = strTok(strTok_param1, ":");
         }
     }
@@ -39,8 +39,16 @@ init()
     command_register(8,     "pm",       ::cmd_pm,           undefined,                      "<client number> <message>");
     command_register(9,     "re",       ::cmd_re,           "Reply to PM.",                 "<message>");
     command_register(10,    "movespec", ::cmd_movespec,     "Move a player to spectator.",  "<client number>");
-    command_register(11,    "endmatch", ::cmd_endmatch);
+    command_register(11,    "endmap",   ::cmd_endmap);
     command_register(12,    "fov",      ::cmd_fov,          "Change field of view.",        "<value number>");
+
+
+    command_register(13,    "test",     ::cmd_test);
+    
+
+
+
+
 }
 command_register(permId, name, function, description, usage)
 {
@@ -133,7 +141,7 @@ numDigits(num)
 {
     return (num + "").size;
 }
-isInteger(input)
+isPositiveInt(input)
 {
     input += "";
     for (i = 0; i < input.size; i++)
@@ -145,9 +153,6 @@ isInteger(input)
             case "6": case "7": case "8":
             case "9":
             break;
-            case "-":
-                if(i == 0 && input.size > 1)
-                    break;
             default:
                 return false;
         }
@@ -333,7 +338,7 @@ cmd_who(args)
 
 cmd_kick(args)
 {
-    if (args.size < 2 || !isInteger(args[1]))
+    if (args.size < 2 || !isPositiveInt(args[1]))
     {
         showUsage(args[0]);
         return;
@@ -367,7 +372,7 @@ cmd_ban(args)
     if (args.size < 3)
     {
         showUsage(args[0]);
-        self iPrintLn("Notes: Use \"h\" for hours or \"d\" for days\n");
+        self iPrintLn("Notes: Use 'h' for hours or 'd' for days");
         return;
     }
 
@@ -406,7 +411,7 @@ cmd_unban(args)
 
 cmd_pm(args)
 {
-    if (args.size < 3 || !isInteger(args[1]))
+    if (args.size < 3 || !isPositiveInt(args[1]))
     {
         showUsage(args[0]);
         return;
@@ -473,7 +478,7 @@ cmd_re(args)
 
 cmd_movespec(args)
 {
-    if (args.size < 2 || !isInteger(args[1]))
+    if (args.size < 2 || !isPositiveInt(args[1]))
     {
         showUsage(args[0]);
         return;
@@ -492,18 +497,30 @@ cmd_movespec(args)
     iPrintLn(entity.name + " ^7moved to spectator");
 }
 
-cmd_endmatch(args)
+cmd_endmap(args)
 {
-    announcement("Manually ending match"); // TODO: Use a hudelem instead
+    level thread cmd_endmap_level();
+}
+cmd_endmap_level()
+{
+    announce = newHudElem();
+    announce.alignX = "center";
+    announce.alignY = "middle";
+    announce.x = 320;
+    announce.y = 110;
+    announce.fontScale = 1.5;
+    announce setText(&"Manually ending map");
+    wait 1;
+    announce fadeOverTime(1);
     wait 2;
-    for(i = 0; i < 5; i++)
-        announcement(" "); // Clear the iPrintLnBold earlier
+    if(isDefined(announce))
+        announce destroy();
     centralizer::endMap();
 }
 
 cmd_fov(args)
 {
-    if (args.size < 2 || !isInteger(args[1]))
+    if (args.size < 2 || !isPositiveInt(args[1]))
     {
         showUsage(args[0]);
         return;
@@ -522,4 +539,19 @@ cmd_fov(args)
     self.pers["fov"] = value;
 
     self iPrintLn("FOV changed to " + value);
+}
+
+cmd_test(args)
+{
+    //self setJumpHeight(120.0);
+
+
+    self setAirJumps(3);
+
+    //thread checkAir();
+
+
+
+
+
 }

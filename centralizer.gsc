@@ -1653,8 +1653,10 @@ _finishPlayerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWea
     victim_will_die = false;
     if(self.health - iDamage <= 0)
         victim_will_die = true;
-
-    eAttacker thread showDamageFeedback(iDamage, victim_will_die);
+    
+    if(isAlive(eAttacker))
+        eAttacker thread showDamageFeedback(iDamage, victim_will_die);
+        
     if(victim_will_die)
     {
         primary = self getWeaponSlotWeapon("primary");

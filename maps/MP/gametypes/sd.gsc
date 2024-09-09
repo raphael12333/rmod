@@ -852,7 +852,7 @@ hud_announce(text)
     wait .9;
 
     if(isdefined(level.announce))
-        level.announce destroy();	
+        level.announce destroy();
 }
 
 addBotClients()

@@ -15,3 +15,4 @@ Some of the customizations are:
 - sd uses the `announcement` gsc function (excepted for when bomb planted, so it doesn't obstruct view)
 - pistol 1sk kill bullet reward
 - chat commands system (based on [MiscMod](https://github.com/cato-a/CoDaM_MiscMod))
+- alive players counter on screen while playing

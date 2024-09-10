@@ -1,6 +1,6 @@
 main()
 {
-    gametype = getcvar("g_gametype");
+    level.gametype = getCvar("g_gametype");
     
     level.callbackStartGameType = ::startGameType;
     level.callbackPlayerConnect = ::playerConnect;
@@ -10,24 +10,24 @@ main()
 
     maps\mp\gametypes\_callbacksetup::SetupCallbacks();
 
-    if(gametype == "sd")
+    if(level.gametype == "sd")
     {
         level._effect["bombexplosion"] = loadfx("fx/explosions/mp_bomb.efx");
     }
 
-    allowed[0] = gametype;
-    if(gametype == "sd")
+    allowed[0] = level.gametype;
+    if(level.gametype == "sd")
     {
         allowed[1] = "bombzone";
         allowed[2] = "blocker";
     }
-    else if(gametype == "re")
+    else if(level.gametype == "re")
     {
         allowed[1] = "retrieval";
     }
     maps\mp\gametypes\_gameobjects::main(allowed);
 
-    if(gametype == "sd")
+    if(level.gametype == "sd")
     {
         if(getcvar("scr_sd_timelimit") == "")		// Time limit per map
             setcvar("scr_sd_timelimit", "0");
@@ -35,7 +35,7 @@ main()
             setcvar("scr_sd_timelimit", "1440");
         level.timelimit = getcvarfloat("scr_sd_timelimit");            
     }
-    else if(gametype == "re")
+    else if(level.gametype == "re")
     {
         if(getcvar("scr_re_timelimit") == "")		// Time limit per map
             setcvar("scr_re_timelimit", "0");
@@ -43,7 +43,7 @@ main()
             setcvar("scr_re_timelimit", "1440");
         level.timelimit = getcvarfloat("scr_re_timelimit");
     }
-    else if(gametype == "dm")
+    else if(level.gametype == "dm")
     {
         if(getcvar("scr_dm_timelimit") == "")		// Time limit per map
             setcvar("scr_dm_timelimit", "30");
@@ -51,7 +51,7 @@ main()
             setcvar("scr_dm_timelimit", "1440");
         level.timelimit = getcvarfloat("scr_dm_timelimit");
     }
-    else if(gametype == "tdm")
+    else if(level.gametype == "tdm")
     {
         if(getcvar("scr_tdm_timelimit") == "")		// Time limit per map
             setcvar("scr_tdm_timelimit", "30");
@@ -59,7 +59,7 @@ main()
             setcvar("scr_tdm_timelimit", "1440");
         level.timelimit = getcvarfloat("scr_tdm_timelimit");
     }
-    else if(gametype == "bel")
+    else if(level.gametype == "bel")
     {
         if(getcvar("scr_bel_timelimit") == "")
             setcvar("scr_bel_timelimit", "30");
@@ -68,13 +68,13 @@ main()
         level.timelimit = getcvarfloat("scr_bel_timelimit");
     }
 
-    if(gametype == "sd" || gametype == "re")
+    if(level.gametype == "sd" || level.gametype == "re")
     {
         if(!isdefined(game["timeleft"]))
             game["timeleft"] = level.timelimit;
     }
     
-    if(gametype == "sd")
+    if(level.gametype == "sd")
     {
         if(getcvar("scr_sd_scorelimit") == "")		// Score limit per map
             setcvar("scr_sd_scorelimit", "10");
@@ -96,7 +96,7 @@ main()
             setcvar("scr_sd_graceperiod", "60");
         level.graceperiod = getcvarfloat("scr_sd_graceperiod");
     }
-    else if(gametype == "re")
+    else if(level.gametype == "re")
     {
         if(getcvar("scr_re_scorelimit") == "")		// Score limit per map
             setcvar("scr_re_scorelimit", "10");
@@ -118,26 +118,26 @@ main()
             setcvar("scr_re_graceperiod", "60");
         level.graceperiod = getcvarfloat("scr_re_graceperiod");
     }
-    else if(gametype == "dm")
+    else if(level.gametype == "dm")
     {
         if(getcvar("scr_dm_scorelimit") == "")		// Score limit per map
             setcvar("scr_dm_scorelimit", "50");
         level.scorelimit = getcvarint("scr_dm_scorelimit");
     }
-    else if(gametype == "tdm")
+    else if(level.gametype == "tdm")
     {
         if(getcvar("scr_tdm_scorelimit") == "")		// Score limit per map
             setcvar("scr_tdm_scorelimit", "100");
         level.scorelimit = getcvarint("scr_tdm_scorelimit");
     }
-    else if(gametype == "bel")
+    else if(level.gametype == "bel")
     {
         if(getcvar("scr_bel_scorelimit") == "")
             setcvar("scr_bel_scorelimit", "50");
         level.playerscorelimit = getcvarint("scr_bel_scorelimit");
     }
 
-    if(gametype == "bel")
+    if(level.gametype == "bel")
     {
         if(getcvar("scr_bel_alivepointtime") == "")
             setcvar("scr_bel_alivepointtime", "10");
@@ -154,23 +154,23 @@ main()
             setcvar("scr_bel_showoncompass", "1");
     }
 
-    if(gametype == "sd" || gametype == "re" || gametype == "tdm" || gametype == "bel")
+    if(level.gametype == "sd" || level.gametype == "re" || level.gametype == "tdm" || level.gametype == "bel")
     {
         if(getcvar("scr_friendlyfire") == "")		// Friendly fire
             setcvar("scr_friendlyfire", "0");
 
-        if(gametype == "sd" || gametype == "re")
+        if(level.gametype == "sd" || level.gametype == "re")
         {
             if(getcvar("scr_roundcam") == "")		// Round Cam On or Off (Default 0 - off)
                 setcvar("scr_roundcam", "0");
         }
 
-        if(gametype == "sd" || gametype == "re" || gametype == "tdm")
+        if(level.gametype == "sd" || level.gametype == "re" || level.gametype == "tdm")
         {
             if(getCvar("scr_teambalance") == "")		// Auto Team Balancing
                 setCvar("scr_teambalance", "0");
             level.teambalance = getCvarInt("scr_teambalance");
-            if(gametype == "tdm")
+            if(level.gametype == "tdm")
             {
                 level.teambalancetimer = 0;
             }
@@ -185,7 +185,7 @@ main()
         level.drawfriend = getcvarint("scr_drawfriend");
     }
 
-    if(gametype == "dm" || gametype == "tdm")
+    if(level.gametype == "dm" || level.gametype == "tdm")
     {
         if(getcvar("scr_forcerespawn") == "")		// Force respawning
             setcvar("scr_forcerespawn", "0");
@@ -196,7 +196,7 @@ main()
     level.allowvote = getcvarint("g_allowvote");
     setcvar("scr_allow_vote", level.allowvote);
 
-    if(gametype == "re")
+    if(level.gametype == "re")
     {
         if(!isdefined(game["re_attackers"]))
             game["re_attackers"] = "allies";
@@ -214,7 +214,7 @@ main()
 
     if(!isdefined(game["state"]))
         game["state"] = "playing";
-    if(gametype == "sd" || gametype == "re")
+    if(level.gametype == "sd" || level.gametype == "re")
     {
         if(!isdefined(game["roundsplayed"]))
             game["roundsplayed"] = 0;
@@ -230,39 +230,39 @@ main()
         setTeamScore("axis", game["axisscore"]);
     }
 
-    if(gametype == "re")
+    if(level.gametype == "re")
     {
         game["headicon_allies"] = "gfx/hud/headicon@allies.tga";
         game["headicon_axis"] = "gfx/hud/headicon@axis.tga";
         game["headicon_carrier"] = "gfx/hud/headicon@re_objcarrier.tga";            
     }
 
-    if(gametype == "sd")
+    if(level.gametype == "sd")
     {
         level.bombplanted = false;
         level.bombexploded = false;
     }
-    if(gametype == "sd" || gametype == "re")
+    if(level.gametype == "sd" || level.gametype == "re")
     {
         level.roundstarted = false;
         level.roundended = false;
     }
-    if(gametype == "dm")
+    if(level.gametype == "dm")
     {
         level.QuickMessageToAll = true;
     }
     level.mapended = false;
-    if(gametype == "dm" || gametype == "tdm")
+    if(level.gametype == "dm" || level.gametype == "tdm")
     {
         level.healthqueue = [];
         level.healthqueuecurrent = 0;
     }
-    if(gametype == "bel")
+    if(level.gametype == "bel")
     {
         level.alliesallowed = 1;
     }
 
-    if(gametype == "sd" || gametype == "re")
+    if(level.gametype == "sd" || level.gametype == "re")
     {
         if (!isdefined (game["BalanceTeamsNextRound"]))
             game["BalanceTeamsNextRound"] = false;
@@ -273,7 +273,7 @@ main()
         level.didexist["allies"] = false;
         level.didexist["axis"] = false;
     }
-    if(gametype == "re")
+    if(level.gametype == "re")
     {
         level.numobjectives = 0;
         level.objectives_done = 0;
@@ -281,13 +281,13 @@ main()
         level.barsize = 288;
     }
     
-    if(gametype == "dm" || gametype == "tdm" || gametype == "bel")
+    if(level.gametype == "dm" || level.gametype == "tdm" || level.gametype == "bel")
     {
-        if(gametype == "dm")
+        if(level.gametype == "dm")
         {
             spawnpointname = "mp_deathmatch_spawn";
         }
-        else if(gametype == "tdm" || gametype == "bel")
+        else if(level.gametype == "tdm" || level.gametype == "bel")
         {
             spawnpointname = "mp_teamdeathmatch_spawn";
         }
@@ -303,11 +303,11 @@ main()
     }
     else
     {
-        if(gametype == "sd")
+        if(level.gametype == "sd")
         {
             spawnpointname = "mp_searchanddestroy_spawn_allied";
         }
-        else if(gametype == "re")
+        else if(level.gametype == "re")
         {
             spawnpointname = "mp_retrieval_spawn_allied";
         }
@@ -321,11 +321,11 @@ main()
         else
             maps\mp\_utility::error("NO " + spawnpointname + " SPAWNPOINTS IN MAP");
         
-        if(gametype == "sd")
+        if(level.gametype == "sd")
         {
             spawnpointname = "mp_searchanddestroy_spawn_axis";            
         }
-        else if(gametype == "re")
+        else if(level.gametype == "re")
         {
             spawnpointname = "mp_retrieval_spawn_axis";            
         }
@@ -340,7 +340,7 @@ main()
             maps\mp\_utility::error("NO " + spawnpointname + " SPAWNPOINTS IN MAP");
     }
 
-    if(gametype == "re")
+    if(level.gametype == "re")
     {
         players = getentarray("player", "classname");
         for(i = 0; i < players.size; i++)
@@ -360,10 +360,8 @@ main()
 
 startGameType()
 {
-    gametype = getcvar("g_gametype");
-
     // if this is a fresh map start, set nationalities based on cvars, otherwise leave game variable nationalities as set in the level script
-    if((gametype == "dm" || gametype == "tdm" || gametype == "bel") || ((gametype == "sd" || gametype == "re") && !isdefined(game["gamestarted"])))
+    if((level.gametype == "dm" || level.gametype == "tdm" || level.gametype == "bel") || ((level.gametype == "sd" || level.gametype == "re") && !isdefined(game["gamestarted"])))
     {
         // defaults if not defined in level script
         if(!isdefined(game["allies"]))
@@ -386,7 +384,7 @@ startGameType()
 
         if(getCvar("g_gametype") != "tdm")
         {
-            if(gametype == "bel")
+            if(level.gametype == "bel")
             {
                 game["menu_team"] = "team_germanonly";
         
@@ -413,22 +411,22 @@ startGameType()
         game["menu_quickcommands"] = "quickcommands";
         game["menu_quickstatements"] = "quickstatements";
         game["menu_quickresponses"] = "quickresponses";
-        if(gametype == "sd" || gametype == "tdm" || gametype == "bel")
+        if(level.gametype == "sd" || level.gametype == "tdm" || level.gametype == "bel")
         {
             game["headicon_allies"] = "gfx/hud/headicon@allies.tga";
             game["headicon_axis"] = "gfx/hud/headicon@axis.tga";
         }
         
-        if(gametype == "sd" || gametype == "re")
+        if(level.gametype == "sd" || level.gametype == "re")
         {
             precacheString(&"MPSCRIPT_PRESS_ACTIVATE_TO_SKIP");
         }
-        else if(gametype == "dm" || gametype == "tdm" || gametype == "bel")
+        else if(level.gametype == "dm" || level.gametype == "tdm" || level.gametype == "bel")
         {
             precacheString(&"MPSCRIPT_PRESS_ACTIVATE_TO_RESPAWN");
         }
         precacheString(&"MPSCRIPT_KILLCAM");
-        if(gametype == "sd")
+        if(level.gametype == "sd")
         {
             precacheString(&"SD_MATCHSTARTING");
             precacheString(&"SD_MATCHRESUMING");
@@ -441,7 +439,7 @@ startGameType()
             precacheString(&"SD_ALLIESHAVEBEENELIMINATED");
             precacheString(&"SD_AXISHAVEBEENELIMINATED");
         }
-        else if(gametype == "re")
+        else if(level.gametype == "re")
         {
             precacheString(&"MPSCRIPT_ROUNDCAM");
             precacheString(&"MPSCRIPT_ALLIES_WIN");
@@ -487,7 +485,7 @@ startGameType()
             precacheString(&"RE_OBJ_ROCKET_SCHEDULE");
             precacheString(&"RE_OBJ_CAMP_RECORDS");
         }
-        else if(gametype == "bel")
+        else if(level.gametype == "bel")
         {
             precacheString(&"BEL_TIME_ALIVE");
             precacheString(&"BEL_TIME_TILL_SPAWN");
@@ -499,7 +497,7 @@ startGameType()
         }
 
         precacheMenu(game["menu_team"]);
-        if(gametype == "bel")
+        if(level.gametype == "bel")
         {
             precacheMenu(game["menu_weapon_all"]);
             precacheMenu(game["menu_weapon_allies_only"]);
@@ -516,39 +514,39 @@ startGameType()
         precacheMenu(game["menu_quickstatements"]);
         precacheMenu(game["menu_quickresponses"]);
 
-        if(gametype == "sd" || gametype == "re" || gametype == "tdm" || gametype == "bel")
+        if(level.gametype == "sd" || level.gametype == "re" || level.gametype == "tdm" || level.gametype == "bel")
         {
             precacheHeadIcon(game["headicon_allies"]);
             precacheHeadIcon(game["headicon_axis"]);
         }
-        if(gametype == "re")
+        if(level.gametype == "re")
         {
             precacheHeadIcon(game["headicon_carrier"]);
         }
-        if(gametype == "bel")
+        if(level.gametype == "bel")
         {
             precacheHeadIcon("gfx/hud/headicon@killcam_arrow");
         }
 
         precacheStatusIcon("gfx/hud/hud@status_dead.tga");
         precacheStatusIcon("gfx/hud/hud@status_connecting.tga");
-        if(gametype == "re")
+        if(level.gametype == "re")
         {
             precacheStatusIcon(game["headicon_carrier"]);
         }
 
         precacheShader("black");
-        if(gametype == "sd" || gametype == "re")
+        if(level.gametype == "sd" || level.gametype == "re")
         {
             precacheShader("white");
         }
         precacheShader("hudScoreboard_mp");
-        if(gametype == "dm")
+        if(level.gametype == "dm")
         {
             precacheShader("gfx/hud/hud@mpflag_none.tga");
         }
         precacheShader("gfx/hud/hud@mpflag_spectator.tga");
-        if(gametype == "sd")
+        if(level.gametype == "sd")
         {
             precacheShader("ui_mp/assets/hud@plantbomb.tga");
             precacheShader("ui_mp/assets/hud@defusebomb.tga");
@@ -563,7 +561,7 @@ startGameType()
             precacheShader("gfx/hud/hud@bombplanted_down.tga");
             precacheShader("gfx/hud/hud@bombplanted_down.tga");
         }
-        else if(gametype == "re")
+        else if(level.gametype == "re")
         {
             precacheShader("gfx/hud/hud@objectivegoal.tga");
             precacheShader("gfx/hud/hud@objectivegoal_up.tga");
@@ -572,7 +570,7 @@ startGameType()
             precacheShader("gfx/hud/objective_up.tga");
             precacheShader("gfx/hud/objective_down.tga");
         }
-        else if(gametype == "bel")
+        else if(level.gametype == "bel")
         {
             precacheShader("gfx/hud/hud@objective_bel.tga");
             precacheShader("gfx/hud/hud@objective_bel_up.tga");
@@ -586,29 +584,29 @@ startGameType()
         The cause maybe lies in SV_SpawnServer, see cod2rev G_GetSavePersist
         Always precache these two models for now
         */
-        /*if(gametype == "sd")
+        /*if(level.gametype == "sd")
         {*/
             precacheModel("xmodel/mp_bomb1_defuse");
             precacheModel("xmodel/mp_bomb1");
         //}
 
-        if(gametype == "dm" || gametype == "tdm")
+        if(level.gametype == "dm" || level.gametype == "tdm")
         {
             precacheItem("item_health");
         }
 
         maps\mp\gametypes\_teams::precache();
-        if(gametype == "sd" || gametype == "re" || gametype == "tdm" || gametype == "bel")
+        if(level.gametype == "sd" || level.gametype == "re" || level.gametype == "tdm" || level.gametype == "bel")
         {
             maps\mp\gametypes\_teams::scoreboard();
         }
         maps\mp\gametypes\_teams::initGlobalCvars();
         
-        if(gametype == "sd")
+        if(level.gametype == "sd")
         {
             //thread addBotClients();
         }
-        else if(gametype == "re")
+        else if(level.gametype == "re")
         {
             //thread addBotClients();
         }
@@ -617,51 +615,181 @@ startGameType()
     maps\mp\gametypes\_teams::modeltype();
     maps\mp\gametypes\_teams::restrictPlacedWeapons();
 
-    if(gametype == "sd" || gametype == "re")
+    if(level.gametype == "sd" || level.gametype == "re")
     {
         game["gamestarted"] = true;
     }
 
-    if(gametype == "sd" || gametype == "re")
+    if(level.gametype == "sd" || level.gametype == "re")
     {
         setClientNameMode("manual_change");
     }
-    else if(gametype == "dm" || gametype == "tdm" || gametype == "bel")
+    else if(level.gametype == "dm" || level.gametype == "tdm" || level.gametype == "bel")
     {
         setClientNameMode("auto_change");
     }
 
-    if(gametype == "sd")
+    if(level.gametype == "sd")
     {
         thread maps\mp\gametypes\sd::bombzones();
         thread maps\mp\gametypes\sd::startGame();
         thread maps\mp\gametypes\sd::updateScriptCvars();
         //thread addBotClients();
     }
-    else if(gametype == "re")
+    else if(level.gametype == "re")
     {
         thread maps\mp\gametypes\re::startGame();
         thread maps\mp\gametypes\re::updateScriptCvars();
         //thread addBotClients();
     }
-    else if(gametype == "dm")
+    else if(level.gametype == "dm")
     {
         thread maps\mp\gametypes\dm::startGame();
         //thread addBotClients(); // For development testing
         thread maps\mp\gametypes\dm::updateScriptCvars();
     }
-    else if(gametype == "tdm")
+    else if(level.gametype == "tdm")
     {
         thread maps\mp\gametypes\tdm::startGame();
         //thread addBotClients(); // For development testing
         thread maps\mp\gametypes\tdm::updateScriptCvars();
     }
-    else if(gametype == "bel")
+    else if(level.gametype == "bel")
     {
         thread maps\mp\gametypes\bel::startGame();
         thread maps\mp\gametypes\bel::updateScriptCvars();            
     }
+
+    if(game["matchstarted"])
+        thread hud_alivePlayers();
 }
+
+hud_alivePlayers()
+{
+    level endon("intermission");
+    
+    hud_enemies_y = 8;
+    hud_vs_y = hud_enemies_y + 18;
+    hud_friends_y = hud_vs_y + 11;
+
+    hud_enemies_color = (1, 0, 0);
+    hud_friends_color = (0, 1, 0);
+
+    hud_enemies_fontScale = 1.6;
+    hud_friends_fontScale = 1.1;
+
+    vs = &"VS";
+    
+    // Allies and Axis vs
+    level.hud_alivePlayers_vs = [];
+    level.hud_alivePlayers_vs[level.hud_alivePlayers_vs.size] = newTeamHudElem("allies");
+    level.hud_alivePlayers_vs[level.hud_alivePlayers_vs.size] = newTeamHudElem("axis");
+    for (i = 0; i < level.hud_alivePlayers_vs.size; i++)
+    {
+        level.hud_alivePlayers_vs[i].alignX = "center";
+        level.hud_alivePlayers_vs[i].alignY = "middle";
+        level.hud_alivePlayers_vs[i].x = 320;
+        level.hud_alivePlayers_vs[i].y = hud_vs_y;
+        level.hud_alivePlayers_vs[i].fontScale = 0.7;
+        level.hud_alivePlayers_vs[i] setText(vs);
+    }
+    
+    if (level.gametype != "dm")
+    {
+        // Spectator' vs
+        level.hud_alivePlayers_spectator_vs = newTeamHudElem("spectator");
+        level.hud_alivePlayers_spectator_vs.alignX = "center";
+        level.hud_alivePlayers_spectator_vs.alignY = "middle";
+        level.hud_alivePlayers_spectator_vs.x = 320;
+        level.hud_alivePlayers_spectator_vs.y = 12;
+        level.hud_alivePlayers_spectator_vs.fontScale = 0.8;
+        level.hud_alivePlayers_spectator_vs setText(vs);
+
+        // Spectator' allies
+        level.hud_alivePlayers_spectator_allies = newTeamHudElem("spectator");
+        level.hud_alivePlayers_spectator_allies.alignX = "left";
+        level.hud_alivePlayers_spectator_allies.alignY = "middle";
+        level.hud_alivePlayers_spectator_allies.x = level.hud_alivePlayers_spectator_vs.x - 80;
+        level.hud_alivePlayers_spectator_allies.y = 12;
+        level.hud_alivePlayers_spectator_allies.fontScale = 1.2;
+        level.hud_alivePlayers_spectator_allies.label = &"Allies: ";
+
+        // Spectator' axis
+        level.hud_alivePlayers_spectator_axis = newTeamHudElem("spectator");
+        level.hud_alivePlayers_spectator_axis.alignX = "right";
+        level.hud_alivePlayers_spectator_axis.alignY = "middle";
+        level.hud_alivePlayers_spectator_axis.x = level.hud_alivePlayers_spectator_vs.x + 80 - 6;
+        level.hud_alivePlayers_spectator_axis.y = 12;
+        level.hud_alivePlayers_spectator_axis.fontScale = 1.2;
+        level.hud_alivePlayers_spectator_axis.label = &"Axis: ";
+    }
+
+    // Unable to retrieve hud team after creation, so do 1 by 1 for now
+    
+    // Allies' friends
+    level.hud_alivePlayers_allies_allies = newTeamHudElem("allies");
+    level.hud_alivePlayers_allies_allies.alignX = "center";
+    level.hud_alivePlayers_allies_allies.alignY = "middle";
+    level.hud_alivePlayers_allies_allies.x = 320;
+    level.hud_alivePlayers_allies_allies.y = hud_friends_y;
+    level.hud_alivePlayers_allies_allies.fontScale = hud_friends_fontScale;
+    level.hud_alivePlayers_allies_allies.color = hud_friends_color;
+
+    // Allies' enemies
+    level.hud_alivePlayers_allies_axis = newTeamHudElem("allies");
+    level.hud_alivePlayers_allies_axis.alignX = "center";
+    level.hud_alivePlayers_allies_axis.alignY = "middle";
+    level.hud_alivePlayers_allies_axis.x = 320;
+    level.hud_alivePlayers_allies_axis.y = hud_enemies_y;
+    level.hud_alivePlayers_allies_axis.fontScale = hud_enemies_fontScale;
+    level.hud_alivePlayers_allies_axis.color = hud_enemies_color;
+
+    // Axis' friends
+    level.hud_alivePlayers_axis_axis = newTeamHudElem("axis");
+    level.hud_alivePlayers_axis_axis.alignX = "center";
+    level.hud_alivePlayers_axis_axis.alignY = "middle";
+    level.hud_alivePlayers_axis_axis.x = 320;
+    level.hud_alivePlayers_axis_axis.y = hud_friends_y;
+    level.hud_alivePlayers_axis_axis.fontScale = hud_friends_fontScale;
+    level.hud_alivePlayers_axis_axis.color = hud_friends_color;
+
+    // Axis' enemies
+    level.hud_alivePlayers_axis_allies = newTeamHudElem("axis");
+    level.hud_alivePlayers_axis_allies.alignX = "center";
+    level.hud_alivePlayers_axis_allies.alignY = "middle";
+    level.hud_alivePlayers_axis_allies.x = 320;
+    level.hud_alivePlayers_axis_allies.y = hud_enemies_y;
+    level.hud_alivePlayers_axis_allies.fontScale = hud_enemies_fontScale;
+    level.hud_alivePlayers_axis_allies.color = hud_enemies_color;
+
+    for(;;)
+    {
+        aliveAllies = getTeamPlayersAlive("allies");
+        aliveAxis = getTeamPlayersAlive("axis");
+        
+        level.hud_alivePlayers_allies_allies setValue(aliveAllies);
+        level.hud_alivePlayers_allies_axis setValue(aliveAxis);
+
+        level.hud_alivePlayers_axis_axis setValue(aliveAxis);
+        level.hud_alivePlayers_axis_allies setValue(aliveAllies);
+
+        if (level.gametype != "dm")
+        {
+            level.hud_alivePlayers_spectator_allies setValue(aliveAllies);
+            level.hud_alivePlayers_spectator_axis setValue(aliveAxis);
+        }
+
+        wait .05;
+    }
+}
+
+
+
+
+
+
+
+
 
 
 
@@ -699,28 +827,26 @@ playerConnect()
     
     
     
-    gametype = getcvar("g_gametype");
-
     self.statusicon = "gfx/hud/hud@status_connecting.tga";
     self waittill("begin");
     self.statusicon = "";
-    if(gametype == "re")
+    if(level.gametype == "re")
     {
         self.hudelem = [];
     }
-    else if(gametype == "bel")
+    else if(level.gametype == "bel")
     {
         self.god = false;
         self.respawnwait = false;
     }
 
-    if((gametype == "dm" || gametype == "tdm") || !isdefined(self.pers["team"]))
+    if((level.gametype == "dm" || level.gametype == "tdm") || !isdefined(self.pers["team"]))
         iprintln(&"MPSCRIPT_CONNECTED", self);
 
     lpselfnum = self getEntityNumber();
     logPrint("J;" + lpselfnum + ";" + self.name + "\n");
 
-    if(gametype == "re")
+    if(level.gametype == "re")
     {
         self.objs_held = 0;
     }
@@ -732,7 +858,7 @@ playerConnect()
 
     level endon("intermission");
 
-    if(gametype == "bel")
+    if(level.gametype == "bel")
     {
         if (isdefined (self.blackscreen))
             self.blackscreen destroy();
@@ -747,34 +873,34 @@ playerConnect()
     if(isdefined(self.pers["team"]) && self.pers["team"] != "spectator")
     {
         self setClientCvar("scr_showweapontab", "1");
-        if(gametype == "dm")
+        if(level.gametype == "dm")
         {
             self.sessionteam = "none";
         }
 
         if(self.pers["team"] == "allies")
         {
-            if(gametype == "tdm" || gametype == "bel")
+            if(level.gametype == "tdm" || level.gametype == "bel")
             {
                 self.sessionteam = "allies";
             }
-            if(gametype != "bel")
+            if(level.gametype != "bel")
             {
                 self setClientCvar("g_scriptMainMenu", game["menu_weapon_allies"]);
             }
         }
         else
         {
-            if(gametype == "tdm" || gametype == "bel")
+            if(level.gametype == "tdm" || level.gametype == "bel")
             {
                 self.sessionteam = "axis";
             }
-            if(gametype != "bel")
+            if(level.gametype != "bel")
             {
                 self setClientCvar("g_scriptMainMenu", game["menu_weapon_axis"]);
             }
         }
-        if(gametype == "bel")
+        if(level.gametype == "bel")
         {
             self setClientCvar("g_scriptMainMenu", game["menu_weapon_all"]);
         }
@@ -785,7 +911,7 @@ playerConnect()
         }
         else
         {
-            if(gametype == "sd" || gametype == "re")
+            if(level.gametype == "sd" || level.gametype == "re")
             {
                 self.sessionteam = "spectator";
             }
@@ -794,7 +920,7 @@ playerConnect()
 
             if(self.pers["team"] == "allies")
             {
-                if(gametype == "bel")
+                if(level.gametype == "bel")
                 {
                     self openMenu(game["menu_weapon_allies_only"]);
                 }
@@ -805,7 +931,7 @@ playerConnect()
             }
             else
             {
-                if(gametype == "bel")
+                if(level.gametype == "bel")
                 {
                     self openMenu(game["menu_weapon_axis_only"]);
                 }
@@ -849,7 +975,7 @@ playerConnect()
             {
                 case "allies":
                 case "axis":
-                    if(gametype == "bel")
+                    if(level.gametype == "bel")
                     {
                         if ( (self.pers["team"] != "axis") && (self.pers["team"] != "allies") )
                         {
@@ -875,14 +1001,14 @@ playerConnect()
                         break;
                     }
                 case "autoassign":
-                    if(gametype == "sd" || gametype == "re")
+                    if(level.gametype == "sd" || level.gametype == "re")
                     {
                         if (level.lockteams)
                             break;
                     }
                     if(response == "autoassign")
                     {
-                        if(gametype == "sd" || gametype == "re" || gametype == "tdm")
+                        if(level.gametype == "sd" || level.gametype == "re" || level.gametype == "tdm")
                         {
                             numonteam["allies"] = 0;
                             numonteam["axis"] = 0;
@@ -918,7 +1044,7 @@ playerConnect()
                                 response = "axis";
                             skipbalancecheck = true;
                         }
-                        else if(gametype == "dm")
+                        else if(level.gametype == "dm")
                         {
                             teams[0] = "allies";
                             teams[1] = "axis";
@@ -929,7 +1055,7 @@ playerConnect()
                     if(response == self.pers["team"] && self.sessionstate == "playing")
                         break;
                     
-                    if(gametype == "sd" || gametype == "re" || gametype == "tdm")
+                    if(level.gametype == "sd" || level.gametype == "re" || level.gametype == "tdm")
                     {
                         //Check if the teams will become unbalanced when the player goes to this team...
                         //------------------------------------------------------------------------------
@@ -993,14 +1119,14 @@ playerConnect()
                     if(response != self.pers["team"] && self.sessionstate == "playing")
                         self suicide();
                     
-                    if(gametype == "dm" || gametype == "tdm")
+                    if(level.gametype == "dm" || level.gametype == "tdm")
                     {
                         self notify("end_respawn");
                     }
                                 
                     self.pers["team"] = response;
                     self.pers["weapon"] = undefined;
-                    if(gametype == "sd" || gametype == "re")
+                    if(level.gametype == "sd" || level.gametype == "re")
                     {
                         self.pers["weapon1"] = undefined;
                         self.pers["weapon2"] = undefined;
@@ -1025,7 +1151,7 @@ playerConnect()
                 case "spectator":
                     if(self.pers["team"] != "spectator")
                     {
-                        if(gametype == "sd" || gametype == "re")
+                        if(level.gametype == "sd" || level.gametype == "re")
                         {
                             if(isalive(self))
                                 self suicide();
@@ -1033,13 +1159,13 @@ playerConnect()
                         
                         self.pers["team"] = "spectator";
                         self.pers["weapon"] = undefined;
-                        if(gametype == "sd" || gametype == "re")
+                        if(level.gametype == "sd" || level.gametype == "re")
                         {
                             self.pers["weapon1"] = undefined;
                             self.pers["weapon2"] = undefined;
                             self.pers["spawnweapon"] = undefined;
                         }
-                        else if(gametype == "bel")
+                        else if(level.gametype == "bel")
                         {
                             self.pers["LastAxisWeapon"] = undefined;
                             self.pers["LastAlliedWeapon"] = undefined;
@@ -1049,7 +1175,7 @@ playerConnect()
                         self.sessionteam = "spectator";
                         self setClientCvar("g_scriptMainMenu", game["menu_team"]);
                         self setClientCvar("scr_showweapontab", "0");
-                        if(gametype == "bel")
+                        if(level.gametype == "bel")
                         {
                             if (isdefined (self.blackscreen))
                                 self.blackscreen destroy();
@@ -1061,7 +1187,7 @@ playerConnect()
                                 self.blackscreentimer destroy();
                         }
                         spawnSpectator();
-                        if(gametype == "bel")
+                        if(level.gametype == "bel")
                         {
                             maps\mp\gametypes\bel::CheckAllies_andMoveAxis_to_Allies();
                         }
@@ -1069,7 +1195,7 @@ playerConnect()
                     break;
                 
                 case "weapon":
-                    if(gametype == "bel")
+                    if(level.gametype == "bel")
                     {
                         if ( (self.pers["team"] == "axis") || (self.pers["team"] == "allies") )
                             self openMenu(game["menu_weapon_all"]);
@@ -1092,7 +1218,7 @@ playerConnect()
                     break;
             }
         }
-        else if(gametype == "bel" && (menu == game["menu_weapon_all"] || menu == game["menu_weapon_allies_only"] || menu == game["menu_weapon_axis_only"]))
+        else if(level.gametype == "bel" && (menu == game["menu_weapon_all"] || menu == game["menu_weapon_allies_only"] || menu == game["menu_weapon_axis_only"]))
         {
             if(response == "team")
             {
@@ -1262,33 +1388,33 @@ playerConnect()
                 continue;
             }
 
-            if(gametype == "sd" || gametype == "re")
+            if(level.gametype == "sd" || level.gametype == "re")
             {
                 if(isdefined(self.pers["weapon"]) && self.pers["weapon"] == weapon && !isdefined(self.pers["weapon1"]))
                     continue;
             }
-            else if(gametype == "dm" || gametype == "tdm")
+            else if(level.gametype == "dm" || level.gametype == "tdm")
             {
                 if(isdefined(self.pers["weapon"]) && self.pers["weapon"] == weapon)
                     continue;
             }
 
-            if((gametype == "sd" || gametype == "re") && !game["matchstarted"])
+            if((level.gametype == "sd" || level.gametype == "re") && !game["matchstarted"])
             {
                 self.pers["weapon"] = weapon;
                 self.spawned = undefined;
                 spawnPlayer();
                 self thread printJoinedTeam(self.pers["team"]);
-                if(gametype == "sd")
+                if(level.gametype == "sd")
                 {
                     level maps\mp\gametypes\sd::checkMatchStart();
                 }
-                else if(gametype == "re")
+                else if(level.gametype == "re")
                 {
                     level maps\mp\gametypes\re::checkMatchStart();
                 }
             }
-            else if((gametype == "sd" || gametype == "re") && !level.roundstarted)
+            else if((level.gametype == "sd" || level.gametype == "re") && !level.roundstarted)
             {
                 if(isdefined(self.pers["weapon"]))
                 {
@@ -1306,11 +1432,11 @@ playerConnect()
                         self.spawned = undefined;
                         spawnPlayer();
                         self thread printJoinedTeam(self.pers["team"]);
-                        if(gametype == "sd")
+                        if(level.gametype == "sd")
                         {
                             level maps\mp\gametypes\sd::checkMatchStart();
                         }
-                        else if(gametype == "re")
+                        else if(level.gametype == "re")
                         {
                             level maps\mp\gametypes\re::checkMatchStart();
                         }
@@ -1324,7 +1450,7 @@ playerConnect()
             }
             else
             {
-                if(gametype == "sd" || gametype == "re")
+                if(level.gametype == "sd" || level.gametype == "re")
                 {
                     if(isdefined(self.pers["weapon"]))
                         self.oldweapon = self.pers["weapon"];
@@ -1352,11 +1478,11 @@ playerConnect()
                         self.spawned = undefined;
                         spawnPlayer();
                         self thread printJoinedTeam(self.pers["team"]);
-                        if(gametype == "sd")
+                        if(level.gametype == "sd")
                         {
                             level maps\mp\gametypes\sd::checkMatchStart();
                         }
-                        else if(gametype == "re")
+                        else if(level.gametype == "re")
                         {
                             level maps\mp\gametypes\re::checkMatchStart();
                         }
@@ -1381,13 +1507,13 @@ playerConnect()
                         }
                     }
                 }
-                else if(gametype == "dm" || gametype == "tdm")
+                else if(level.gametype == "dm" || level.gametype == "tdm")
                 {
                     if(!isdefined(self.pers["weapon"]))
                     {
                         self.pers["weapon"] = weapon;
                         spawnPlayer();
-                        if(gametype == "tdm")
+                        if(level.gametype == "tdm")
                         {
                             self thread printJoinedTeam(self.pers["team"]);
                         }
@@ -1406,7 +1532,7 @@ playerConnect()
                 }
             }
 
-            if(gametype == "sd" || gametype == "re" || gametype == "tdm")
+            if(level.gametype == "sd" || level.gametype == "re" || level.gametype == "tdm")
             {
                 if (isdefined (self.autobalance_notify))
                     self.autobalance_notify destroy();
@@ -1421,7 +1547,7 @@ playerConnect()
                 break;
             
             case "weapon":
-                if(gametype == "bel")
+                if(level.gametype == "bel")
                 {
                     if ( (self.pers["team"] == "axis") || (self.pers["team"] == "allies") )
                         self openMenu(game["menu_weapon_all"]);
@@ -1449,7 +1575,7 @@ playerConnect()
                 break;
             
             case "weapon":
-                if(gametype == "bel")
+                if(level.gametype == "bel")
                 {
                     if ( (self.pers["team"] == "axis") || (self.pers["team"] == "allies") )
                         self openMenu(game["menu_weapon_all"]);
@@ -1479,14 +1605,12 @@ playerConnect()
 
 playerDisconnect()
 {
-    gametype = getcvar("g_gametype");
-
     iprintln(&"MPSCRIPT_DISCONNECTED", self);
 
     lpselfnum = self getEntityNumber();
     logPrint("Q;" + lpselfnum + ";" + self.name + "\n");
 
-    if(gametype == "re")
+    if(level.gametype == "re")
     {
         if (isdefined (self.objs_held))
         {
@@ -1507,22 +1631,22 @@ playerDisconnect()
 
         self notify ("death");
     }
-    else if(gametype == "bel")
+    else if(level.gametype == "bel")
     {
         self.pers["team"] = "spectator";
         self maps\mp\gametypes\bel::check_delete_objective();
         maps\mp\gametypes\bel::CheckAllies_andMoveAxis_to_Allies();
     }
 
-    if(gametype == "sd" || gametype == "re")
+    if(level.gametype == "sd" || level.gametype == "re")
     {
         if(game["matchstarted"])
         {
-            if(gametype == "sd")
+            if(level.gametype == "sd")
             {
                 level thread maps\mp\gametypes\sd::updateTeamStatus();
             }
-            else if(gametype == "re")
+            else if(level.gametype == "re")
             {
                 level thread maps\mp\gametypes\re::updateTeamStatus();
             }
@@ -1532,9 +1656,7 @@ playerDisconnect()
 
 playerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc)
 {
-    gametype = getcvar("g_gametype");
-
-    if(gametype == "bel")
+    if(level.gametype == "bel")
     {
         if ( (isdefined (eAttacker)) && (isPlayer(eAttacker)) && (isdefined (eAttacker.god)) && (eAttacker.god == true) )
             return;
@@ -1552,14 +1674,14 @@ playerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vP
     if(!isDefined(vDir))
         iDFlags |= level.iDFLAGS_NO_KNOCKBACK;
     
-    if(gametype == "dm")
+    if(level.gametype == "dm")
     {
         // Make sure at least one point of damage is done
         if(iDamage < 1)
             iDamage = 1;
     }
 
-    if(gametype == "sd" || gametype == "re" || gametype == "tdm" || gametype == "bel")
+    if(level.gametype == "sd" || level.gametype == "re" || level.gametype == "tdm" || level.gametype == "bel")
     {
         // check for completely getting out of the damage
         if(!(iDFlags & level.iDFLAGS_NO_PROTECTION))
@@ -1605,7 +1727,7 @@ playerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vP
             " damage:" + iDamage + " hitLoc:" + sHitLoc);
     }
 
-    if(gametype == "dm")
+    if(level.gametype == "dm")
     {
         // Apply the damage to the player
         self _finishPlayerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc);            
@@ -1735,10 +1857,8 @@ destroyDamageFeedback()
 
 playerKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc)
 {
-    gametype = getcvar("g_gametype");
-
     self endon("spawned");
-    if(gametype == "bel")
+    if(level.gametype == "bel")
     {
         self notify ("Stop give points");
         
@@ -1759,7 +1879,7 @@ playerKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitL
 
     // send out an obituary message to all clients about the kill
     obituary(self, eAttacker, sWeapon, sMeansOfDeath);
-    if(gametype == "re")
+    if(level.gametype == "re")
     {
         self notify ("death");
 
@@ -1789,13 +1909,13 @@ playerKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitL
 
     self.sessionstate = "dead";
     self.statusicon = "gfx/hud/hud@status_dead.tga";
-    if(gametype != "dm")
+    if(level.gametype != "dm")
     {
         self.headicon = "";
     }
     if (!isdefined (self.autobalance))
     {
-        if(gametype == "sd" || gametype == "re")
+        if(level.gametype == "sd" || level.gametype == "re")
         {
             self.pers["deaths"]++;
             self.deaths = self.pers["deaths"];
@@ -1806,7 +1926,7 @@ playerKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitL
         }
     }
 
-    if(gametype == "bel")
+    if(level.gametype == "bel")
     {
         body = self cloneplayer();
         self dropItem(self getcurrentweapon());
@@ -1815,7 +1935,7 @@ playerKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitL
 
     lpselfnum = self getEntityNumber();
     lpselfname = self.name;
-    if(gametype == "dm")
+    if(level.gametype == "dm")
     {
         lpselfteam = "";
     }
@@ -1826,14 +1946,14 @@ playerKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitL
     lpattackerteam = "";
 
     attackerNum = -1;
-    if(gametype == "sd" || gametype == "re")
+    if(level.gametype == "sd" || level.gametype == "re")
     {
         level.playercam = eAttacker getEntityNumber();
     }
 
     if(isPlayer(eAttacker))
     {
-        if(gametype == "bel")
+        if(level.gametype == "bel")
         {
             lpattacknum = eAttacker getEntityNumber();
             lpattackname = eAttacker.name;
@@ -1843,7 +1963,7 @@ playerKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitL
 
         if(eAttacker == self) // killed himself
         {
-            if(gametype == "bel")
+            if(level.gametype == "bel")
             {
                 if(isdefined(eAttacker.reflectdamage))
                     clientAnnouncement(eAttacker, &"MPSCRIPT_FRIENDLY_FIRE_WILL_NOT"); 
@@ -1870,7 +1990,7 @@ playerKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitL
 
                 if (!isdefined (self.autobalance))
                 {
-                    if(gametype == "dm" || gametype == "tdm")
+                    if(level.gametype == "dm" || level.gametype == "tdm")
                     {
                         eAttacker.score--;
                     }
@@ -1881,7 +2001,7 @@ playerKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitL
                     }
                 }
 
-                if(gametype == "sd" || gametype == "re" || gametype == "tdm")
+                if(level.gametype == "sd" || level.gametype == "re" || level.gametype == "tdm")
                 {
                     if(isdefined(eAttacker.reflectdamage))
                         clientAnnouncement(eAttacker, &"MPSCRIPT_FRIENDLY_FIRE_WILL_NOT");
@@ -1890,7 +2010,7 @@ playerKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitL
         }
         else
         {
-            if(gametype == "bel")
+            if(level.gametype == "bel")
             {
                 if(self.pers["team"] == eAttacker.pers["team"]) // player was killed by a friendly
                 {
@@ -1941,7 +2061,7 @@ playerKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitL
                 attackerNum = eAttacker getEntityNumber();
                 doKillcam = true;
 
-                if(gametype == "dm")
+                if(level.gametype == "dm")
                 {
                     eAttacker.score++;
                     eAttacker maps\mp\gametypes\dm::checkScoreLimit();
@@ -1950,7 +2070,7 @@ playerKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitL
                 {
                     if(self.pers["team"] == eAttacker.pers["team"]) // killed by a friendly
                     {
-                        if(gametype == "tdm")
+                        if(level.gametype == "tdm")
                         {
                             eAttacker.score--;
                         }
@@ -1962,7 +2082,7 @@ playerKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitL
                     }
                     else
                     {
-                        if(gametype == "tdm")
+                        if(level.gametype == "tdm")
                         {
                             eAttacker.score++;
 
@@ -1984,14 +2104,14 @@ playerKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitL
 
         lpattacknum = eAttacker getEntityNumber();
         lpattackname = eAttacker.name;
-        if(gametype == "sd" || gametype == "re" || gametype == "tdm")
+        if(level.gametype == "sd" || level.gametype == "re" || level.gametype == "tdm")
         {
             lpattackerteam = eAttacker.pers["team"];
         }
     }
     else
     {
-        if(gametype == "bel") // Player wasn't killed by another player or themself (landmines, etc.)
+        if(level.gametype == "bel") // Player wasn't killed by another player or themself (landmines, etc.)
         {
             lpattacknum = -1;
             lpattackname = "";
@@ -2019,7 +2139,7 @@ playerKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitL
         {
             doKillcam = false;
 
-            if(gametype == "dm" || gametype == "tdm")
+            if(level.gametype == "dm" || level.gametype == "tdm")
             {
                 self.score--;
             }
@@ -2031,7 +2151,7 @@ playerKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitL
 
             lpattacknum = -1;
             lpattackname = "";
-            if(gametype == "sd" || gametype == "re" || gametype == "tdm")
+            if(level.gametype == "sd" || level.gametype == "re" || level.gametype == "tdm")
             {
                 lpattackerteam = "world";
             }
@@ -2040,13 +2160,13 @@ playerKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitL
 
     logPrint("K;" + lpselfnum + ";" + lpselfteam + ";" + lpselfname + ";" + lpattacknum + ";" + lpattackerteam + ";" + lpattackname + ";" + sWeapon + ";" + iDamage + ";" + sMeansOfDeath + ";" + sHitLoc + "\n");
 
-    if(gametype == "dm" || gametype == "tdm")
+    if(level.gametype == "dm" || level.gametype == "tdm")
     {
         // Stop thread if map ended on this death
         if(level.mapended)
             return;
         
-        if(gametype == "dm")
+        if(level.gametype == "dm")
         {
             //self updateDeathArray();
         }
@@ -2056,14 +2176,14 @@ playerKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitL
     if (!isdefined (self.autobalance))
         self dropItem(self getcurrentweapon());
 
-    if(gametype == "sd" || gametype == "re")
+    if(level.gametype == "sd" || level.gametype == "re")
     {
         self.pers["weapon1"] = undefined;
         self.pers["weapon2"] = undefined;
         self.pers["spawnweapon"] = undefined;
     }
 
-    if(gametype == "re")
+    if(level.gametype == "re")
     {
         //Remove HUD text if there is any
         for (i=1;i<16;i++)
@@ -2077,12 +2197,12 @@ playerKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitL
             self.progressbar destroy();
     }
 
-    if(gametype == "dm")
+    if(level.gametype == "dm")
     {
         // Make the player drop health
         self maps\mp\gametypes\dm::dropHealth();            
     }
-    else if(gametype == "tdm")
+    else if(level.gametype == "tdm")
     {
         // Make the player drop health
         self maps\mp\gametypes\tdm::dropHealth();
@@ -2092,16 +2212,16 @@ playerKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitL
         body = self cloneplayer();
     self.autobalance = undefined;
 
-    if(gametype == "sd")
+    if(level.gametype == "sd")
     {
         maps\mp\gametypes\sd::updateTeamStatus();
     }
-    else if(gametype == "re")
+    else if(level.gametype == "re")
     {
         maps\mp\gametypes\re::updateTeamStatus();
     }
 
-    if(gametype == "sd" || gametype == "re")
+    if(level.gametype == "sd" || level.gametype == "re")
     {
         // TODO: Add additional checks that allow killcam when the last player killed wouldn't end the round (bomb is planted)
         if(!level.exist[self.pers["team"]]) // If the last player on a team was just killed, don't do killcam
@@ -2121,23 +2241,23 @@ playerKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitL
     delay = 2;	// Delay the player becoming a spectator till after he's done dying
     wait delay;	// ?? Also required for Callback_PlayerKilled to complete before killcam can execute
 
-    if(gametype == "dm" || gametype == "tdm")
+    if(level.gametype == "dm" || level.gametype == "tdm")
     {
         if(getcvarint("scr_forcerespawn") > 0)
             doKillcam = false;
     }
 
-    if((((gametype == "dm" || gametype == "tdm") && doKillcam)) || ((gametype == "sd" || gametype == "re") && doKillcam && !level.roundended))
+    if((((level.gametype == "dm" || level.gametype == "tdm") && doKillcam)) || ((level.gametype == "sd" || level.gametype == "re") && doKillcam && !level.roundended))
     {
         self thread killcam(attackerNum, delay);
     }
     else
     {
-        if(gametype == "dm")
+        if(level.gametype == "dm")
         {
             self thread maps\mp\gametypes\dm::respawn();
         }
-        else if(gametype == "tdm")
+        else if(level.gametype == "tdm")
         {
             self thread maps\mp\gametypes\tdm::respawn();
         }
@@ -2146,7 +2266,7 @@ playerKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitL
             currentorigin = self.origin;
             currentangles = self.angles;
 
-            if(gametype == "sd" || gametype == "re")
+            if(level.gametype == "sd" || level.gametype == "re")
             {
                 self thread spawnSpectator(currentorigin + (0, 0, 60), currentangles);
             }
@@ -2156,14 +2276,12 @@ playerKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitL
 
 spawnPlayer()
 {
-    gametype = getcvar("g_gametype");
-
     self notify("spawned");
-    if(gametype == "dm" || gametype == "tdm" || gametype == "bel")
+    if(level.gametype == "dm" || level.gametype == "tdm" || level.gametype == "bel")
     {
         self notify("end_respawn");
     }
-    if(gametype == "bel")
+    if(level.gametype == "bel")
     {
         self notify("stop weapon timeout");
         self notify ("do_timer_cleanup");
@@ -2171,7 +2289,7 @@ spawnPlayer()
 
     resettimeout();
 
-    if(gametype == "dm")
+    if(level.gametype == "dm")
     {
         //if(isdefined(self.shocked))
         //{
@@ -2180,11 +2298,11 @@ spawnPlayer()
         //}
     }
 
-    if(gametype == "bel")
+    if(level.gametype == "bel")
     {
         self.respawnwait = false;
     }
-    if(gametype == "dm")
+    if(level.gametype == "dm")
     {
         self.sessionteam = "none";
     }
@@ -2192,26 +2310,26 @@ spawnPlayer()
     {
         self.sessionteam = self.pers["team"];
     }
-    if(gametype == "bel")
+    if(level.gametype == "bel")
     {
         self.lastteam = self.pers["team"];
     }
-    if(gametype == "dm" || gametype == "tdm" || gametype == "bel")
+    if(level.gametype == "dm" || level.gametype == "tdm" || level.gametype == "bel")
     {
         self.sessionstate = "playing";
     }
-    if(gametype != "bel")
+    if(level.gametype != "bel")
     {
         self.spectatorclient = -1;
         self.archivetime = 0;
     }
-    if(gametype == "sd" || gametype == "re" || gametype == "tdm" || gametype == "bel")
+    if(level.gametype == "sd" || level.gametype == "re" || level.gametype == "tdm" || level.gametype == "bel")
     {
         self.reflectdamage = undefined;
 
-        if(gametype == "sd" || gametype == "re" || gametype == "bel")
+        if(level.gametype == "sd" || level.gametype == "re" || level.gametype == "bel")
         {
-            if(gametype == "bel")
+            if(level.gametype == "bel")
             {
                 if (isdefined(self.spawnMsg))
                     self.spawnMsg destroy();
@@ -2224,7 +2342,7 @@ spawnPlayer()
                 self.sessionstate = "playing";
             }
 
-            if(gametype == "bel")
+            if(level.gametype == "bel")
             {
                 spawnpointname = "mp_teamdeathmatch_spawn";
                 spawnpoints = getentarray(spawnpointname, "classname");
@@ -2235,22 +2353,22 @@ spawnPlayer()
             {
                 if(self.pers["team"] == "allies")
                 {
-                    if(gametype == "sd")
+                    if(level.gametype == "sd")
                     {
                         spawnpointname = "mp_searchanddestroy_spawn_allied";
                     }
-                    else if(gametype == "re")
+                    else if(level.gametype == "re")
                     {
                         spawnpointname = "mp_retrieval_spawn_allied";
                     }
                 }
                 else
                 {
-                    if(gametype == "sd")
+                    if(level.gametype == "sd")
                     {
                         spawnpointname = "mp_searchanddestroy_spawn_axis";
                     }
-                    else if(gametype == "re")
+                    else if(level.gametype == "re")
                     {
                         spawnpointname = "mp_retrieval_spawn_axis";
                     }
@@ -2260,14 +2378,14 @@ spawnPlayer()
                 spawnpoint = maps\mp\gametypes\_spawnlogic::getSpawnpoint_Random(spawnpoints);
             }
         }
-        else if(gametype == "tdm")
+        else if(level.gametype == "tdm")
         {
             spawnpointname = "mp_teamdeathmatch_spawn";
             spawnpoints = getentarray(spawnpointname, "classname");
             spawnpoint = maps\mp\gametypes\_spawnlogic::getSpawnpoint_NearTeam(spawnpoints);
         }
     }
-    else if(gametype == "dm")
+    else if(level.gametype == "dm")
     {
         spawnpointname = "mp_deathmatch_spawn";
         spawnpoints = getentarray(spawnpointname, "classname");
@@ -2279,7 +2397,7 @@ spawnPlayer()
     else
         maps\mp\_utility::error("NO " + spawnpointname + " SPAWNPOINTS IN MAP");
 
-    if(gametype == "re")
+    if(level.gametype == "re")
     {
         //Set their intro text
         /*REMOVED
@@ -2296,18 +2414,18 @@ spawnPlayer()
         */
     }
 
-    if(gametype == "sd" || gametype == "re")
+    if(level.gametype == "sd" || level.gametype == "re")
     {
         self.spawned = true;
     }
     self.statusicon = "";
     self.maxhealth = 100;
     self.health = self.maxhealth;
-    if(gametype == "re")
+    if(level.gametype == "re")
     {
         self.objs_held = 0;
     }
-    if(gametype == "bel")
+    if(level.gametype == "bel")
     {
         self.pers["savedmodel"] = undefined;
 
@@ -2361,16 +2479,16 @@ spawnPlayer()
     }
     else
     {
-        if(gametype == "sd")
+        if(level.gametype == "sd")
         {
             maps\mp\gametypes\re::updateTeamStatus();
         }
-        else if(gametype == "re")
+        else if(level.gametype == "re")
         {
             maps\mp\gametypes\re::updateTeamStatus();
         }
 
-        if(gametype == "sd" || gametype == "re")
+        if(level.gametype == "sd" || level.gametype == "re")
         {
             if(!isdefined(self.pers["score"]))
                 self.pers["score"] = 0;
@@ -2389,7 +2507,7 @@ spawnPlayer()
         maps\mp\gametypes\_teams::loadout();
     }
 
-    if(gametype == "dm")
+    if(level.gametype == "dm")
     {
         self giveWeapon(self.pers["weapon"]);
         self giveMaxAmmo(self.pers["weapon"]);
@@ -2399,7 +2517,7 @@ spawnPlayer()
     }
     else
     {
-        if(gametype == "sd" || gametype == "re")
+        if(level.gametype == "sd" || level.gametype == "re")
         {
             if(isdefined(self.pers["weapon1"]) && isdefined(self.pers["weapon2"]))
             {
@@ -2422,28 +2540,28 @@ spawnPlayer()
                 self setSpawnWeapon(self.pers["weapon"]);
             }
         }
-        else if(gametype == "tdm")
+        else if(level.gametype == "tdm")
         {
             self giveWeapon(self.pers["weapon"]);
             self giveMaxAmmo(self.pers["weapon"]);
             self setSpawnWeapon(self.pers["weapon"]);
         }
 
-        if(gametype == "sd")
+        if(level.gametype == "sd")
         {
             if(self.pers["team"] == game["attackers"])
                 self setClientCvar("cg_objectiveText", &"SD_OBJ_ATTACKERS");
             else if(self.pers["team"] == game["defenders"])
                 self setClientCvar("cg_objectiveText", &"SD_OBJ_DEFENDERS");
         }
-        else if(gametype == "re")
+        else if(level.gametype == "re")
         {
             if(self.pers["team"] == game["re_attackers"])
                 self setClientCvar("cg_objectiveText", game["re_attackers_obj_text"]);
             else if(self.pers["team"] == game["re_defenders"])
                 self setClientCvar("cg_objectiveText", game["re_defenders_obj_text"]);
         }
-        else if(gametype == "tdm")
+        else if(level.gametype == "tdm")
         {
             if(self.pers["team"] == "allies")
                 self setClientCvar("cg_objectiveText", &"TDM_KILL_AXIS_PLAYERS");
@@ -2465,7 +2583,7 @@ spawnPlayer()
             }
         }
 
-        if(gametype == "bel")
+        if(level.gametype == "bel")
         {
             self.god = false;
             wait 0.05;
@@ -2486,22 +2604,20 @@ spawnPlayer()
 
 spawnSpectator(origin, angles)
 {
-    gametype = getcvar("g_gametype");
-
     self notify("spawned");
-    if(gametype == "dm" || gametype == "tdm" || gametype == "bel")
+    if(level.gametype == "dm" || level.gametype == "tdm" || level.gametype == "bel")
     {
         self notify("end_respawn");
     }
 
-    if(gametype == "bel")
+    if(level.gametype == "bel")
     {
         self maps\mp\gametypes\bel::check_delete_objective();
     }
 
     resettimeout();
 
-    if(gametype == "dm")
+    if(level.gametype == "dm")
     {
         //if(isdefined(self.shocked))
         //{
@@ -2513,17 +2629,17 @@ spawnSpectator(origin, angles)
     self.sessionstate = "spectator";
     self.spectatorclient = -1;
     self.archivetime = 0;
-    if(gametype == "sd" || gametype == "re" || gametype == "tdm" || gametype == "bel")
+    if(level.gametype == "sd" || level.gametype == "re" || level.gametype == "tdm" || level.gametype == "bel")
     {
         self.reflectdamage = undefined;
     }
-    if(gametype == "bel")
+    if(level.gametype == "bel")
     {
         self.pers["savedmodel"] = undefined;
         self.headicon = "";            
     }
 
-    if(gametype != "bel")
+    if(level.gametype != "bel")
     {
         if(self.pers["team"] == "spectator")
             self.statusicon = "";
@@ -2533,19 +2649,19 @@ spawnSpectator(origin, angles)
         self spawn(origin, angles);
     else
     {
-        if(gametype == "sd")
+        if(level.gametype == "sd")
         {
             spawnpointname = "mp_searchanddestroy_intermission";
         }
-        else if(gametype == "re")
+        else if(level.gametype == "re")
         {
             spawnpointname = "mp_retrieval_intermission";
         }
-        else if(gametype == "dm")
+        else if(level.gametype == "dm")
         {
             spawnpointname = "mp_deathmatch_intermission";
         }
-        else if(gametype == "tdm" || gametype == "bel")
+        else if(level.gametype == "tdm" || level.gametype == "bel")
         {
             spawnpointname = "mp_teamdeathmatch_intermission";
         }
@@ -2558,7 +2674,7 @@ spawnSpectator(origin, angles)
             maps\mp\_utility::error("NO " + spawnpointname + " SPAWNPOINTS IN MAP");
     }
 
-    if(gametype == "sd")
+    if(level.gametype == "sd")
     {
         maps\mp\gametypes\sd::updateTeamStatus();
 
@@ -2567,7 +2683,7 @@ spawnSpectator(origin, angles)
         else if(game["attackers"] == "axis")
             self setClientCvar("cg_objectiveText", &"SD_OBJ_SPECTATOR_AXISATTACKING");
     }
-    else if(gametype == "re")
+    else if(level.gametype == "re")
     {
         maps\mp\gametypes\re::updateTeamStatus();
 
@@ -2577,15 +2693,15 @@ spawnSpectator(origin, angles)
         //	self setClientCvar("cg_objectiveText", &"RE_AXIS", game["re_attackers_obj_text"]);
         self setClientCvar("cg_objectiveText", game["re_spectator_obj_text"]);
     }
-    else if(gametype == "dm")
+    else if(level.gametype == "dm")
     {
         self setClientCvar("cg_objectiveText", &"DM_KILL_OTHER_PLAYERS");
     }
-    else if(gametype == "tdm")
+    else if(level.gametype == "tdm")
     {
         self setClientCvar("cg_objectiveText", &"TDM_ALLIES_KILL_AXIS_PLAYERS");
     }
-    else if(gametype == "bel")
+    else if(level.gametype == "bel")
     {
         self setClientCvar("cg_objectiveText", &"BEL_SPECTATOR_OBJS");
     }
@@ -2593,17 +2709,15 @@ spawnSpectator(origin, angles)
 
 spawnIntermission()
 {
-    gametype = getcvar("g_gametype");
-    
     self notify("spawned");
-    if(gametype == "dm" || gametype == "tdm" || gametype == "bel")
+    if(level.gametype == "dm" || level.gametype == "tdm" || level.gametype == "bel")
     {
         self notify("end_respawn");
     }
 
     resettimeout();
 
-    if(gametype == "dm")
+    if(level.gametype == "dm")
     {
         //if(isdefined(self.shocked))
         //{
@@ -2615,29 +2729,29 @@ spawnIntermission()
     self.sessionstate = "intermission";
     self.spectatorclient = -1;
     self.archivetime = 0;
-    if(gametype == "sd" || gametype == "re" || gametype == "tdm" || gametype == "bel")
+    if(level.gametype == "sd" || level.gametype == "re" || level.gametype == "tdm" || level.gametype == "bel")
     {
         self.reflectdamage = undefined;
     }
 
-    if(gametype == "sd")
+    if(level.gametype == "sd")
     {
         spawnpointname = "mp_searchanddestroy_intermission";
     }
-    else if(gametype == "re")
+    else if(level.gametype == "re")
     {
         spawnpointname = "mp_retrieval_intermission";
     }
-    else if(gametype == "dm")
+    else if(level.gametype == "dm")
     {
         spawnpointname = "mp_deathmatch_intermission";
     }
-    else if(gametype == "tdm" || gametype == "bel")
+    else if(level.gametype == "tdm" || level.gametype == "bel")
     {
         spawnpointname = "mp_teamdeathmatch_intermission";
     }
     spawnpoints = getentarray(spawnpointname, "classname");
-    if(gametype == "bel")
+    if(level.gametype == "bel")
     {
         spawnpoint = maps\mp\gametypes\_spawnlogic::getSpawnpoint_MiddleThird(spawnpoints);
     }
@@ -2651,7 +2765,7 @@ spawnIntermission()
     else
         maps\mp\_utility::error("NO " + spawnpointname + " SPAWNPOINTS IN MAP");
     
-    if(gametype == "bel")
+    if(level.gametype == "bel")
     {
         if (isdefined (self.blackscreen))
             self.blackscreen destroy();
@@ -2666,11 +2780,9 @@ spawnIntermission()
 
 killcam(attackerNum, delay, option)
 {
-    gametype = getcvar("g_gametype");
-
     self endon("spawned");
 
-    if(gametype == "dm" || gametype == "tdm")
+    if(level.gametype == "dm" || level.gametype == "tdm")
     {
         //previousorigin = self.origin;
         //previousangles = self.angles;
@@ -2680,7 +2792,7 @@ killcam(attackerNum, delay, option)
     if(attackerNum < 0)
         return;
     
-    if(gametype == "bel")
+    if(level.gametype == "bel")
     {
         if (option == "axis to axis")
             wait 2;
@@ -2703,20 +2815,20 @@ killcam(attackerNum, delay, option)
     {
         self.spectatorclient = -1;
         self.archivetime = 0;
-        if(gametype == "dm" || gametype == "tdm")
+        if(level.gametype == "dm" || level.gametype == "tdm")
         {
             self.sessionstate = "dead";
 
-            if(gametype == "dm")
+            if(level.gametype == "dm")
             {
                 self thread maps\mp\gametypes\dm::respawn();
             }
-            else if(gametype == "tdm")
+            else if(level.gametype == "tdm")
             {
                 self thread maps\mp\gametypes\tdm::respawn();
             }
         }
-        else if(gametype == "bel")
+        else if(level.gametype == "bel")
         {
             if (option == "axis to axis")
             {
@@ -2730,7 +2842,7 @@ killcam(attackerNum, delay, option)
         return;
     }
 
-    if(gametype == "sd" || gametype == "re")
+    if(level.gametype == "sd" || level.gametype == "re")
     {
         self.killcam = true;
     }
@@ -2778,7 +2890,7 @@ killcam(attackerNum, delay, option)
         self.kc_skiptext.alignY = "middle";
         self.kc_skiptext.sort = 1; // force to draw after the bars
     }
-    if(gametype == "dm" || gametype == "tdm" || gametype == "bel")
+    if(level.gametype == "dm" || level.gametype == "tdm" || level.gametype == "bel")
     {
         self.kc_skiptext setText(&"MPSCRIPT_PRESS_ACTIVATE_TO_RESPAWN");
     }
@@ -2809,26 +2921,26 @@ killcam(attackerNum, delay, option)
 
     self.spectatorclient = -1;
     self.archivetime = 0;
-    if(gametype == "sd" || gametype == "re")
+    if(level.gametype == "sd" || level.gametype == "re")
     {
         self.killcam = undefined;
     }
-    if(gametype == "dm" || gametype == "tdm")
+    if(level.gametype == "dm" || level.gametype == "tdm")
     {
         self.sessionstate = "dead";
     }
 
-    if(gametype == "dm")
+    if(level.gametype == "dm")
     {
         //self thread spawnSpectator(previousorigin + (0, 0, 60), previousangles);
         self thread maps\mp\gametypes\dm::respawn();
     }
-    else if(gametype == "tdm")
+    else if(level.gametype == "tdm")
     {
         //self thread spawnSpectator(previousorigin + (0, 0, 60), previousangles);
         self thread maps\mp\gametypes\tdm::respawn();
     }
-    else if(gametype == "bel")
+    else if(level.gametype == "bel")
     {
         if (option == "axis to axis")
         {
@@ -2885,20 +2997,18 @@ spawnedKillcamCleanup()
 
 roundcam(delay, winningteam)
 {
-    gametype = getcvar("g_gametype");
-
     self endon("spawned");
 
     spawnSpectator();
 
-    if(gametype == "sd")
+    if(level.gametype == "sd")
     {
         if(isdefined(level.bombcam))
             self thread spawnSpectator(level.bombcam.origin, level.bombcam.angles);
         else
             self.spectatorclient = level.playercam;            
     }
-    else if(gametype == "re")
+    else if(level.gametype == "re")
     {
         if(isdefined(level.goalcam))
             self thread spawnSpectator(level.goalcam.origin, level.goalcam.angles);
@@ -3004,8 +3114,6 @@ resetScores()
 
 endRound(roundwinner, timeexpired)
 {
-    gametype = getcvar("g_gametype");
-
     if(level.roundended)
         return;
     level.roundended = true;
@@ -3059,8 +3167,8 @@ endRound(roundwinner, timeexpired)
 
     if((getcvar("scr_roundcam") == "1") && (!timeexpired) && (game["matchstarted"]))
     {
-        if(gametype == "sd" && ((isdefined(level.playercam) || isdefined(level.bombcam)) && roundwinner != "draw" && roundwinner != "reset")
-            || gametype == "re" && ((isdefined(level.playercam) || isdefined(level.goalcam)) && roundwinner != "draw" && roundwinner != "reset"))
+        if(level.gametype == "sd" && ((isdefined(level.playercam) || isdefined(level.bombcam)) && roundwinner != "draw" && roundwinner != "reset")
+            || level.gametype == "re" && ((isdefined(level.playercam) || isdefined(level.goalcam)) && roundwinner != "draw" && roundwinner != "reset"))
         {
             delay = 2;	// Delay the player becoming a spectator
             wait delay;
@@ -3181,18 +3289,18 @@ endRound(roundwinner, timeexpired)
 
 endMap()
 {
-    gametype = getcvar("g_gametype");
-
-    if(gametype == "bel")
+    if(level.gametype == "bel")
     {
         level notify ("End of Round");
     }
     game["state"] = "intermission";
     level notify("intermission");
 
-    if(gametype == "sd" || gametype == "re")
+    hud_alivePlayers_delete();
+
+    if(level.gametype == "sd" || level.gametype == "re")
     {
-        if(gametype == "sd")
+        if(level.gametype == "sd")
         {
             if(isdefined(level.bombmodel))
                 level.bombmodel stopLoopSound();
@@ -3205,7 +3313,7 @@ endMap()
         else
             text = &"MPSCRIPT_AXIS_WIN";
     }
-    else if(gametype == "dm" || gametype == "bel")
+    else if(level.gametype == "dm" || level.gametype == "bel")
     {
         players = getentarray("player", "classname");
         for(i = 0; i < players.size; i++)
@@ -3234,7 +3342,7 @@ endMap()
             }
         }
     }
-    else if(gametype == "tdm")
+    else if(level.gametype == "tdm")
     {
         alliedscore = getTeamScore("allies");
         axisscore = getTeamScore("axis");
@@ -3270,7 +3378,7 @@ endMap()
     {
         player = players[i];
 
-        if(gametype == "tdm")
+        if(level.gametype == "tdm")
         {
             if ( (winningteam == "allies") || (winningteam == "axis") )
             {
@@ -3283,11 +3391,11 @@ endMap()
 
         player closeMenu();
         player setClientCvar("g_scriptMainMenu", "main");
-        if(gametype == "sd" || gametype == "re" || gametype == "tdm")
+        if(level.gametype == "sd" || level.gametype == "re" || level.gametype == "tdm")
         {
             player setClientCvar("cg_objectiveText", text);
         }
-        else if(gametype == "dm" || gametype == "bel")
+        else if(level.gametype == "dm" || level.gametype == "bel")
         {
             if(isdefined(tied) && tied == true)
                 player setClientCvar("cg_objectiveText", &"MPSCRIPT_THE_GAME_IS_A_TIE");
@@ -3296,12 +3404,12 @@ endMap()
         }
         player spawnIntermission();
     }
-    if(gametype == "dm" || gametype == "bel")
+    if(level.gametype == "dm" || level.gametype == "bel")
     {
         if (isdefined (name))
             logPrint("W;;" + name + "\n");
     }
-    else if(gametype == "tdm")
+    else if(level.gametype == "tdm")
     {
         if ( (winningteam == "allies") || (winningteam == "axis") )
         {
@@ -3315,6 +3423,34 @@ endMap()
     mapvote::start();
     
     exitLevel(false); // TODO: add a fix in libcod1 to make exitLevel(true) working
+}
+
+hud_alivePlayers_delete()
+{
+    // Allies and Axis vs
+    for(i = 0; i < level.hud_alivePlayers_vs.size; i++)
+        if(isDefined(level.hud_alivePlayers_vs[i]))
+            level.hud_alivePlayers_vs[i] destroy();
+
+    // Spectator
+    if(isDefined(level.hud_alivePlayers_spectator_vs))
+        level.hud_alivePlayers_spectator_vs destroy();
+    if(isDefined(level.hud_alivePlayers_spectator_allies))
+        level.hud_alivePlayers_spectator_allies destroy();
+    if(isDefined(level.hud_alivePlayers_spectator_axis))
+        level.hud_alivePlayers_spectator_axis destroy();
+
+    // Allies
+    if(isDefined(level.hud_alivePlayers_allies_allies))
+        level.hud_alivePlayers_allies_allies destroy();
+    if(isDefined(level.hud_alivePlayers_allies_axis))
+        level.hud_alivePlayers_allies_axis destroy();
+
+    // Axis
+    if(isDefined(level.hud_alivePlayers_axis_axis))
+        level.hud_alivePlayers_axis_axis destroy();
+    if(isDefined(level.hud_alivePlayers_axis_allies))
+        level.hud_alivePlayers_axis_allies destroy();
 }
 
 checkScoreLimit()

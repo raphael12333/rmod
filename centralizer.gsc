@@ -662,7 +662,7 @@ startGameType()
 
     hud_scoreLimit();
 
-    if(game["matchstarted"])
+    if(level.gametype != "dm" && game["matchstarted"])
         thread hud_alivePlayers();
 }
 
@@ -2898,13 +2898,7 @@ startGame()
     {
         if(level.timelimit > 0)
         {
-            level.clock = newHudElem();
-            level.clock.x = 320;
-            level.clock.y = 460;
-            level.clock.alignX = "center";
-            level.clock.alignY = "middle";
-            level.clock.font = "bigfixed";
-            level.clock setTimer(level.timelimit * 60);
+            createClock();
         }
     }
     
@@ -2919,13 +2913,7 @@ startRound()
 {
     thread maps\mp\gametypes\_teams::sayMoveIn();
 
-    level.clock = newHudElem();
-    level.clock.x = 320;
-    level.clock.y = 460;
-    level.clock.alignX = "center";
-    level.clock.alignY = "middle";
-    level.clock.font = "bigfixed";
-    level.clock setTimer(level.roundlength * 60);
+    createClock();
 
     if(game["matchstarted"])
     {
@@ -2936,7 +2924,8 @@ startRound()
             wait level.graceperiod;
 
             level.roundstarted = true;
-            level.clock.color = (1, 1, 1);
+            if(!level.bombplanted)
+                level.clock.color = (1, 1, 1);
 
             // Players on a team but without a weapon show as dead since they can not get in this round
             players = getEntArray("player", "classname");
@@ -2985,6 +2974,24 @@ startRound()
 
         announcement(&"RE_TIMEEXPIRED");
         level thread endRound(game["re_defenders"], true);
+    }
+}
+
+createClock()
+{
+    level.clock = newHudElem();
+    level.clock.x = 320;
+    level.clock.y = 465;
+    level.clock.alignX = "center";
+    level.clock.alignY = "middle";
+    level.clock.font = "bigfixed";
+    if (level.gametype == "sd" || level.gametype == "re")
+    {
+        level.clock setTimer(level.roundlength * 60);
+    }
+    else
+    {
+        level.clock setTimer(level.timelimit * 60);
     }
 }
 
@@ -3491,12 +3498,6 @@ printJoinedTeam(team)
         iprintln(&"MPSCRIPT_JOINED_AXIS", self);
 }
 
-
-
-
-
-
-
 hud_scoreLimit()
 {
     scorelimitCvar = getCvar("scr_" + level.gametype + "_scorelimit");
@@ -3504,14 +3505,12 @@ hud_scoreLimit()
     {
         level.hudScoreLimit = newHudElem();
         level.hudScoreLimit.sort = -1;
-        level.hudScoreLimit.x = 320;
-        level.hudScoreLimit.y = 480;
-        level.hudScoreLimit.alignX = "center";
-        level.hudScoreLimit.alignY = "middle";
-        level.hudScoreLimit.fontScale = 0.9;
+        level.hudScoreLimit.alignX = "left";
+        level.hudScoreLimit.x = 372;
+        level.hudScoreLimit.y = 466;
+        level.hudScoreLimit.fontScale = 0.95;
         level.hudScoreLimit.label = &"Score limit: ";
         level.hudScoreLimit setValue(scorelimitCvar);
-
 
         thread waitDestroyScoreLimit();
     }
@@ -3521,9 +3520,6 @@ waitDestroyScoreLimit()
     level waittill("intermission");
     level.hudScoreLimit destroy();
 }
-
-
-
 
 hud_alivePlayers()
 {
@@ -3646,9 +3642,10 @@ hud_alivePlayers()
 hud_alivePlayers_delete()
 {
     // Allies and Axis vs
-    for(i = 0; i < level.hud_alivePlayers_vs.size; i++)
-        if(isDefined(level.hud_alivePlayers_vs[i]))
-            level.hud_alivePlayers_vs[i] destroy();
+    if(isDefined(level.hud_alivePlayers_vs))
+        for(i = 0; i < level.hud_alivePlayers_vs.size; i++)
+            if(isDefined(level.hud_alivePlayers_vs[i]))
+                level.hud_alivePlayers_vs[i] destroy();
 
     // Spectator
     if(isDefined(level.hud_alivePlayers_spectator_vs))
@@ -3673,14 +3670,18 @@ hud_alivePlayers_delete()
 
 hud_playerFps()
 {
+    if(isDefined(self.hud_fps))
+        return;
+
     level endon("intermission");
     self endon("hud_playerFps_delete");
 
     self.hud_fps = newClientHudElem(self);
     self.hud_fps.sort = -1;
-    self.hud_fps.x = 540;
+    self.hud_fps.alignX = "left";
+    self.hud_fps.x = 538;
     self.hud_fps.y = 25;
-    self.hud_fps.fontScale = 0.8;
+    self.hud_fps.fontScale = 0.85;
     self.hud_fps.label = &"Public FPS: ";
 
     for(;;)

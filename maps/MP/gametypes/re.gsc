@@ -333,14 +333,6 @@ updateScriptCvars()
             setcvar("scr_allow_vote", allowvote);
         }
 
-        teambalance = getCvarInt("scr_teambalance");
-        if (level.teambalance != teambalance)
-        {
-            level.teambalance = getCvarInt("scr_teambalance");
-            if (level.teambalance > 0)
-                level thread maps\mp\gametypes\_teams::TeamBalance_Check_Roundbased();
-        }
-
         wait 1;
     }
 }

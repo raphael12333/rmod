@@ -229,27 +229,6 @@ waitForceRespawnButton()
     self notify("respawn");
 }
 
-startGame()
-{
-    level.starttime = getTime();
-    if(level.timelimit > 0)
-    {
-        level.clock = newHudElem();
-        level.clock.alignX = "center";
-        level.clock.alignY = "middle";
-        level.clock.x = 320;
-        level.clock.y = 460;
-        level.clock.font = "bigfixed";
-        level.clock setTimer(level.timelimit * 60);
-    }
-
-    for(;;)
-    {
-        checkTimeLimit();
-        wait 1;
-    }
-}
-
 endMap()
 {
     centralizer::endMap();
@@ -257,20 +236,7 @@ endMap()
 
 checkTimeLimit()
 {
-    if(level.timelimit <= 0)
-        return;
-
-    timepassed = (getTime() - level.starttime) / 1000;
-    timepassed = timepassed / 60.0;
-
-    if(timepassed < level.timelimit)
-        return;
-
-    if(level.mapended)
-        return;
-    level.mapended = true;
-
-    endMap();
+    centralizer::checkTimeLimit();
 }
 
 checkScoreLimit()

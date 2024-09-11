@@ -173,79 +173,6 @@ roundcam(delay,winningteam)
     centralizer::roundcam(delay, winningteam);
 }
 
-startGame()
-{
-    level.starttime = getTime();
-    thread startRound();
-
-    if ( (level.teambalance > 0) && (!game["BalanceTeamsNextRound"]) )
-        level thread maps\mp\gametypes\_teams::TeamBalance_Check_Roundbased();
-
-    for(;;)
-    {
-        checkTimeLimit();
-        wait 1;
-    }
-}
-
-startRound()
-{
-    thread maps\mp\gametypes\_teams::sayMoveIn();
-    
-    level.clock = newHudElem();
-    level.clock.x = 320;
-    level.clock.y = 460;
-    level.clock.alignX = "center";
-    level.clock.alignY = "middle";
-    level.clock.font = "bigfixed";
-    level.clock setTimer(level.roundlength * 60);
-    
-    if(game["matchstarted"])
-    {
-        level.clock.color = (0, 1, 0);
-
-        if((level.roundlength * 60) > level.graceperiod)
-        {
-            wait level.graceperiod;
-    
-            level.roundstarted = true;
-            level.clock.color = (1, 1, 1);
-    
-            // Players on a team but without a weapon show as dead since they can not get in this round
-            players = getEntArray("player", "classname");
-            for(i = 0; i < players.size; i++)
-            {
-                player = players[i];
-    
-                if(player.sessionteam != "spectator" && !isdefined(player.pers["weapon"]))
-                    player.statusicon = "gfx/hud/hud@status_dead.tga";
-            }
-            
-            wait ((level.roundlength * 60) - level.graceperiod);
-        }	
-        else
-            wait (level.roundlength * 60);
-    }
-    else
-    {
-        level.clock.color = (1, 1, 1);
-        wait (level.roundlength * 60);
-    }
-
-    if(level.roundended)
-        return;
-
-    if(!level.exist[game["re_attackers"]] || !level.exist[game["re_defenders"]])
-    {
-        announcement(&"RE_TIMEEXPIRED");
-        level thread endRound("draw",true);
-        return;
-    }
-
-    announcement(&"RE_TIMEEXPIRED");
-    level thread endRound(game["re_defenders"], true);
-}
-
 checkMatchStart()
 {
     oldvalue["teams"] = level.exist["teams"];
@@ -285,21 +212,7 @@ endMap()
 
 checkTimeLimit()
 {
-    if(level.timelimit <= 0)
-        return;
-
-    timepassed = (getTime() - level.starttime) / 1000;
-    timepassed = timepassed / 60.0;
-
-    if(timepassed < game["timeleft"])
-        return;
-
-    if(level.mapended)
-        return;
-    level.mapended = true;
-
-    iprintln(&"MPSCRIPT_TIME_LIMIT_REACHED");
-    endMap();
+    centralizer::checkTimeLimit();
 }
 
 checkScoreLimit()

@@ -594,31 +594,31 @@ startGameType()
     if(level.gametype == "sd")
     {
         thread maps\mp\gametypes\sd::bombzones();
-        thread maps\mp\gametypes\sd::startGame();
+        thread startGame();
         thread maps\mp\gametypes\sd::updateScriptCvars();
         //thread addBotClients();
     }
     else if(level.gametype == "re")
     {
-        thread maps\mp\gametypes\re::startGame();
+        thread startGame();
         thread maps\mp\gametypes\re::updateScriptCvars();
         //thread addBotClients();
     }
     else if(level.gametype == "dm")
     {
-        thread maps\mp\gametypes\dm::startGame();
+        thread startGame();
         //thread addBotClients(); // For development testing
         thread maps\mp\gametypes\dm::updateScriptCvars();
     }
     else if(level.gametype == "tdm")
     {
-        thread maps\mp\gametypes\tdm::startGame();
+        thread startGame();
         //thread addBotClients(); // For development testing
         thread maps\mp\gametypes\tdm::updateScriptCvars();
     }
     else if(level.gametype == "bel")
     {
-        thread maps\mp\gametypes\bel::startGame();
+        thread startGame();
         thread maps\mp\gametypes\bel::updateScriptCvars();            
     }
 }
@@ -2604,6 +2604,108 @@ spawnedKillcamCleanup()
     self removeKillcamElements();
 }
 
+startGame()
+{
+    level.starttime = getTime();
+
+    if (level.gametype == "sd" || level.gametype == "re")
+    {
+        thread startRound();        
+    }
+    else
+    {
+        if(level.timelimit > 0)
+        {
+            level.clock = newHudElem();
+            level.clock.x = 320;
+            level.clock.y = 460;
+            level.clock.alignX = "center";
+            level.clock.alignY = "middle";
+            level.clock.font = "bigfixed";
+            level.clock setTimer(level.timelimit * 60);
+        }
+    }
+    
+    for(;;)
+    {
+        checkTimeLimit();
+        wait 1;
+    }
+}
+
+startRound()
+{
+    thread maps\mp\gametypes\_teams::sayMoveIn();
+
+    level.clock = newHudElem();
+    level.clock.x = 320;
+    level.clock.y = 460;
+    level.clock.alignX = "center";
+    level.clock.alignY = "middle";
+    level.clock.font = "bigfixed";
+    level.clock setTimer(level.roundlength * 60);
+
+    if(game["matchstarted"])
+    {
+        level.clock.color = (0, 1, 0);
+
+        if((level.roundlength * 60) > level.graceperiod)
+        {
+            wait level.graceperiod;
+
+            level.roundstarted = true;
+            level.clock.color = (1, 1, 1);
+
+            // Players on a team but without a weapon show as dead since they can not get in this round
+            players = getentarray("player", "classname");
+            for(i = 0; i < players.size; i++)
+            {
+                player = players[i];
+
+                if(player.sessionteam != "spectator" && !isdefined(player.pers["weapon"]))
+                    player.statusicon = "gfx/hud/hud@status_dead.tga";
+            }
+        
+            wait ((level.roundlength * 60) - level.graceperiod);
+        }
+        else
+            wait (level.roundlength * 60);
+    }
+    else	
+    {
+        level.clock.color = (1, 1, 1);
+        wait (level.roundlength * 60);
+    }
+    
+    if(level.roundended)
+        return;
+
+    if (level.gametype == "sd")
+    {
+        if(!level.exist[game["attackers"]] || !level.exist[game["defenders"]])
+        {
+            level thread maps\mp\gametypes\sd::hud_announce(&"SD_TIMEHASEXPIRED");
+            level thread endRound("draw", true);
+            return;
+        }
+
+        level thread maps\mp\gametypes\sd::hud_announce(&"SD_TIMEHASEXPIRED");
+        level thread endRound(game["defenders"], true);
+    }
+    else if (level.gametype == "re")
+    {
+        if(!level.exist[game["re_attackers"]] || !level.exist[game["re_defenders"]])
+        {
+            announcement(&"RE_TIMEEXPIRED");
+            level thread endRound("draw",true);
+            return;
+        }
+
+        announcement(&"RE_TIMEEXPIRED");
+        level thread endRound(game["re_defenders"], true);
+    }
+}
+
 roundcam(delay, winningteam)
 {
     self endon("spawned");
@@ -3027,6 +3129,28 @@ endMap()
 
     wait 10;
     exitLevel(false);
+}
+
+checkTimeLimit()
+{
+    if(level.timelimit <= 0)
+        return;
+    
+    timepassed = (getTime() - level.starttime) / 1000;
+    timepassed = timepassed / 60.0;
+    
+    if(timepassed < level.timelimit)
+        return;
+    
+    if(level.mapended)
+        return;
+    level.mapended = true;
+
+    if (level.gametype != "bel")
+    {
+        iprintln(&"MPSCRIPT_TIME_LIMIT_REACHED");
+    }
+    endMap();
 }
 
 checkScoreLimit()

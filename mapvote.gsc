@@ -409,7 +409,6 @@ setMapWinner(val)
 playerVote()
 {
     level endon("vote_over");
-    self endon("disconnect");
 
     self.vote_indicator = newClientHudElem(self);
     self.vote_indicator.archived = false;

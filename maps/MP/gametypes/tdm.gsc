@@ -117,7 +117,7 @@ respawn()
 
     self endon("end_respawn");
     
-    if(getcvarint("scr_forcerespawn") > 0)
+    if(getCvarInt("scr_forcerespawn") > 0)
     {
         self thread waitForceRespawnTime();
         self thread waitRespawnButton();
@@ -137,7 +137,7 @@ waitForceRespawnTime()
     self endon("end_respawn");
     self endon("respawn");
     
-    wait getcvarint("scr_forcerespawn");
+    wait getCvarInt("scr_forcerespawn");
     self notify("respawn");
 }
 
@@ -255,7 +255,7 @@ updateScriptCvars()
 {
     for(;;)
     {
-        timelimit = getcvarfloat("scr_tdm_timelimit");
+        timelimit = getCvarFloat("scr_tdm_timelimit");
         if(level.timelimit != timelimit)
         {
             if(timelimit > 1440)
@@ -289,14 +289,14 @@ updateScriptCvars()
             checkTimeLimit();
         }
 
-        scorelimit = getcvarint("scr_tdm_scorelimit");
+        scorelimit = getCvarInt("scr_tdm_scorelimit");
         if(level.scorelimit != scorelimit)
         {
             level.scorelimit = scorelimit;
             checkScoreLimit();
         }
 
-        drawfriend = getcvarfloat("scr_drawfriend");
+        drawfriend = getCvarFloat("scr_drawfriend");
         if(level.drawfriend != drawfriend)
         {
             level.drawfriend = drawfriend;
@@ -304,7 +304,7 @@ updateScriptCvars()
             if(level.drawfriend)
             {
                 // for all living players, show the appropriate headicon
-                players = getentarray("player", "classname");
+                players = getEntArray("player", "classname");
                 for(i = 0; i < players.size; i++)
                 {
                     player = players[i];
@@ -326,7 +326,7 @@ updateScriptCvars()
             }
             else
             {
-                players = getentarray("player", "classname");
+                players = getEntArray("player", "classname");
                 for(i = 0; i < players.size; i++)
                 {
                     player = players[i];
@@ -337,7 +337,7 @@ updateScriptCvars()
             }
         }
 
-        allowvote = getcvarint("g_allowvote");
+        allowvote = getCvarInt("g_allowvote");
         if(level.allowvote != allowvote)
         {
             level.allowvote = allowvote;

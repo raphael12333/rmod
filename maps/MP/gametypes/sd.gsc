@@ -204,7 +204,7 @@ startRound()
                     level.clock.color = (1, 1, 1);
 
             // Players on a team but without a weapon show as dead since they can not get in this round
-            players = getentarray("player", "classname");
+            players = getEntArray("player", "classname");
             for(i = 0; i < players.size; i++)
             {
                 player = players[i];
@@ -308,7 +308,7 @@ updateScriptCvars()
 {
     for(;;)
     {
-        timelimit = getcvarfloat("scr_sd_timelimit");
+        timelimit = getCvarFloat("scr_sd_timelimit");
         if(level.timelimit != timelimit)
         {
             if(timelimit > 1440)
@@ -324,7 +324,7 @@ updateScriptCvars()
             checkTimeLimit();
         }
 
-        scorelimit = getcvarint("scr_sd_scorelimit");
+        scorelimit = getCvarInt("scr_sd_scorelimit");
         if(level.scorelimit != scorelimit)
         {
             level.scorelimit = scorelimit;
@@ -333,7 +333,7 @@ updateScriptCvars()
                 checkScoreLimit();
         }
 
-        roundlimit = getcvarint("scr_sd_roundlimit");
+        roundlimit = getCvarInt("scr_sd_roundlimit");
         if(level.roundlimit != roundlimit)
         {
             level.roundlimit = roundlimit;
@@ -342,15 +342,15 @@ updateScriptCvars()
                 checkRoundLimit();
         }
 
-        roundlength = getcvarfloat("scr_sd_roundlength");
+        roundlength = getCvarFloat("scr_sd_roundlength");
         if(roundlength > 10)
             setcvar("scr_sd_roundlength", "10");
 
-        graceperiod = getcvarfloat("scr_sd_graceperiod");
+        graceperiod = getCvarFloat("scr_sd_graceperiod");
         if(graceperiod > 60)
             setcvar("scr_sd_graceperiod", "60");
 
-        drawfriend = getcvarfloat("scr_drawfriend");
+        drawfriend = getCvarFloat("scr_drawfriend");
         if(level.drawfriend != drawfriend)
         {
             level.drawfriend = drawfriend;
@@ -358,7 +358,7 @@ updateScriptCvars()
             if(level.drawfriend)
             {
                 // for all living players, show the appropriate headicon
-                players = getentarray("player", "classname");
+                players = getEntArray("player", "classname");
                 for(i = 0; i < players.size; i++)
                 {
                     player = players[i];
@@ -380,7 +380,7 @@ updateScriptCvars()
             }
             else
             {
-                players = getentarray("player", "classname");
+                players = getEntArray("player", "classname");
                 for(i = 0; i < players.size; i++)
                 {
                     player = players[i];
@@ -391,7 +391,7 @@ updateScriptCvars()
             }
         }
 
-        allowvote = getcvarint("g_allowvote");
+        allowvote = getCvarInt("g_allowvote");
         if(level.allowvote != allowvote)
         {
             level.allowvote = allowvote;
@@ -421,7 +421,7 @@ updateTeamStatus()
     level.exist["allies"] = 0;
     level.exist["axis"] = 0;
     
-    players = getentarray("player", "classname");
+    players = getEntArray("player", "classname");
     for(i = 0; i < players.size; i++)
     {
         player = players[i];
@@ -634,7 +634,7 @@ bombzone_think(bombzone_other)
                     
                     level thread hud_announce(&"SD_EXPLOSIVESPLANTED");
                                         
-                    players = getentarray("player", "classname");
+                    players = getEntArray("player", "classname");
                     for(i = 0; i < players.size; i++)
                         players[i] playLocalSound("MP_announcer_bomb_planted");
                     
@@ -796,7 +796,7 @@ bomb_think()
                     lpselfnum = other getEntityNumber();
                     logPrint("A;" + lpselfnum + ";" + game["defenders"] + ";" + other.name + ";" + "bomb_defuse" + "\n");
                     
-                    players = getentarray("player", "classname");
+                    players = getEntArray("player", "classname");
                     for(i = 0; i < players.size; i++)
                         players[i] playLocalSound("MP_announcer_bomb_defused");
                 

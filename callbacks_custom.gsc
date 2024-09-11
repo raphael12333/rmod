@@ -36,3 +36,8 @@ CodeCallback_PlayerCommand(command_object)
     }
     self processClientCommand();
 }
+
+CodeCallback_PlayerAirJump()
+{
+    self playSound("airjump");
+}

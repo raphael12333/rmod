@@ -29,43 +29,43 @@ main()
 
     if(level.gametype == "sd")
     {
-        if(getcvar("scr_sd_timelimit") == "")		// Time limit per map
+        if(getCvar("scr_sd_timelimit") == "")		// Time limit per map
             setcvar("scr_sd_timelimit", "0");
-        else if(getcvarfloat("scr_sd_timelimit") > 1440)
+        else if(getCvarFloat("scr_sd_timelimit") > 1440)
             setcvar("scr_sd_timelimit", "1440");
-        level.timelimit = getcvarfloat("scr_sd_timelimit");            
+        level.timelimit = getCvarFloat("scr_sd_timelimit");            
     }
     else if(level.gametype == "re")
     {
-        if(getcvar("scr_re_timelimit") == "")		// Time limit per map
+        if(getCvar("scr_re_timelimit") == "")		// Time limit per map
             setcvar("scr_re_timelimit", "0");
-        else if(getcvarfloat("scr_re_timelimit") > 1440)
+        else if(getCvarFloat("scr_re_timelimit") > 1440)
             setcvar("scr_re_timelimit", "1440");
-        level.timelimit = getcvarfloat("scr_re_timelimit");
+        level.timelimit = getCvarFloat("scr_re_timelimit");
     }
     else if(level.gametype == "dm")
     {
-        if(getcvar("scr_dm_timelimit") == "")		// Time limit per map
+        if(getCvar("scr_dm_timelimit") == "")		// Time limit per map
             setcvar("scr_dm_timelimit", "30");
-        else if(getcvarfloat("scr_dm_timelimit") > 1440)
+        else if(getCvarFloat("scr_dm_timelimit") > 1440)
             setcvar("scr_dm_timelimit", "1440");
-        level.timelimit = getcvarfloat("scr_dm_timelimit");
+        level.timelimit = getCvarFloat("scr_dm_timelimit");
     }
     else if(level.gametype == "tdm")
     {
-        if(getcvar("scr_tdm_timelimit") == "")		// Time limit per map
+        if(getCvar("scr_tdm_timelimit") == "")		// Time limit per map
             setcvar("scr_tdm_timelimit", "30");
-        else if(getcvarfloat("scr_tdm_timelimit") > 1440)
+        else if(getCvarFloat("scr_tdm_timelimit") > 1440)
             setcvar("scr_tdm_timelimit", "1440");
-        level.timelimit = getcvarfloat("scr_tdm_timelimit");
+        level.timelimit = getCvarFloat("scr_tdm_timelimit");
     }
     else if(level.gametype == "bel")
     {
-        if(getcvar("scr_bel_timelimit") == "")
+        if(getCvar("scr_bel_timelimit") == "")
             setcvar("scr_bel_timelimit", "30");
-        else if(getcvarfloat("scr_bel_timelimit") > 1440)
+        else if(getCvarFloat("scr_bel_timelimit") > 1440)
             setcvar("scr_bel_timelimit", "1440");
-        level.timelimit = getcvarfloat("scr_bel_timelimit");
+        level.timelimit = getCvarFloat("scr_bel_timelimit");
     }
 
     if(level.gametype == "sd" || level.gametype == "re")
@@ -76,92 +76,92 @@ main()
     
     if(level.gametype == "sd")
     {
-        if(getcvar("scr_sd_scorelimit") == "")		// Score limit per map
+        if(getCvar("scr_sd_scorelimit") == "")		// Score limit per map
             setcvar("scr_sd_scorelimit", "10");
-        level.scorelimit = getcvarint("scr_sd_scorelimit");
+        level.scorelimit = getCvarInt("scr_sd_scorelimit");
             
-        if(getcvar("scr_sd_roundlimit") == "")		// Round limit per map
+        if(getCvar("scr_sd_roundlimit") == "")		// Round limit per map
             setcvar("scr_sd_roundlimit", "0");
-        level.roundlimit = getcvarint("scr_sd_roundlimit");
+        level.roundlimit = getCvarInt("scr_sd_roundlimit");
 
-        if(getcvar("scr_sd_roundlength") == "")		// Time length of each round
+        if(getCvar("scr_sd_roundlength") == "")		// Time length of each round
             setcvar("scr_sd_roundlength", "4");
-        else if(getcvarfloat("scr_sd_roundlength") > 10)
+        else if(getCvarFloat("scr_sd_roundlength") > 10)
             setcvar("scr_sd_roundlength", "10");
-        level.roundlength = getcvarfloat("scr_sd_roundlength");
+        level.roundlength = getCvarFloat("scr_sd_roundlength");
 
-        if(getcvar("scr_sd_graceperiod") == "")		// Time at round start where spawning and weapon choosing is still allowed
+        if(getCvar("scr_sd_graceperiod") == "")		// Time at round start where spawning and weapon choosing is still allowed
             setcvar("scr_sd_graceperiod", "15");
-        else if(getcvarfloat("scr_sd_graceperiod") > 60)
+        else if(getCvarFloat("scr_sd_graceperiod") > 60)
             setcvar("scr_sd_graceperiod", "60");
-        level.graceperiod = getcvarfloat("scr_sd_graceperiod");
+        level.graceperiod = getCvarFloat("scr_sd_graceperiod");
     }
     else if(level.gametype == "re")
     {
-        if(getcvar("scr_re_scorelimit") == "")		// Score limit per map
+        if(getCvar("scr_re_scorelimit") == "")		// Score limit per map
             setcvar("scr_re_scorelimit", "10");
-        level.scorelimit = getcvarint("scr_re_scorelimit");
+        level.scorelimit = getCvarInt("scr_re_scorelimit");
 
-        if(getcvar("scr_re_roundlimit") == "")		// Round limit per map
+        if(getCvar("scr_re_roundlimit") == "")		// Round limit per map
             setcvar("scr_re_roundlimit", "0");
-        level.roundlimit = getcvarint("scr_re_roundlimit");
+        level.roundlimit = getCvarInt("scr_re_roundlimit");
 
-        if(getcvar("scr_re_roundlength") == "")		// Time length of each round
+        if(getCvar("scr_re_roundlength") == "")		// Time length of each round
             setcvar("scr_re_roundlength", "4");
-        else if(getcvarfloat("scr_re_roundlength") > 10)
+        else if(getCvarFloat("scr_re_roundlength") > 10)
             setcvar("scr_re_roundlength", "10");
-        level.roundlength = getcvarfloat("scr_re_roundlength");
+        level.roundlength = getCvarFloat("scr_re_roundlength");
 
-        if(getcvar("scr_re_graceperiod") == "")		// Time at round start where spawning and weapon choosing is still allowed
+        if(getCvar("scr_re_graceperiod") == "")		// Time at round start where spawning and weapon choosing is still allowed
             setcvar("scr_re_graceperiod", "15");
-        else if(getcvarfloat("scr_re_graceperiod") > 60)
+        else if(getCvarFloat("scr_re_graceperiod") > 60)
             setcvar("scr_re_graceperiod", "60");
-        level.graceperiod = getcvarfloat("scr_re_graceperiod");
+        level.graceperiod = getCvarFloat("scr_re_graceperiod");
     }
     else if(level.gametype == "dm")
     {
-        if(getcvar("scr_dm_scorelimit") == "")		// Score limit per map
+        if(getCvar("scr_dm_scorelimit") == "")		// Score limit per map
             setcvar("scr_dm_scorelimit", "50");
-        level.scorelimit = getcvarint("scr_dm_scorelimit");
+        level.scorelimit = getCvarInt("scr_dm_scorelimit");
     }
     else if(level.gametype == "tdm")
     {
-        if(getcvar("scr_tdm_scorelimit") == "")		// Score limit per map
+        if(getCvar("scr_tdm_scorelimit") == "")		// Score limit per map
             setcvar("scr_tdm_scorelimit", "100");
-        level.scorelimit = getcvarint("scr_tdm_scorelimit");
+        level.scorelimit = getCvarInt("scr_tdm_scorelimit");
     }
     else if(level.gametype == "bel")
     {
-        if(getcvar("scr_bel_scorelimit") == "")
+        if(getCvar("scr_bel_scorelimit") == "")
             setcvar("scr_bel_scorelimit", "50");
-        level.playerscorelimit = getcvarint("scr_bel_scorelimit");
+        level.playerscorelimit = getCvarInt("scr_bel_scorelimit");
     }
 
     if(level.gametype == "bel")
     {
-        if(getcvar("scr_bel_alivepointtime") == "")
+        if(getCvar("scr_bel_alivepointtime") == "")
             setcvar("scr_bel_alivepointtime", "10");
-        level.AlivePointTime = getcvarint("scr_bel_alivepointtime");
+        level.AlivePointTime = getCvarInt("scr_bel_alivepointtime");
 
-        if(getcvar("scr_bel_positiontime") == "")
+        if(getCvar("scr_bel_positiontime") == "")
             setcvar("scr_bel_positiontime", "6");
-        level.PositionUpdateTime = getcvarint("scr_bel_positiontime");
+        level.PositionUpdateTime = getCvarInt("scr_bel_positiontime");
 
-        if(getcvar("scr_bel_respawndelay") == "")
+        if(getCvar("scr_bel_respawndelay") == "")
             setcvar("scr_bel_respawndelay", "0");
 
-        if(getcvar("scr_bel_showoncompass") == "")
+        if(getCvar("scr_bel_showoncompass") == "")
             setcvar("scr_bel_showoncompass", "1");
     }
 
     if(level.gametype == "sd" || level.gametype == "re" || level.gametype == "tdm" || level.gametype == "bel")
     {
-        if(getcvar("scr_friendlyfire") == "")		// Friendly fire
+        if(getCvar("scr_friendlyfire") == "")		// Friendly fire
             setcvar("scr_friendlyfire", "0");
 
         if(level.gametype == "sd" || level.gametype == "re")
         {
-            if(getcvar("scr_roundcam") == "")		// Round Cam On or Off (Default 0 - off)
+            if(getCvar("scr_roundcam") == "")		// Round Cam On or Off (Default 0 - off)
                 setcvar("scr_roundcam", "0");
         }
 
@@ -180,20 +180,20 @@ main()
             }
         }
 
-        if(getcvar("scr_drawfriend") == "")		// Draws a team icon over teammates
+        if(getCvar("scr_drawfriend") == "")		// Draws a team icon over teammates
             setcvar("scr_drawfriend", "0");
-        level.drawfriend = getcvarint("scr_drawfriend");
+        level.drawfriend = getCvarInt("scr_drawfriend");
     }
 
     if(level.gametype == "dm" || level.gametype == "tdm")
     {
-        if(getcvar("scr_forcerespawn") == "")		// Force respawning
+        if(getCvar("scr_forcerespawn") == "")		// Force respawning
             setcvar("scr_forcerespawn", "0");
     }
 
-    if(getcvar("g_allowvote") == "")
+    if(getCvar("g_allowvote") == "")
         setcvar("g_allowvote", "1");
-    level.allowvote = getcvarint("g_allowvote");
+    level.allowvote = getCvarInt("g_allowvote");
     setcvar("scr_allow_vote", level.allowvote);
 
     if(level.gametype == "re")
@@ -203,7 +203,7 @@ main()
         if(!isdefined(game["re_defenders"]))
             game["re_defenders"] = "axis";
 
-        if(getcvar("scr_re_showcarrier") == "")
+        if(getCvar("scr_re_showcarrier") == "")
             setcvar("scr_re_showcarrier", "0");
 
         if(!isdefined(game["re_attackers_obj_text"]))
@@ -291,7 +291,7 @@ main()
         {
             spawnpointname = "mp_teamdeathmatch_spawn";
         }
-        spawnpoints = getentarray(spawnpointname, "classname");
+        spawnpoints = getEntArray(spawnpointname, "classname");
 
         if(spawnpoints.size > 0)
         {
@@ -311,7 +311,7 @@ main()
         {
             spawnpointname = "mp_retrieval_spawn_allied";
         }
-        spawnpoints = getentarray(spawnpointname, "classname");
+        spawnpoints = getEntArray(spawnpointname, "classname");
 
         if(spawnpoints.size > 0)
         {
@@ -329,7 +329,7 @@ main()
         {
             spawnpointname = "mp_retrieval_spawn_axis";            
         }
-        spawnpoints = getentarray(spawnpointname, "classname");
+        spawnpoints = getEntArray(spawnpointname, "classname");
 
         if(spawnpoints.size > 0)
         {
@@ -342,12 +342,12 @@ main()
 
     if(level.gametype == "re")
     {
-        players = getentarray("player", "classname");
+        players = getEntArray("player", "classname");
         for(i = 0; i < players.size; i++)
             players[i].objs_held = 0;
 
         //get the minefields
-        level.minefield = getentarray("minefield", "targetname");
+        level.minefield = getEntArray("minefield", "targetname");
 
         thread maps\mp\gametypes\re::retrieval();
     }
@@ -377,10 +377,10 @@ startGameType()
         makeCvarServerInfo("scr_layoutimage", "");
 
         // server cvar overrides
-        if(getcvar("scr_allies") != "")
-            game["allies"] = getcvar("scr_allies");	
-        if(getcvar("scr_axis") != "")
-            game["axis"] = getcvar("scr_axis");
+        if(getCvar("scr_allies") != "")
+            game["allies"] = getCvar("scr_allies");	
+        if(getCvar("scr_axis") != "")
+            game["axis"] = getCvar("scr_axis");
 
         if(getCvar("g_gametype") != "tdm")
         {
@@ -660,128 +660,12 @@ startGameType()
         thread maps\mp\gametypes\bel::updateScriptCvars();            
     }
 
+    hud_scoreLimit();
+
     if(game["matchstarted"])
         thread hud_alivePlayers();
 }
 
-hud_alivePlayers()
-{
-    level endon("intermission");
-    
-    hud_enemies_y = 8;
-    hud_vs_y = hud_enemies_y + 18;
-    hud_friends_y = hud_vs_y + 11;
-
-    hud_enemies_color = (1, 0, 0);
-    hud_friends_color = (0, 1, 0);
-
-    hud_enemies_fontScale = 1.6;
-    hud_friends_fontScale = 1.1;
-
-    vs = &"VS";
-    
-    // Allies and Axis vs
-    level.hud_alivePlayers_vs = [];
-    level.hud_alivePlayers_vs[level.hud_alivePlayers_vs.size] = newTeamHudElem("allies");
-    level.hud_alivePlayers_vs[level.hud_alivePlayers_vs.size] = newTeamHudElem("axis");
-    for (i = 0; i < level.hud_alivePlayers_vs.size; i++)
-    {
-        level.hud_alivePlayers_vs[i].alignX = "center";
-        level.hud_alivePlayers_vs[i].alignY = "middle";
-        level.hud_alivePlayers_vs[i].x = 320;
-        level.hud_alivePlayers_vs[i].y = hud_vs_y;
-        level.hud_alivePlayers_vs[i].fontScale = 0.7;
-        level.hud_alivePlayers_vs[i] setText(vs);
-    }
-    
-    if (level.gametype != "dm")
-    {
-        // Spectator' vs
-        level.hud_alivePlayers_spectator_vs = newTeamHudElem("spectator");
-        level.hud_alivePlayers_spectator_vs.alignX = "center";
-        level.hud_alivePlayers_spectator_vs.alignY = "middle";
-        level.hud_alivePlayers_spectator_vs.x = 320;
-        level.hud_alivePlayers_spectator_vs.y = 12;
-        level.hud_alivePlayers_spectator_vs.fontScale = 0.8;
-        level.hud_alivePlayers_spectator_vs setText(vs);
-
-        // Spectator' allies
-        level.hud_alivePlayers_spectator_allies = newTeamHudElem("spectator");
-        level.hud_alivePlayers_spectator_allies.alignX = "left";
-        level.hud_alivePlayers_spectator_allies.alignY = "middle";
-        level.hud_alivePlayers_spectator_allies.x = level.hud_alivePlayers_spectator_vs.x - 80;
-        level.hud_alivePlayers_spectator_allies.y = 12;
-        level.hud_alivePlayers_spectator_allies.fontScale = 1.2;
-        level.hud_alivePlayers_spectator_allies.label = &"Allies: ";
-
-        // Spectator' axis
-        level.hud_alivePlayers_spectator_axis = newTeamHudElem("spectator");
-        level.hud_alivePlayers_spectator_axis.alignX = "right";
-        level.hud_alivePlayers_spectator_axis.alignY = "middle";
-        level.hud_alivePlayers_spectator_axis.x = level.hud_alivePlayers_spectator_vs.x + 80 - 6;
-        level.hud_alivePlayers_spectator_axis.y = 12;
-        level.hud_alivePlayers_spectator_axis.fontScale = 1.2;
-        level.hud_alivePlayers_spectator_axis.label = &"Axis: ";
-    }
-
-    // Unable to retrieve hud team after creation, so do 1 by 1 for now
-    
-    // Allies' friends
-    level.hud_alivePlayers_allies_allies = newTeamHudElem("allies");
-    level.hud_alivePlayers_allies_allies.alignX = "center";
-    level.hud_alivePlayers_allies_allies.alignY = "middle";
-    level.hud_alivePlayers_allies_allies.x = 320;
-    level.hud_alivePlayers_allies_allies.y = hud_friends_y;
-    level.hud_alivePlayers_allies_allies.fontScale = hud_friends_fontScale;
-    level.hud_alivePlayers_allies_allies.color = hud_friends_color;
-
-    // Allies' enemies
-    level.hud_alivePlayers_allies_axis = newTeamHudElem("allies");
-    level.hud_alivePlayers_allies_axis.alignX = "center";
-    level.hud_alivePlayers_allies_axis.alignY = "middle";
-    level.hud_alivePlayers_allies_axis.x = 320;
-    level.hud_alivePlayers_allies_axis.y = hud_enemies_y;
-    level.hud_alivePlayers_allies_axis.fontScale = hud_enemies_fontScale;
-    level.hud_alivePlayers_allies_axis.color = hud_enemies_color;
-
-    // Axis' friends
-    level.hud_alivePlayers_axis_axis = newTeamHudElem("axis");
-    level.hud_alivePlayers_axis_axis.alignX = "center";
-    level.hud_alivePlayers_axis_axis.alignY = "middle";
-    level.hud_alivePlayers_axis_axis.x = 320;
-    level.hud_alivePlayers_axis_axis.y = hud_friends_y;
-    level.hud_alivePlayers_axis_axis.fontScale = hud_friends_fontScale;
-    level.hud_alivePlayers_axis_axis.color = hud_friends_color;
-
-    // Axis' enemies
-    level.hud_alivePlayers_axis_allies = newTeamHudElem("axis");
-    level.hud_alivePlayers_axis_allies.alignX = "center";
-    level.hud_alivePlayers_axis_allies.alignY = "middle";
-    level.hud_alivePlayers_axis_allies.x = 320;
-    level.hud_alivePlayers_axis_allies.y = hud_enemies_y;
-    level.hud_alivePlayers_axis_allies.fontScale = hud_enemies_fontScale;
-    level.hud_alivePlayers_axis_allies.color = hud_enemies_color;
-
-    for(;;)
-    {
-        aliveAllies = getTeamPlayersAlive("allies");
-        aliveAxis = getTeamPlayersAlive("axis");
-        
-        level.hud_alivePlayers_allies_allies setValue(aliveAllies);
-        level.hud_alivePlayers_allies_axis setValue(aliveAxis);
-
-        level.hud_alivePlayers_axis_axis setValue(aliveAxis);
-        level.hud_alivePlayers_axis_allies setValue(aliveAllies);
-
-        if (level.gametype != "dm")
-        {
-            level.hud_alivePlayers_spectator_allies setValue(aliveAllies);
-            level.hud_alivePlayers_spectator_axis setValue(aliveAxis);
-        }
-
-        wait .05;
-    }
-}
 
 
 
@@ -1013,7 +897,7 @@ playerConnect()
                             numonteam["allies"] = 0;
                             numonteam["axis"] = 0;
 
-                            players = getentarray("player", "classname");
+                            players = getEntArray("player", "classname");
                             for(i = 0; i < players.size; i++)
                             {
                                 player = players[i];
@@ -1652,6 +1536,8 @@ playerDisconnect()
             }
         }
     }
+
+    hud_playerFps_delete();
 }
 
 playerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc)
@@ -1826,7 +1712,6 @@ isPistol(sWeapon)
 showDamageFeedback(iDamage, victim_will_die)
 {
     self endon("spawned");
-    self endon("disconnect");
     destroyDamageFeedback();
 
     if(victim_will_die)
@@ -2243,7 +2128,7 @@ playerKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitL
 
     if(level.gametype == "dm" || level.gametype == "tdm")
     {
-        if(getcvarint("scr_forcerespawn") > 0)
+        if(getCvarInt("scr_forcerespawn") > 0)
             doKillcam = false;
     }
 
@@ -2272,6 +2157,8 @@ playerKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitL
             }
         }
     }
+
+    hud_playerFps_delete();
 }
 
 spawnPlayer()
@@ -2345,7 +2232,7 @@ spawnPlayer()
             if(level.gametype == "bel")
             {
                 spawnpointname = "mp_teamdeathmatch_spawn";
-                spawnpoints = getentarray(spawnpointname, "classname");
+                spawnpoints = getEntArray(spawnpointname, "classname");
 
                 spawnpoint = maps\mp\gametypes\_spawnlogic::getSpawnpoint_MiddleThird(spawnpoints);
             }
@@ -2374,21 +2261,21 @@ spawnPlayer()
                     }
                 }
 
-                spawnpoints = getentarray(spawnpointname, "classname");
+                spawnpoints = getEntArray(spawnpointname, "classname");
                 spawnpoint = maps\mp\gametypes\_spawnlogic::getSpawnpoint_Random(spawnpoints);
             }
         }
         else if(level.gametype == "tdm")
         {
             spawnpointname = "mp_teamdeathmatch_spawn";
-            spawnpoints = getentarray(spawnpointname, "classname");
+            spawnpoints = getEntArray(spawnpointname, "classname");
             spawnpoint = maps\mp\gametypes\_spawnlogic::getSpawnpoint_NearTeam(spawnpoints);
         }
     }
     else if(level.gametype == "dm")
     {
         spawnpointname = "mp_deathmatch_spawn";
-        spawnpoints = getentarray(spawnpointname, "classname");
+        spawnpoints = getEntArray(spawnpointname, "classname");
         spawnpoint = maps\mp\gametypes\_spawnlogic::getSpawnpoint_DM(spawnpoints);
     }
     
@@ -2600,6 +2487,8 @@ spawnPlayer()
             }
         }
     }
+
+    thread hud_playerFps();
 }
 
 spawnSpectator(origin, angles)
@@ -2665,7 +2554,7 @@ spawnSpectator(origin, angles)
         {
             spawnpointname = "mp_teamdeathmatch_intermission";
         }
-        spawnpoints = getentarray(spawnpointname, "classname");
+        spawnpoints = getEntArray(spawnpointname, "classname");
         spawnpoint = maps\mp\gametypes\_spawnlogic::getSpawnpoint_Random(spawnpoints);
 
         if(isdefined(spawnpoint))
@@ -2705,6 +2594,8 @@ spawnSpectator(origin, angles)
     {
         self setClientCvar("cg_objectiveText", &"BEL_SPECTATOR_OBJS");
     }
+
+    hud_playerFps_delete();
 }
 
 spawnIntermission()
@@ -2750,7 +2641,7 @@ spawnIntermission()
     {
         spawnpointname = "mp_teamdeathmatch_intermission";
     }
-    spawnpoints = getentarray(spawnpointname, "classname");
+    spawnpoints = getEntArray(spawnpointname, "classname");
     if(level.gametype == "bel")
     {
         spawnpoint = maps\mp\gametypes\_spawnlogic::getSpawnpoint_MiddleThird(spawnpoints);
@@ -3098,7 +2989,7 @@ roundcam(delay, winningteam)
 
 resetScores()
 {
-    players = getentarray("player", "classname");
+    players = getEntArray("player", "classname");
     for(i = 0; i < players.size; i++)
     {
         player = players[i];
@@ -3129,7 +3020,7 @@ endRound(roundwinner, timeexpired)
         game["alliedscore"]++;
         setTeamScore("allies", game["alliedscore"]);
         
-        players = getentarray("player", "classname");
+        players = getEntArray("player", "classname");
         for(i = 0; i < players.size; i++)
         {
             if ( (isdefined (players[i].pers["team"])) && (players[i].pers["team"] == "allies") )
@@ -3146,7 +3037,7 @@ endRound(roundwinner, timeexpired)
         game["axisscore"]++;
         setTeamScore("axis", game["axisscore"]);
 
-        players = getentarray("player", "classname");
+        players = getEntArray("player", "classname");
         for(i = 0; i < players.size; i++)
         {
             if ( (isdefined (players[i].pers["team"])) && (players[i].pers["team"] == "axis") )
@@ -3160,12 +3051,12 @@ endRound(roundwinner, timeexpired)
     }
     else if(roundwinner == "draw")
     {
-        players = getentarray("player", "classname");
+        players = getEntArray("player", "classname");
         for(i = 0; i < players.size; i++)
             players[i] playLocalSound("MP_announcer_round_draw");
     }
 
-    if((getcvar("scr_roundcam") == "1") && (!timeexpired) && (game["matchstarted"]))
+    if((getCvar("scr_roundcam") == "1") && (!timeexpired) && (game["matchstarted"]))
     {
         if(level.gametype == "sd" && ((isdefined(level.playercam) || isdefined(level.bombcam)) && roundwinner != "draw" && roundwinner != "reset")
             || level.gametype == "re" && ((isdefined(level.playercam) || isdefined(level.goalcam)) && roundwinner != "draw" && roundwinner != "reset"))
@@ -3218,7 +3109,7 @@ endRound(roundwinner, timeexpired)
     level.mapended = true;
 
     // for all living players store their weapons
-    players = getentarray("player", "classname");
+    players = getEntArray("player", "classname");
     for(i = 0; i < players.size; i++)
     {
         player = players[i];
@@ -3297,6 +3188,9 @@ endMap()
     level notify("intermission");
 
     hud_alivePlayers_delete();
+    players = getEntArray("player", "classname");
+    for(i = 0; i < players.size; i++)
+        players[i] hud_playerFps_delete();
 
     if(level.gametype == "sd" || level.gametype == "re")
     {
@@ -3315,7 +3209,7 @@ endMap()
     }
     else if(level.gametype == "dm" || level.gametype == "bel")
     {
-        players = getentarray("player", "classname");
+        players = getEntArray("player", "classname");
         for(i = 0; i < players.size; i++)
         {
             player = players[i];
@@ -3373,7 +3267,7 @@ endMap()
         }
     }
 
-    players = getentarray("player", "classname");
+    players = getEntArray("player", "classname");
     for(i = 0; i < players.size; i++)
     {
         player = players[i];
@@ -3418,39 +3312,11 @@ endMap()
         }
     }
 
-    wait 5.5;
+    wait 5;
 
     mapvote::start();
     
     exitLevel(false); // TODO: add a fix in libcod1 to make exitLevel(true) working
-}
-
-hud_alivePlayers_delete()
-{
-    // Allies and Axis vs
-    for(i = 0; i < level.hud_alivePlayers_vs.size; i++)
-        if(isDefined(level.hud_alivePlayers_vs[i]))
-            level.hud_alivePlayers_vs[i] destroy();
-
-    // Spectator
-    if(isDefined(level.hud_alivePlayers_spectator_vs))
-        level.hud_alivePlayers_spectator_vs destroy();
-    if(isDefined(level.hud_alivePlayers_spectator_allies))
-        level.hud_alivePlayers_spectator_allies destroy();
-    if(isDefined(level.hud_alivePlayers_spectator_axis))
-        level.hud_alivePlayers_spectator_axis destroy();
-
-    // Allies
-    if(isDefined(level.hud_alivePlayers_allies_allies))
-        level.hud_alivePlayers_allies_allies destroy();
-    if(isDefined(level.hud_alivePlayers_allies_axis))
-        level.hud_alivePlayers_allies_axis destroy();
-
-    // Axis
-    if(isDefined(level.hud_alivePlayers_axis_axis))
-        level.hud_alivePlayers_axis_axis destroy();
-    if(isDefined(level.hud_alivePlayers_axis_allies))
-        level.hud_alivePlayers_axis_allies destroy();
 }
 
 checkScoreLimit()
@@ -3491,4 +3357,211 @@ printJoinedTeam(team)
         iprintln(&"MPSCRIPT_JOINED_ALLIES", self);
     else if(team == "axis")
         iprintln(&"MPSCRIPT_JOINED_AXIS", self);
+}
+
+
+
+
+
+
+
+hud_scoreLimit()
+{
+    scorelimitCvar = getCvar("scr_" + level.gametype + "_scorelimit");
+    if (scorelimitCvar != "")
+    {
+        level.hudScoreLimit = newHudElem();
+        level.hudScoreLimit.sort = -1;
+        level.hudScoreLimit.x = 320;
+        level.hudScoreLimit.y = 480;
+        level.hudScoreLimit.alignX = "center";
+        level.hudScoreLimit.alignY = "middle";
+        level.hudScoreLimit.fontScale = 0.9;
+        level.hudScoreLimit.label = &"Score limit: ";
+        level.hudScoreLimit setValue(scorelimitCvar);
+
+
+        thread waitDestroyScoreLimit();
+    }
+}
+waitDestroyScoreLimit()
+{
+    level waittill("intermission");
+    level.hudScoreLimit destroy();
+}
+
+
+
+
+hud_alivePlayers()
+{
+    level endon("intermission");
+    
+    hud_enemies_y = 8;
+    hud_vs_y = hud_enemies_y + 18;
+    hud_friends_y = hud_vs_y + 11;
+
+    hud_enemies_color = (1, 0, 0);
+    hud_friends_color = (0, 1, 0);
+
+    hud_enemies_fontScale = 1.6;
+    hud_friends_fontScale = 1.1;
+
+    vs = &"VS";
+    
+    // Allies and Axis vs
+    level.hud_alivePlayers_vs = [];
+    level.hud_alivePlayers_vs[level.hud_alivePlayers_vs.size] = newTeamHudElem("allies");
+    level.hud_alivePlayers_vs[level.hud_alivePlayers_vs.size] = newTeamHudElem("axis");
+    for (i = 0; i < level.hud_alivePlayers_vs.size; i++)
+    {
+        level.hud_alivePlayers_vs[i].alignX = "center";
+        level.hud_alivePlayers_vs[i].alignY = "middle";
+        level.hud_alivePlayers_vs[i].x = 320;
+        level.hud_alivePlayers_vs[i].y = hud_vs_y;
+        level.hud_alivePlayers_vs[i].fontScale = 0.7;
+        level.hud_alivePlayers_vs[i] setText(vs);
+    }
+    
+    if (level.gametype != "dm")
+    {
+        // Spectator' vs
+        level.hud_alivePlayers_spectator_vs = newTeamHudElem("spectator");
+        level.hud_alivePlayers_spectator_vs.alignX = "center";
+        level.hud_alivePlayers_spectator_vs.alignY = "middle";
+        level.hud_alivePlayers_spectator_vs.x = 320;
+        level.hud_alivePlayers_spectator_vs.y = 12;
+        level.hud_alivePlayers_spectator_vs.fontScale = 0.8;
+        level.hud_alivePlayers_spectator_vs setText(vs);
+
+        // Spectator' allies
+        level.hud_alivePlayers_spectator_allies = newTeamHudElem("spectator");
+        level.hud_alivePlayers_spectator_allies.alignX = "left";
+        level.hud_alivePlayers_spectator_allies.alignY = "middle";
+        level.hud_alivePlayers_spectator_allies.x = level.hud_alivePlayers_spectator_vs.x - 80;
+        level.hud_alivePlayers_spectator_allies.y = 12;
+        level.hud_alivePlayers_spectator_allies.fontScale = 1.2;
+        level.hud_alivePlayers_spectator_allies.label = &"Allies: ";
+
+        // Spectator' axis
+        level.hud_alivePlayers_spectator_axis = newTeamHudElem("spectator");
+        level.hud_alivePlayers_spectator_axis.alignX = "right";
+        level.hud_alivePlayers_spectator_axis.alignY = "middle";
+        level.hud_alivePlayers_spectator_axis.x = level.hud_alivePlayers_spectator_vs.x + 80 - 6;
+        level.hud_alivePlayers_spectator_axis.y = 12;
+        level.hud_alivePlayers_spectator_axis.fontScale = 1.2;
+        level.hud_alivePlayers_spectator_axis.label = &"Axis: ";
+    }
+
+    // Unable to retrieve hud team after creation, so do 1 by 1 for now
+    
+    // Allies' friends
+    level.hud_alivePlayers_allies_allies = newTeamHudElem("allies");
+    level.hud_alivePlayers_allies_allies.alignX = "center";
+    level.hud_alivePlayers_allies_allies.alignY = "middle";
+    level.hud_alivePlayers_allies_allies.x = 320;
+    level.hud_alivePlayers_allies_allies.y = hud_friends_y;
+    level.hud_alivePlayers_allies_allies.fontScale = hud_friends_fontScale;
+    level.hud_alivePlayers_allies_allies.color = hud_friends_color;
+
+    // Allies' enemies
+    level.hud_alivePlayers_allies_axis = newTeamHudElem("allies");
+    level.hud_alivePlayers_allies_axis.alignX = "center";
+    level.hud_alivePlayers_allies_axis.alignY = "middle";
+    level.hud_alivePlayers_allies_axis.x = 320;
+    level.hud_alivePlayers_allies_axis.y = hud_enemies_y;
+    level.hud_alivePlayers_allies_axis.fontScale = hud_enemies_fontScale;
+    level.hud_alivePlayers_allies_axis.color = hud_enemies_color;
+
+    // Axis' friends
+    level.hud_alivePlayers_axis_axis = newTeamHudElem("axis");
+    level.hud_alivePlayers_axis_axis.alignX = "center";
+    level.hud_alivePlayers_axis_axis.alignY = "middle";
+    level.hud_alivePlayers_axis_axis.x = 320;
+    level.hud_alivePlayers_axis_axis.y = hud_friends_y;
+    level.hud_alivePlayers_axis_axis.fontScale = hud_friends_fontScale;
+    level.hud_alivePlayers_axis_axis.color = hud_friends_color;
+
+    // Axis' enemies
+    level.hud_alivePlayers_axis_allies = newTeamHudElem("axis");
+    level.hud_alivePlayers_axis_allies.alignX = "center";
+    level.hud_alivePlayers_axis_allies.alignY = "middle";
+    level.hud_alivePlayers_axis_allies.x = 320;
+    level.hud_alivePlayers_axis_allies.y = hud_enemies_y;
+    level.hud_alivePlayers_axis_allies.fontScale = hud_enemies_fontScale;
+    level.hud_alivePlayers_axis_allies.color = hud_enemies_color;
+
+    for(;;)
+    {
+        aliveAllies = getTeamPlayersAlive("allies");
+        aliveAxis = getTeamPlayersAlive("axis");
+        
+        level.hud_alivePlayers_allies_allies setValue(aliveAllies);
+        level.hud_alivePlayers_allies_axis setValue(aliveAxis);
+
+        level.hud_alivePlayers_axis_axis setValue(aliveAxis);
+        level.hud_alivePlayers_axis_allies setValue(aliveAllies);
+
+        if (level.gametype != "dm")
+        {
+            level.hud_alivePlayers_spectator_allies setValue(aliveAllies);
+            level.hud_alivePlayers_spectator_axis setValue(aliveAxis);
+        }
+
+        wait .05;
+    }
+}
+hud_alivePlayers_delete()
+{
+    // Allies and Axis vs
+    for(i = 0; i < level.hud_alivePlayers_vs.size; i++)
+        if(isDefined(level.hud_alivePlayers_vs[i]))
+            level.hud_alivePlayers_vs[i] destroy();
+
+    // Spectator
+    if(isDefined(level.hud_alivePlayers_spectator_vs))
+        level.hud_alivePlayers_spectator_vs destroy();
+    if(isDefined(level.hud_alivePlayers_spectator_allies))
+        level.hud_alivePlayers_spectator_allies destroy();
+    if(isDefined(level.hud_alivePlayers_spectator_axis))
+        level.hud_alivePlayers_spectator_axis destroy();
+
+    // Allies
+    if(isDefined(level.hud_alivePlayers_allies_allies))
+        level.hud_alivePlayers_allies_allies destroy();
+    if(isDefined(level.hud_alivePlayers_allies_axis))
+        level.hud_alivePlayers_allies_axis destroy();
+
+    // Axis
+    if(isDefined(level.hud_alivePlayers_axis_axis))
+        level.hud_alivePlayers_axis_axis destroy();
+    if(isDefined(level.hud_alivePlayers_axis_allies))
+        level.hud_alivePlayers_axis_allies destroy();
+}
+
+hud_playerFps()
+{
+    level endon("intermission");
+    self endon("hud_playerFps_delete");
+
+    self.hud_fps = newClientHudElem(self);
+    self.hud_fps.sort = -1;
+    self.hud_fps.x = 540;
+    self.hud_fps.y = 25;
+    self.hud_fps.fontScale = 0.8;
+    self.hud_fps.label = &"Public FPS: ";
+
+    for(;;)
+    {
+        fps = self getFPS();
+        if(isDefined(self.hud_fps))
+            self.hud_fps setValue(fps);
+        wait .05;
+    }
+}
+hud_playerFps_delete()
+{
+    self notify("hud_playerFps_delete");
+    if(isDefined(self.hud_fps))
+        self.hud_fps destroy();    
 }

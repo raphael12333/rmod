@@ -470,39 +470,39 @@ initGlobalCvars()
 
 restrictPlacedWeapons()
 {
-    if(!getcvar("scr_allow_m1carbine"))
+    if(!getCvar("scr_allow_m1carbine"))
         deletePlacedEntity("mpweapon_m1carbine");
-    if(!getcvar("scr_allow_m1garand"))
+    if(!getCvar("scr_allow_m1garand"))
         deletePlacedEntity("mpweapon_m1garand");
-    if(!getcvar("scr_allow_thompson"))
+    if(!getCvar("scr_allow_thompson"))
         deletePlacedEntity("mpweapon_thompson");
-    if(!getcvar("scr_allow_bar"))
+    if(!getCvar("scr_allow_bar"))
         deletePlacedEntity("mpweapon_bar");
-    if(!getcvar("scr_allow_springfield"))
+    if(!getCvar("scr_allow_springfield"))
         deletePlacedEntity("mpweapon_springfield");
-    if(!getcvar("scr_allow_enfield"))
+    if(!getCvar("scr_allow_enfield"))
         deletePlacedEntity("mpweapon_enfield");
-    if(!getcvar("scr_allow_sten"))
+    if(!getCvar("scr_allow_sten"))
         deletePlacedEntity("mpweapon_sten");
-    if(!getcvar("scr_allow_bren"))
+    if(!getCvar("scr_allow_bren"))
         deletePlacedEntity("mpweapon_bren");
-    if(!getcvar("scr_allow_nagant"))
+    if(!getCvar("scr_allow_nagant"))
         deletePlacedEntity("mpweapon_mosinnagant");
-    if(!getcvar("scr_allow_ppsh"))
+    if(!getCvar("scr_allow_ppsh"))
         deletePlacedEntity("mpweapon_ppsh");
-    if(!getcvar("scr_allow_nagantsniper"))
+    if(!getCvar("scr_allow_nagantsniper"))
         deletePlacedEntity("mpweapon_mosinnagantsniper");
-    if(!getcvar("scr_allow_kar98k"))
+    if(!getCvar("scr_allow_kar98k"))
         deletePlacedEntity("mpweapon_kar98k");
-    if(!getcvar("scr_allow_mp40"))
+    if(!getCvar("scr_allow_mp40"))
         deletePlacedEntity("mpweapon_mp40");
-    if(!getcvar("scr_allow_mp44"))
+    if(!getCvar("scr_allow_mp44"))
         deletePlacedEntity("mpweapon_mp44");
-    if(!getcvar("scr_allow_kar98ksniper"))
+    if(!getCvar("scr_allow_kar98ksniper"))
         deletePlacedEntity("mpweapon_kar98ksniper");
-    if(!getcvar("scr_allow_fg42"))
+    if(!getCvar("scr_allow_fg42"))
         deletePlacedEntity("mpweapon_fg42");
-    if(!getcvar("scr_allow_panzerfaust"))
+    if(!getCvar("scr_allow_panzerfaust"))
         deletePlacedEntity("mpweapon_panzerfaust");
 
     // Need to not automatically give these to players if I allow restricting them
@@ -516,7 +516,7 @@ restrictPlacedWeapons()
 
 deletePlacedEntity(entity)
 {
-    entities = getentarray(entity, "classname");
+    entities = getEntArray(entity, "classname");
     for(i = 0; i < entities.size; i++)
     {
         //println("DELETED: ", entities[i].classname);
@@ -624,7 +624,7 @@ restrict(response)
             switch(response)		
             {
             case "m1carbine_mp":
-                if(!getcvar("scr_allow_m1carbine"))
+                if(!getCvar("scr_allow_m1carbine"))
                 {
                     self iprintln(&"MPSCRIPT_M1A1_CARBINE_IS_A_RESTRICTED");
                     response = "restricted";
@@ -632,7 +632,7 @@ restrict(response)
                 break;
                 
             case "m1garand_mp":
-                if(!getcvar("scr_allow_m1garand"))
+                if(!getCvar("scr_allow_m1garand"))
                 {
                     self iprintln(&"MPSCRIPT_M1_GARAND_IS_A_RESTRICTED");
                     response = "restricted";
@@ -640,7 +640,7 @@ restrict(response)
                 break;
                 
             case "thompson_mp":
-                if(!getcvar("scr_allow_thompson"))
+                if(!getCvar("scr_allow_thompson"))
                 {
                     self iprintln(&"MPSCRIPT_THOMPSON_IS_A_RESTRICTED");
                     response = "restricted";
@@ -648,7 +648,7 @@ restrict(response)
                 break;
                 
             case "bar_mp":
-                if(!getcvar("scr_allow_bar"))
+                if(!getCvar("scr_allow_bar"))
                 {
                     self iprintln(&"MPSCRIPT_BAR_IS_A_RESTRICTED_WEAPON");
                     response = "restricted";
@@ -656,7 +656,7 @@ restrict(response)
                 break;
                 
             case "springfield_mp":
-                if(!getcvar("scr_allow_springfield"))
+                if(!getCvar("scr_allow_springfield"))
                 {
                     self iprintln(&"MPSCRIPT_SPRINGFIELD_IS_A_RESTRICTED");
                     response = "restricted";
@@ -673,7 +673,7 @@ restrict(response)
             switch(response)		
             {
             case "enfield_mp":
-                if(!getcvar("scr_allow_enfield"))
+                if(!getCvar("scr_allow_enfield"))
                 {
                     self iprintln(&"MPSCRIPT_LEEENFIELD_IS_A_RESTRICTED");
                     response = "restricted";
@@ -681,7 +681,7 @@ restrict(response)
                 break;
 
             case "sten_mp":
-                if(!getcvar("scr_allow_sten"))
+                if(!getCvar("scr_allow_sten"))
                 {
                     self iprintln(&"MPSCRIPT_STEN_IS_A_RESTRICTED");
                     response = "restricted";
@@ -689,7 +689,7 @@ restrict(response)
                 break;
 
             case "bren_mp":
-                if(!getcvar("scr_allow_bren"))
+                if(!getCvar("scr_allow_bren"))
                 {
                     self iprintln(&"MPSCRIPT_BREN_LMG_IS_A_RESTRICTED");
                     response = "restricted";
@@ -697,7 +697,7 @@ restrict(response)
                 break;
             
             case "springfield_mp":
-                if(!getcvar("scr_allow_springfield"))
+                if(!getCvar("scr_allow_springfield"))
                 {
                     self iprintln(&"MPSCRIPT_SPRINGFIELD_IS_A_RESTRICTED1");
                     response = "restricted";
@@ -714,7 +714,7 @@ restrict(response)
             switch(response)		
             {
             case "mosin_nagant_mp":
-                if(!getcvar("scr_allow_nagant"))
+                if(!getCvar("scr_allow_nagant"))
                 {
                     self iprintln(&"MPSCRIPT_MOSINNAGANT_IS_A_RESTRICTED");
                     response = "restricted";
@@ -722,7 +722,7 @@ restrict(response)
                 break;
 
             case "ppsh_mp":
-                if(!getcvar("scr_allow_ppsh"))
+                if(!getCvar("scr_allow_ppsh"))
                 {
                     self iprintln(&"MPSCRIPT_PPSH_IS_A_RESTRICTED");
                     response = "restricted";
@@ -730,7 +730,7 @@ restrict(response)
                 break;
 
             case "mosin_nagant_sniper_mp":
-                if(!getcvar("scr_allow_nagantsniper"))
+                if(!getCvar("scr_allow_nagantsniper"))
                 {
                     self iprintln(&"MPSCRIPT_SCOPED_MOSINNAGANT_IS");
                     response = "restricted";
@@ -752,7 +752,7 @@ restrict(response)
             switch(response)		
             {
             case "kar98k_mp":
-                if(!getcvar("scr_allow_kar98k"))
+                if(!getCvar("scr_allow_kar98k"))
                 {
                     self iprintln(&"MPSCRIPT_KAR98K_IS_A_RESTRICTED");
                     response = "restricted";
@@ -760,7 +760,7 @@ restrict(response)
                 break;
 
             case "mp40_mp":
-                if(!getcvar("scr_allow_mp40"))
+                if(!getCvar("scr_allow_mp40"))
                 {
                     self iprintln(&"MPSCRIPT_MP40_IS_A_RESTRICTED");
                     response = "restricted";
@@ -768,7 +768,7 @@ restrict(response)
                 break;
 
             case "mp44_mp":
-                if(!getcvar("scr_allow_mp44"))
+                if(!getCvar("scr_allow_mp44"))
                 {
                     self iprintln(&"MPSCRIPT_MP44_IS_A_RESTRICTED");
                     response = "restricted";
@@ -776,7 +776,7 @@ restrict(response)
                 break;
 
             case "kar98k_sniper_mp":
-                if(!getcvar("scr_allow_kar98ksniper"))
+                if(!getCvar("scr_allow_kar98ksniper"))
                 {
                     self iprintln(&"MPSCRIPT_SCOPED_KAR98K_IS_A_RESTRICTED");
                     response = "restricted";
@@ -798,7 +798,7 @@ restrict_anyteam(response)
     switch(response)		
     {
     case "m1carbine_mp":
-        if(!getcvar("scr_allow_m1carbine"))
+        if(!getCvar("scr_allow_m1carbine"))
         {
             self iprintln(&"MPSCRIPT_M1A1_CARBINE_IS_A_RESTRICTED");
             response = "restricted";
@@ -806,7 +806,7 @@ restrict_anyteam(response)
         break;
         
     case "m1garand_mp":
-        if(!getcvar("scr_allow_m1garand"))
+        if(!getCvar("scr_allow_m1garand"))
         {
             self iprintln(&"MPSCRIPT_M1_GARAND_IS_A_RESTRICTED");
             response = "restricted";
@@ -814,7 +814,7 @@ restrict_anyteam(response)
         break;
         
     case "thompson_mp":
-        if(!getcvar("scr_allow_thompson"))
+        if(!getCvar("scr_allow_thompson"))
         {
             self iprintln(&"MPSCRIPT_THOMPSON_IS_A_RESTRICTED");
             response = "restricted";
@@ -822,7 +822,7 @@ restrict_anyteam(response)
         break;
         
     case "bar_mp":
-        if(!getcvar("scr_allow_bar"))
+        if(!getCvar("scr_allow_bar"))
         {
             self iprintln(&"MPSCRIPT_BAR_IS_A_RESTRICTED_WEAPON");
             response = "restricted";
@@ -830,7 +830,7 @@ restrict_anyteam(response)
         break;
         
     case "springfield_mp":
-        if(!getcvar("scr_allow_springfield"))
+        if(!getCvar("scr_allow_springfield"))
         {
             self iprintln(&"MPSCRIPT_SPRINGFIELD_IS_A_RESTRICTED");
             response = "restricted";
@@ -838,7 +838,7 @@ restrict_anyteam(response)
         break;
 
     case "enfield_mp":
-        if(!getcvar("scr_allow_enfield"))
+        if(!getCvar("scr_allow_enfield"))
         {
             self iprintln(&"MPSCRIPT_LEEENFIELD_IS_A_RESTRICTED");
             response = "restricted";
@@ -846,7 +846,7 @@ restrict_anyteam(response)
         break;
 
     case "sten_mp":
-        if(!getcvar("scr_allow_sten"))
+        if(!getCvar("scr_allow_sten"))
         {
             self iprintln(&"MPSCRIPT_STEN_IS_A_RESTRICTED");
             response = "restricted";
@@ -854,7 +854,7 @@ restrict_anyteam(response)
         break;
 
     case "bren_mp":
-        if(!getcvar("scr_allow_bren"))
+        if(!getCvar("scr_allow_bren"))
         {
             self iprintln(&"MPSCRIPT_BREN_LMG_IS_A_RESTRICTED");
             response = "restricted";
@@ -862,7 +862,7 @@ restrict_anyteam(response)
         break;
 
     case "mosin_nagant_mp":
-        if(!getcvar("scr_allow_nagant"))
+        if(!getCvar("scr_allow_nagant"))
         {
             self iprintln(&"MPSCRIPT_MOSINNAGANT_IS_A_RESTRICTED");
             response = "restricted";
@@ -870,7 +870,7 @@ restrict_anyteam(response)
         break;
 
     case "ppsh_mp":
-        if(!getcvar("scr_allow_ppsh"))
+        if(!getCvar("scr_allow_ppsh"))
         {
             self iprintln(&"MPSCRIPT_PPSH_IS_A_RESTRICTED");
             response = "restricted";
@@ -878,7 +878,7 @@ restrict_anyteam(response)
         break;
 
     case "mosin_nagant_sniper_mp":
-        if(!getcvar("scr_allow_nagantsniper"))
+        if(!getCvar("scr_allow_nagantsniper"))
         {
             self iprintln(&"MPSCRIPT_SCOPED_MOSINNAGANT_IS");
             response = "restricted";
@@ -886,7 +886,7 @@ restrict_anyteam(response)
         break;
 
     case "kar98k_mp":
-        if(!getcvar("scr_allow_kar98k"))
+        if(!getCvar("scr_allow_kar98k"))
         {
             self iprintln(&"MPSCRIPT_KAR98K_IS_A_RESTRICTED");
             response = "restricted";
@@ -894,7 +894,7 @@ restrict_anyteam(response)
         break;
 
     case "mp40_mp":
-        if(!getcvar("scr_allow_mp40"))
+        if(!getCvar("scr_allow_mp40"))
         {
             self iprintln(&"MPSCRIPT_MP40_IS_A_RESTRICTED");
             response = "restricted";
@@ -902,7 +902,7 @@ restrict_anyteam(response)
         break;
 
     case "mp44_mp":
-        if(!getcvar("scr_allow_mp44"))
+        if(!getCvar("scr_allow_mp44"))
         {
             self iprintln(&"MPSCRIPT_MP44_IS_A_RESTRICTED");
             response = "restricted";
@@ -910,7 +910,7 @@ restrict_anyteam(response)
         break;
 
     case "kar98k_sniper_mp":
-        if(!getcvar("scr_allow_kar98ksniper"))
+        if(!getCvar("scr_allow_kar98ksniper"))
         {
             self iprintln(&"MPSCRIPT_SCOPED_KAR98K_IS_A_RESTRICTED");
             response = "restricted";
@@ -1707,7 +1707,7 @@ sayMoveIn()
     alliedsoundalias = game["allies"] + "_move_in";
     axissoundalias = game["axis"] + "_move_in";
 
-    players = getentarray("player", "classname");
+    players = getEntArray("player", "classname");
     for(i = 0; i < players.size; i++)
     {
         player = players[i];
@@ -1814,7 +1814,7 @@ useAn(weapon)
 CountPlayers()
 {
     //chad
-    players = getentarray("player", "classname");
+    players = getEntArray("player", "classname");
     allies = 0;
     axis = 0;
     for(i = 0; i < players.size; i++)
@@ -1837,7 +1837,7 @@ TeamBalance_Check()
     {
         level.team["allies"] = 0;
         level.team["axis"] = 0;
-        players = getentarray("player", "classname");
+        players = getEntArray("player", "classname");
         for(i = 0; i < players.size; i++)
         {
             if((isdefined(players[i].pers["team"])) && (players[i].pers["team"] == "allies"))
@@ -1879,7 +1879,7 @@ TeamBalance()
     AxisPlayers = [];
     
     // Populate the team arrays
-    players = getentarray("player", "classname");
+    players = getEntArray("player", "classname");
     for(i = 0; i < players.size; i++)
     {
         if (!isdefined (players[i].pers["teamTime"]))
@@ -1924,7 +1924,7 @@ TeamBalance()
         AlliedPlayers = [];
         AxisPlayers = [];
         
-        players = getentarray("player", "classname");
+        players = getEntArray("player", "classname");
         for(i = 0; i < players.size; i++)
         {
             if((isdefined(players[i].pers["team"])) && (players[i].pers["team"] == "allies"))
@@ -1943,7 +1943,7 @@ TeamBalance_Check_Roundbased()
     {
         level.team["allies"] = 0;
         level.team["axis"] = 0;
-        players = getentarray("player", "classname");
+        players = getEntArray("player", "classname");
         for(i = 0; i < players.size; i++)
         {
             if((isdefined(players[i].pers["team"])) && (players[i].pers["team"] == "allies"))

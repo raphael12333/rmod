@@ -548,9 +548,6 @@ cmd_test(args)
 
     self setAirJumps(3);
 
-    //thread checkAir();
-
-
 
 
 

@@ -212,7 +212,7 @@ startRound()
             level.clock.color = (1, 1, 1);
     
             // Players on a team but without a weapon show as dead since they can not get in this round
-            players = getentarray("player", "classname");
+            players = getEntArray("player", "classname");
             for(i = 0; i < players.size; i++)
             {
                 player = players[i];
@@ -316,7 +316,7 @@ updateScriptCvars()
 {
     for(;;)
     {
-        timelimit = getcvarfloat("scr_bel_timelimit");
+        timelimit = getCvarFloat("scr_bel_timelimit");
         if(level.timelimit != timelimit)
         {
             if(timelimit > 1440)
@@ -332,7 +332,7 @@ updateScriptCvars()
             checkTimeLimit();
         }
 
-        scorelimit = getcvarint("scr_re_scorelimit");
+        scorelimit = getCvarInt("scr_re_scorelimit");
         if(level.scorelimit != scorelimit)
         {
             level.scorelimit = scorelimit;
@@ -341,7 +341,7 @@ updateScriptCvars()
                 checkScoreLimit();
         }
 
-        roundlimit = getcvarint("scr_re_roundlimit");
+        roundlimit = getCvarInt("scr_re_roundlimit");
         if(level.roundlimit != roundlimit)
         {
             level.roundlimit = roundlimit;
@@ -350,15 +350,15 @@ updateScriptCvars()
                 checkRoundLimit();
         }
 
-        roundlength = getcvarfloat("scr_re_roundlength");
+        roundlength = getCvarFloat("scr_re_roundlength");
         if(roundlength > 10)
             setcvar("scr_re_roundlength", "10");
 
-        graceperiod = getcvarfloat("scr_re_graceperiod");
+        graceperiod = getCvarFloat("scr_re_graceperiod");
         if(graceperiod > 60)
             setcvar("scr_re_graceperiod", "60");
 
-        drawfriend = getcvarfloat("scr_drawfriend");
+        drawfriend = getCvarFloat("scr_drawfriend");
         if(level.drawfriend != drawfriend)
         {
             level.drawfriend = drawfriend;
@@ -366,7 +366,7 @@ updateScriptCvars()
             if(level.drawfriend)
             {
                 // for all living players, show the appropriate headicon
-                players = getentarray("player", "classname");
+                players = getEntArray("player", "classname");
                 for(i = 0; i < players.size; i++)
                 {
                     player = players[i];
@@ -388,7 +388,7 @@ updateScriptCvars()
             }
             else
             {
-                players = getentarray("player", "classname");
+                players = getEntArray("player", "classname");
                 for(i = 0; i < players.size; i++)
                 {
                     player = players[i];
@@ -399,7 +399,7 @@ updateScriptCvars()
             }
         }
 
-        allowvote = getcvarint("g_allowvote");
+        allowvote = getCvarInt("g_allowvote");
         if(level.allowvote != allowvote)
         {
             level.allowvote = allowvote;
@@ -429,7 +429,7 @@ updateTeamStatus()
     level.exist["allies"] = 0;
     level.exist["axis"] = 0;
 
-    players = getentarray("player", "classname");
+    players = getEntArray("player", "classname");
     for(i = 0; i < players.size; i++)
     {
         player = players[i];
@@ -470,7 +470,7 @@ updateTeamStatus()
 
 retrieval()
 {
-    level.retrieval_objective = getentarray("retrieval_objective","targetname");
+    level.retrieval_objective = getEntArray("retrieval_objective","targetname");
     for(i = 0; i < level.retrieval_objective.size; i++)
     {
         level.retrieval_objective[i] thread retrieval_spawn_objective();
@@ -491,7 +491,7 @@ objective_think(type)
         level.hudcount++;
         self.hudnum = level.hudcount;
         objective_position(num, self.origin);
-        if (getcvar("scr_re_showcarrier") == "0")
+        if (getCvar("scr_re_showcarrier") == "0")
         {
             while (1)
             {
@@ -507,14 +507,14 @@ objective_think(type)
     if (type == "goal")
     {
         objective_icon (num,"gfx/hud/hud@objectivegoal.tga");
-        //if (getcvar("scr_re_showcarrier") == "0")
+        //if (getCvar("scr_re_showcarrier") == "0")
         //	objective_team(num,game["re_attackers"]);
     }
 }
 
 retrieval_spawn_objective()
 {
-    targeted = getentarray (self.target,"targetname");
+    targeted = getEntArray (self.target,"targetname");
     for (i=0;i<targeted.size;i++)
     {
         if (targeted[i].classname == "mp_retrieval_objective")
@@ -587,14 +587,14 @@ retrieval_think() //each objective model runs this to find it's trigger and goal
         {
             if ( (isdefined (self.script_objective_name)) && (isdefined (level.obj[self.script_objective_name])) )
             {
-                if (getcvar("scr_re_showcarrier") == "0")
+                if (getCvar("scr_re_showcarrier") == "0")
                     announcement(&"RE_OBJ_PICKED_UP_NOSTARS",level.obj[self.script_objective_name]);
                 else
                 announcement(&"RE_OBJ_PICKED_UP",level.obj[self.script_objective_name]);
             }
             else
             {
-                if (getcvar("scr_re_showcarrier") == "0")
+                if (getCvar("scr_re_showcarrier") == "0")
                     announcement(&"RE_OBJ_PICKED_UP_GENERIC_NOSTARS");
                 else
                 announcement(&"RE_OBJ_PICKED_UP_GENERIC");
@@ -659,7 +659,7 @@ hold_objective(player) //the objective model runs this to be held by 'player'
     self thread pressuse_notify(player);
 
     player.headicon = game["headicon_carrier"];
-    if (getcvar("scr_re_showcarrier") == "0")
+    if (getCvar("scr_re_showcarrier") == "0")
         player.headiconteam = (game["re_attackers"]);
     else
         player.headiconteam = "none";

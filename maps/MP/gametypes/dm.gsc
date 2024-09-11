@@ -138,7 +138,7 @@ respawn()
 
     self endon("end_respawn");
 
-    if(getcvarint("scr_forcerespawn") > 0)
+    if(getCvarInt("scr_forcerespawn") > 0)
     {
         self thread waitForceRespawnTime();
         self thread waitRespawnButton();
@@ -158,7 +158,7 @@ waitForceRespawnTime()
     self endon("end_respawn");
     self endon("respawn");
 
-    wait getcvarint("scr_forcerespawn");
+    wait getCvarInt("scr_forcerespawn");
     self notify("respawn");
 }
 
@@ -276,7 +276,7 @@ updateScriptCvars()
 {
     for(;;)
     {
-        timelimit = getcvarfloat("scr_dm_timelimit");
+        timelimit = getCvarFloat("scr_dm_timelimit");
         if(level.timelimit != timelimit)
         {
             if(timelimit > 1440)
@@ -310,17 +310,17 @@ updateScriptCvars()
             checkTimeLimit();
         }
 
-        scorelimit = getcvarint("scr_dm_scorelimit");
+        scorelimit = getCvarInt("scr_dm_scorelimit");
         if(level.scorelimit != scorelimit)
         {
             level.scorelimit = scorelimit;
 
-            players = getentarray("player", "classname");
+            players = getEntArray("player", "classname");
             for(i = 0; i < players.size; i++)
                 players[i] checkScoreLimit();
         }
 
-        allowvote = getcvarint("g_allowvote");
+        allowvote = getCvarInt("g_allowvote");
         if(level.allowvote != allowvote)
         {
             level.allowvote = allowvote;

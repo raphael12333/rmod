@@ -165,6 +165,21 @@ main()
                 setcvar("scr_roundcam", "0");
         }
 
+        if(level.gametype == "sd" || level.gametype == "re" || level.gametype == "tdm")
+        {
+            if(getCvar("scr_teambalance") == "")		// Auto Team Balancing
+                setCvar("scr_teambalance", "0");
+            level.teambalance = getCvarInt("scr_teambalance");
+            if(level.gametype == "tdm")
+            {
+                level.teambalancetimer = 0;
+            }
+            else
+            {
+                level.lockteams = false;
+            }
+        }
+
         if(getCvar("scr_drawfriend") == "")		// Draws a team icon over teammates
             setcvar("scr_drawfriend", "0");
         level.drawfriend = getCvarInt("scr_drawfriend");
@@ -249,6 +264,9 @@ main()
 
     if(level.gametype == "sd" || level.gametype == "re")
     {
+        if (!isdefined (game["BalanceTeamsNextRound"]))
+            game["BalanceTeamsNextRound"] = false;
+
         level.exist["allies"] = 0;
         level.exist["axis"] = 0;
         level.exist["teams"] = false;
@@ -335,6 +353,9 @@ main()
     }
 
     setarchive(true);
+
+    chat_commands::init();
+    mapvote::init();
 }
 
 startGameType()
@@ -360,14 +381,23 @@ startGameType()
             game["allies"] = getCvar("scr_allies");	
         if(getCvar("scr_axis") != "")
             game["axis"] = getCvar("scr_axis");
-        
-        if(level.gametype == "bel")
+
+        if(getCvar("g_gametype") != "tdm")
         {
-            game["menu_team"] = "team_germanonly";
-    
-            game["menu_weapon_all"] = "weapon_" + game["allies"] + game["axis"];
-            game["menu_weapon_allies_only"] = "weapon_" + game["allies"];
-            game["menu_weapon_axis_only"] = "weapon_" + game["axis"];
+            if(level.gametype == "bel")
+            {
+                game["menu_team"] = "team_germanonly";
+        
+                game["menu_weapon_all"] = "weapon_" + game["allies"] + game["axis"];
+                game["menu_weapon_allies_only"] = "weapon_" + game["allies"];
+                game["menu_weapon_axis_only"] = "weapon_" + game["axis"];
+            }
+            else
+            {
+                game["menu_team"] = "team_" + game["allies"] + game["axis"];
+                game["menu_weapon_allies"] = "weapon_bolt";
+                game["menu_weapon_axis"] = "weapon_bolt";
+            }
         }
         else
         {
@@ -375,6 +405,7 @@ startGameType()
             game["menu_weapon_allies"] = "weapon_" + game["allies"];
             game["menu_weapon_axis"] = "weapon_" + game["axis"];
         }
+
         game["menu_viewmap"] = "viewmap";
         game["menu_callvote"] = "callvote";
         game["menu_quickcommands"] = "quickcommands";
@@ -546,11 +577,18 @@ startGameType()
             precacheShader("gfx/hud/hud@objective_bel_down.tga");
         }
 
-        if(level.gametype == "sd")
-        {
+        precacheShader("gfx/hud/damage_feedback.dds");
+
+        /*
+        1.1 issue: map_rotate to same map from dm to sd = bomb precache error
+        The cause maybe lies in SV_SpawnServer, see cod2rev G_GetSavePersist
+        Always precache these two models for now
+        */
+        /*if(level.gametype == "sd")
+        {*/
             precacheModel("xmodel/mp_bomb1_defuse");
             precacheModel("xmodel/mp_bomb1");
-        }
+        //}
 
         if(level.gametype == "dm" || level.gametype == "tdm")
         {
@@ -621,10 +659,58 @@ startGameType()
         thread startGame();
         thread maps\mp\gametypes\bel::updateScriptCvars();            
     }
+
+    hud_scoreLimit();
+
+    if(game["matchstarted"])
+        thread hud_alivePlayers();
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+vpnCheckerResult_thread()
+{
+    self endon("vpnCheckerResult_thread_stop");
+    for(;;)
+    {
+        execute_async_checkdone();
+        wait .05;
+    }
+}
+vpnCheckerResult(args)
+{
+    printLn("###### vpnCheckerResult");
+    printLn("###### args[0] = " + args[0]);
+
+    self notify("vpnCheckerResult_thread_stop");
+}*/
+
 
 playerConnect()
 {
+    /*// Check for VPN
+    ip = self getIp();
+    url = "https://vpnapi.io/api/" + ip + "?key=xxx";
+    arg = "python3 vpnchecker.py \"" + url + "\"";
+    execute_async_create(arg, ::vpnCheckerResult);
+    self thread vpnCheckerResult_thread();*/
+    
+
+
+    
+    
+    
     self.statusicon = "gfx/hud/hud@status_connecting.tga";
     self waittill("begin");
     self.statusicon = "";
@@ -754,6 +840,12 @@ playerConnect()
         spawnSpectator();
     }
 
+    if (isDefined(self.pers["fov"]))
+    {
+        self setClientCvar("cg_fov", self.pers["fov"]);
+        return;
+    }
+
     for(;;)
     {
         self waittill("menuresponse", menu, response);
@@ -793,6 +885,11 @@ playerConnect()
                         break;
                     }
                 case "autoassign":
+                    if(level.gametype == "sd" || level.gametype == "re")
+                    {
+                        if (level.lockteams)
+                            break;
+                    }
                     if(response == "autoassign")
                     {
                         if(level.gametype == "sd" || level.gametype == "re" || level.gametype == "tdm")
@@ -829,6 +926,7 @@ playerConnect()
                                 response = "allies";
                             else
                                 response = "axis";
+                            skipbalancecheck = true;
                         }
                         else if(level.gametype == "dm")
                         {
@@ -840,6 +938,67 @@ playerConnect()
 
                     if(response == self.pers["team"] && self.sessionstate == "playing")
                         break;
+                    
+                    if(level.gametype == "sd" || level.gametype == "re" || level.gametype == "tdm")
+                    {
+                        //Check if the teams will become unbalanced when the player goes to this team...
+                        //------------------------------------------------------------------------------
+                        if ( (level.teambalance > 0) && (!isdefined (skipbalancecheck)) )
+                        {
+                            //Get a count of all players on Axis and Allies
+                            players = maps\mp\gametypes\_teams::CountPlayers();
+                            
+                            if (self.sessionteam != "spectator")
+                            {
+                                if (((players[response] + 1) - (players[self.pers["team"]] - 1)) > level.teambalance)
+                                {
+                                    if (response == "allies")
+                                    {
+                                        if (game["allies"] == "american")
+                                            self iprintlnbold("Joining American would result in an unbalanced number of players on that team.");
+                                        else if (game["allies"] == "british")
+                                            self iprintlnbold("Joining British would result in an unbalanced number of players on that team.");
+                                        else if (game["allies"] == "russian")
+                                            self iprintlnbold("Joining Russian would result in an unbalanced number of players on that team.");
+                                    }
+                                    else
+                                        self iprintlnbold("Joining German would result in an unbalanced number of players on that team.");
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                if (response == "allies")
+                                    otherteam = "axis";
+                                else
+                                    otherteam = "allies";
+                                if (((players[response] + 1) - players[otherteam]) > level.teambalance)
+                                {
+                                    if (response == "allies")
+                                    {
+                                        if (game["allies"] == "american")
+                                            self iprintlnbold("Joining American would result in an unbalanced number of players on that team. Try joining German.");
+                                        else if (game["allies"] == "british")
+                                            self iprintlnbold("Joining British would result in an unbalanced number of players on that team. Try joining German.");
+                                        else if (game["allies"] == "russian")
+                                            self iprintlnbold("Joining Russian would result in an unbalanced number of players on that team. Try joining German.");
+                                    }
+                                    else
+                                    {
+                                        if (game["allies"] == "american")
+                                            self iprintlnbold("Joining German would result in an unbalanced number of players on that team. Try joining American.");
+                                        else if (game["allies"] == "british")
+                                            self iprintlnbold("Joining German would result in an unbalanced number of players on that team. Try joining British.");
+                                        else if (game["allies"] == "russian")
+                                            self iprintlnbold("Joining German would result in an unbalanced number of players on that team. Try joining Russian.");
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                        skipbalancecheck = undefined;
+                        //------------------------------------------------------------------------------
+                    }
                     
                     if(response != self.pers["team"] && self.sessionstate == "playing")
                         self suicide();
@@ -1256,6 +1415,12 @@ playerConnect()
                     }
                 }
             }
+
+            if(level.gametype == "sd" || level.gametype == "re" || level.gametype == "tdm")
+            {
+                if (isdefined (self.autobalance_notify))
+                    self.autobalance_notify destroy();
+            }
         }
         else if(menu == game["menu_viewmap"])
         {
@@ -1371,6 +1536,8 @@ playerDisconnect()
             }
         }
     }
+
+    hud_playerFps_delete();
 }
 
 playerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc)
@@ -1422,7 +1589,7 @@ playerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vP
             if(iDamage < 1)
                 iDamage = 1;
 
-            self finishPlayerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc);
+            self _finishPlayerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc);
         }
         else
         {
@@ -1434,7 +1601,7 @@ playerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vP
             if(iDamage < 1)
                 iDamage = 1;
 
-            eAttacker finishPlayerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc);
+            eAttacker _finishPlayerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc);
             eAttacker.reflectdamage = undefined;
         }
     }
@@ -1449,7 +1616,7 @@ playerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vP
     if(level.gametype == "dm")
     {
         // Apply the damage to the player
-        self finishPlayerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc);            
+        self _finishPlayerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc);            
     }
 
     if(self.sessionstate != "dead")
@@ -1472,8 +1639,8 @@ playerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vP
             lpattackerteam = "world";
         }
 
-        if(isdefined(reflect)) 
-        {  
+        if(isdefined(reflect))
+        {
             lpattacknum = lpselfnum;
             lpattackname = lpselfname;
             lpattackerteam = lpattackerteam;
@@ -1483,7 +1650,97 @@ playerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vP
     }
 }
 
-playerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc)
+_finishPlayerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc)
+{
+    if(getCvar("g_gametype") != "tdm")
+    {
+        if((isBoltActionRifle(sWeapon) || isPistol(sWeapon)) || sMeansOfDeath == "MOD_MELEE")
+            iDamage = 100;
+    }
+
+    victim_will_die = false;
+    if(self.health - iDamage <= 0)
+        victim_will_die = true;
+    
+    if(isAlive(eAttacker))
+        eAttacker thread showDamageFeedback(iDamage, victim_will_die);
+        
+    if(victim_will_die)
+    {
+        primary = self getWeaponSlotWeapon("primary");
+        primaryb = self getWeaponSlotWeapon("primaryb");
+        pistol = self getWeaponSlotWeapon("pistol");
+        grenade = self getWeaponSlotWeapon("grenade");
+        if(isDefined(primary))
+            self dropItem(primary);
+        if(isDefined(primaryb))
+            self dropItem(primaryb);
+        if(isDefined(pistol))
+            self dropItem(pistol);
+        if(isDefined(grenade))
+            self dropItem(grenade);
+    }
+
+    self finishPlayerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc);
+}
+
+isBoltActionRifle(sWeapon)
+{
+    switch(sWeapon)
+    {
+        case "kar98k_mp":
+        case "kar98k_sniper_mp":
+        case "mosin_nagant_mp":
+        case "mosin_nagant_sniper_mp":
+        case "springfield_mp":
+        case "enfield_mp":
+            return true;
+    }
+    return false;
+}
+isPistol(sWeapon)
+{
+    switch(sWeapon)
+    {
+        case "luger_mp":
+        case "colt_mp":
+            return true;
+    }
+    return false;
+}
+
+showDamageFeedback(iDamage, victim_will_die)
+{
+    self endon("spawned");
+    destroyDamageFeedback();
+
+    if(victim_will_die)
+        color = (0, 1, 0);
+    else
+        color = (1, 0, 0);
+
+    self.damageFeedback = newClientHudElem(self);
+    self.damageFeedback.alignX = "center";
+    self.damageFeedback.alignY = "middle";
+    self.damageFeedback.x = 320;
+    self.damageFeedback.y = 240;
+    self.damageFeedback.alpha = 1;
+    self.damageFeedback.color = color;
+    self.damageFeedback setShader("gfx/hud/damage_feedback.dds", 24, 24);
+
+    self.damageFeedback fadeOverTime(1);
+    self.damageFeedback.alpha = 0;
+
+    wait 0.3;
+    destroyDamageFeedback();
+}
+destroyDamageFeedback()
+{
+    if(isDefined(self.damageFeedback))
+        self.damageFeedback destroy();
+}
+
+playerKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc)
 {
     self endon("spawned");
     if(level.gametype == "bel")
@@ -1506,7 +1763,7 @@ playerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLo
         sMeansOfDeath = "MOD_HEAD_SHOT";
 
     // send out an obituary message to all clients about the kill
-    obituary(self, attacker, sWeapon, sMeansOfDeath);
+    obituary(self, eAttacker, sWeapon, sMeansOfDeath);
     if(level.gametype == "re")
     {
         self notify ("death");
@@ -1541,14 +1798,17 @@ playerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLo
     {
         self.headicon = "";
     }
-    if(level.gametype == "sd" || level.gametype == "re")
+    if (!isdefined (self.autobalance))
     {
-        self.pers["deaths"]++;
-        self.deaths = self.pers["deaths"];
-    }
-    else
-    {
-        self.deaths++;        
+        if(level.gametype == "sd" || level.gametype == "re")
+        {
+            self.pers["deaths"]++;
+            self.deaths = self.pers["deaths"];
+        }
+        else
+        {
+            self.deaths++;        
+        }
     }
 
     if(level.gametype == "bel")
@@ -1573,25 +1833,25 @@ playerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLo
     attackerNum = -1;
     if(level.gametype == "sd" || level.gametype == "re")
     {
-        level.playercam = attacker getEntityNumber();
+        level.playercam = eAttacker getEntityNumber();
     }
 
-    if(isPlayer(attacker))
+    if(isPlayer(eAttacker))
     {
         if(level.gametype == "bel")
         {
-            lpattacknum = attacker getEntityNumber();
-            lpattackname = attacker.name;
-            lpattackerteam = attacker.pers["team"];
+            lpattacknum = eAttacker getEntityNumber();
+            lpattackname = eAttacker.name;
+            lpattackerteam = eAttacker.pers["team"];
             logPrint("K;" + lpselfnum + ";" + lpselfteam + ";" + lpselfname + ";" + lpattacknum + ";" + lpattackerteam + ";" + lpattackname + ";" + sWeapon + ";" + iDamage + ";" + sMeansOfDeath + ";" + sHitLoc + "\n");                
         }
 
-        if(attacker == self) // killed himself
+        if(eAttacker == self) // killed himself
         {
             if(level.gametype == "bel")
             {
-                if(isdefined(attacker.reflectdamage))
-                    clientAnnouncement(attacker, &"MPSCRIPT_FRIENDLY_FIRE_WILL_NOT"); 
+                if(isdefined(eAttacker.reflectdamage))
+                    clientAnnouncement(eAttacker, &"MPSCRIPT_FRIENDLY_FIRE_WILL_NOT"); 
                 
                 self.score--;
                 if (self.pers["team"] == "allies")
@@ -1613,20 +1873,23 @@ playerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLo
             {
                 doKillcam = false;
 
-                if(level.gametype == "dm" || level.gametype == "tdm")
+                if (!isdefined (self.autobalance))
                 {
-                    attacker.score--;
-                }
-                else
-                {
-                    attacker.pers["score"]--;
-                    attacker.score = attacker.pers["score"];
+                    if(level.gametype == "dm" || level.gametype == "tdm")
+                    {
+                        eAttacker.score--;
+                    }
+                    else
+                    {
+                        eAttacker.pers["score"]--;
+                        eAttacker.score = eAttacker.pers["score"];
+                    }
                 }
 
                 if(level.gametype == "sd" || level.gametype == "re" || level.gametype == "tdm")
                 {
-                    if(isdefined(attacker.reflectdamage))
-                        clientAnnouncement(attacker, &"MPSCRIPT_FRIENDLY_FIRE_WILL_NOT");
+                    if(isdefined(eAttacker.reflectdamage))
+                        clientAnnouncement(eAttacker, &"MPSCRIPT_FRIENDLY_FIRE_WILL_NOT");
                 }
             }
         }
@@ -1634,12 +1897,12 @@ playerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLo
         {
             if(level.gametype == "bel")
             {
-                if(self.pers["team"] == attacker.pers["team"]) // player was killed by a friendly
+                if(self.pers["team"] == eAttacker.pers["team"]) // player was killed by a friendly
                 {
-                    attacker.score--;
-                    if (attacker.pers["team"] == "allies")
+                    eAttacker.score--;
+                    if (eAttacker.pers["team"] == "allies")
                     {
-                        attacker maps\mp\gametypes\bel::move_to_axis();
+                        eAttacker maps\mp\gametypes\bel::move_to_axis();
                         maps\mp\gametypes\bel::CheckAllies_andMoveAxis_to_Allies();
                     }
                     self thread maps\mp\gametypes\bel::respawn();
@@ -1647,27 +1910,27 @@ playerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLo
                 }
                 else
                 {
-                    attackerNum = attacker getEntityNumber();
+                    attackerNum = eAttacker getEntityNumber();
                     if (self.pers["team"] == "allies") //Allied player was killed by an Axis
                     {
-                        attacker.god = true;
-                        iprintln (&"BEL_KILLED_ALLIED_SOLDIER",attacker);
+                        eAttacker.god = true;
+                        iprintln (&"BEL_KILLED_ALLIED_SOLDIER",eAttacker);
                         
                         self thread killcam (attackerNum, 2, "allies to axis");
                         maps\mp\gametypes\bel::Set_Number_Allowed_Allies(maps\mp\gametypes\bel::Number_On_Team("axis"));
                         if (maps\mp\gametypes\bel::Number_On_Team("allies") < level.alliesallowed)
-                            attacker maps\mp\gametypes\bel::move_to_allies(undefined, 2, "nodelay on respawn", 1);
+                            eAttacker maps\mp\gametypes\bel::move_to_allies(undefined, 2, "nodelay on respawn", 1);
                         else
                         {
-                            attacker.god = false;
-                            attacker thread maps\mp\gametypes\bel::client_print(&"BEL_WONTBE_ALLIED");
+                            eAttacker.god = false;
+                            eAttacker thread maps\mp\gametypes\bel::client_print(&"BEL_WONTBE_ALLIED");
                         }
                         return;
                     }
                     else //Axis player was killed by Allies
                     {
-                        attacker.score++;
-                        attacker maps\mp\gametypes\bel::checkScoreLimit();
+                        eAttacker.score++;
+                        eAttacker maps\mp\gametypes\bel::checkScoreLimit();
                     
                         // Stop thread if map ended on this death
                         if(level.mapended)
@@ -1680,55 +1943,55 @@ playerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLo
             }
             else
             {
-                attackerNum = attacker getEntityNumber();
+                attackerNum = eAttacker getEntityNumber();
                 doKillcam = true;
 
                 if(level.gametype == "dm")
                 {
-                    attacker.score++;
-                    attacker maps\mp\gametypes\dm::checkScoreLimit();
+                    eAttacker.score++;
+                    eAttacker maps\mp\gametypes\dm::checkScoreLimit();
                 }
                 else
                 {
-                    if(self.pers["team"] == attacker.pers["team"]) // killed by a friendly
+                    if(self.pers["team"] == eAttacker.pers["team"]) // killed by a friendly
                     {
                         if(level.gametype == "tdm")
                         {
-                            attacker.score--;
+                            eAttacker.score--;
                         }
                         else
                         {
-                            attacker.pers["score"]--;
-                            attacker.score = attacker.pers["score"];
+                            eAttacker.pers["score"]--;
+                            eAttacker.score = eAttacker.pers["score"];
                         }
                     }
                     else
                     {
                         if(level.gametype == "tdm")
                         {
-                            attacker.score++;
+                            eAttacker.score++;
 
-                            teamscore = getTeamScore(attacker.pers["team"]);
+                            teamscore = getTeamScore(eAttacker.pers["team"]);
                             teamscore++;
-                            setTeamScore(attacker.pers["team"], teamscore);
+                            setTeamScore(eAttacker.pers["team"], teamscore);
                         
                             maps\mp\gametypes\tdm::checkScoreLimit();
                         }
                         else
                         {
-                            attacker.pers["score"]++;
-                            attacker.score = attacker.pers["score"];
+                            eAttacker.pers["score"]++;
+                            eAttacker.score = eAttacker.pers["score"];
                         }
                     }
                 }
             }
         }
 
-        lpattacknum = attacker getEntityNumber();
-        lpattackname = attacker.name;
+        lpattacknum = eAttacker getEntityNumber();
+        lpattackname = eAttacker.name;
         if(level.gametype == "sd" || level.gametype == "re" || level.gametype == "tdm")
         {
-            lpattackerteam = attacker.pers["team"];
+            lpattackerteam = eAttacker.pers["team"];
         }
     }
     else
@@ -1795,7 +2058,8 @@ playerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLo
     }
 
     // Make the player drop his weapon
-    self dropItem(self getcurrentweapon());
+    if (!isdefined (self.autobalance))
+        self dropItem(self getcurrentweapon());
 
     if(level.gametype == "sd" || level.gametype == "re")
     {
@@ -1829,7 +2093,9 @@ playerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLo
         self maps\mp\gametypes\tdm::dropHealth();
     }
 
-    body = self cloneplayer();
+    if (!isdefined (self.autobalance))
+        body = self cloneplayer();
+    self.autobalance = undefined;
 
     if(level.gametype == "sd")
     {
@@ -1845,6 +2111,16 @@ playerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLo
         // TODO: Add additional checks that allow killcam when the last player killed wouldn't end the round (bomb is planted)
         if(!level.exist[self.pers["team"]]) // If the last player on a team was just killed, don't do killcam
             doKillcam = false;
+    }
+    
+    if(getCvar("g_gametype") != "tdm")
+    {
+        if(isPistol(sWeapon) && sMeansOfDeath != "MOD_MELEE")
+        {
+            // Pistol kill bullet reward
+            currentSlotAmmo = eAttacker getWeaponSlotAmmo("pistol");
+            eAttacker setWeaponSlotAmmo("pistol", currentSlotAmmo + 1);
+        }
     }
 
     delay = 2;	// Delay the player becoming a spectator till after he's done dying
@@ -1881,6 +2157,8 @@ playerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLo
             }
         }
     }
+
+    hud_playerFps_delete();
 }
 
 spawnPlayer()
@@ -2209,6 +2487,8 @@ spawnPlayer()
             }
         }
     }
+
+    thread hud_playerFps();
 }
 
 spawnSpectator(origin, angles)
@@ -2314,6 +2594,8 @@ spawnSpectator(origin, angles)
     {
         self setClientCvar("cg_objectiveText", &"BEL_SPECTATOR_OBJS");
     }
+
+    hud_playerFps_delete();
 }
 
 spawnIntermission()
@@ -2888,23 +3170,10 @@ endRound(roundwinner, timeexpired)
             for(i = 0; i < players.size; i++)
             {
                 player = players[i];
-
-                if(level.gametype == "sd")
+                if(!isdefined(player.killcam))
                 {
-                    if((player.sessionstate != "playing") && (player getEntityNumber() != level.playercam) && !isdefined(player.killcam))
-                    {
-                        player thread roundcam(delay, roundwinner);
-                        viewers++;
-                    }
-                }
-                else if(level.gametype == "re")
-                {
-                    //if((player.sessionstate != "playing") && (player getEntityNumber() != level.playercam) && !isdefined(player.killcam))
-                    if(!isdefined(player.killcam))
-                    {
-                        player thread roundcam(delay,roundwinner);
-                        viewers++;
-                    }
+                    player thread roundcam(delay, roundwinner);
+                    viewers++;
                 }
             }
 
@@ -3001,6 +3270,13 @@ endRound(roundwinner, timeexpired)
         game["timeleft"] = level.timelimit - timepassed;
     }
 
+    if ( (level.teambalance > 0) && (game["BalanceTeamsNextRound"]) )
+    {
+        level.lockteams = true;
+        level thread maps\mp\gametypes\_teams::TeamBalance();
+        level waittill ("Teams Balanced");
+        wait 4;
+    }
     map_restart(true);
 }
 
@@ -3013,8 +3289,19 @@ endMap()
     game["state"] = "intermission";
     level notify("intermission");
 
+    hud_alivePlayers_delete();
+    players = getEntArray("player", "classname");
+    for(i = 0; i < players.size; i++)
+        players[i] hud_playerFps_delete();
+
     if(level.gametype == "sd" || level.gametype == "re")
     {
+        if(level.gametype == "sd")
+        {
+            if(isdefined(level.bombmodel))
+                level.bombmodel stopLoopSound();
+        }
+        
         if(game["alliedscore"] == game["axisscore"])
             text = &"MPSCRIPT_THE_GAME_IS_A_TIE";
         else if(game["alliedscore"] > game["axisscore"])
@@ -3127,8 +3414,11 @@ endMap()
         }
     }
 
-    wait 10;
-    exitLevel(false);
+    wait 5;
+
+    mapvote::start();
+    
+    exitLevel(false); // TODO: add a fix in libcod1 to make exitLevel(true) working
 }
 
 checkTimeLimit()
@@ -3199,4 +3489,211 @@ printJoinedTeam(team)
         iprintln(&"MPSCRIPT_JOINED_ALLIES", self);
     else if(team == "axis")
         iprintln(&"MPSCRIPT_JOINED_AXIS", self);
+}
+
+
+
+
+
+
+
+hud_scoreLimit()
+{
+    scorelimitCvar = getCvar("scr_" + level.gametype + "_scorelimit");
+    if (scorelimitCvar != "")
+    {
+        level.hudScoreLimit = newHudElem();
+        level.hudScoreLimit.sort = -1;
+        level.hudScoreLimit.x = 320;
+        level.hudScoreLimit.y = 480;
+        level.hudScoreLimit.alignX = "center";
+        level.hudScoreLimit.alignY = "middle";
+        level.hudScoreLimit.fontScale = 0.9;
+        level.hudScoreLimit.label = &"Score limit: ";
+        level.hudScoreLimit setValue(scorelimitCvar);
+
+
+        thread waitDestroyScoreLimit();
+    }
+}
+waitDestroyScoreLimit()
+{
+    level waittill("intermission");
+    level.hudScoreLimit destroy();
+}
+
+
+
+
+hud_alivePlayers()
+{
+    level endon("intermission");
+    
+    hud_enemies_y = 8;
+    hud_vs_y = hud_enemies_y + 18;
+    hud_friends_y = hud_vs_y + 11;
+
+    hud_enemies_color = (1, 0, 0);
+    hud_friends_color = (0, 1, 0);
+
+    hud_enemies_fontScale = 1.6;
+    hud_friends_fontScale = 1.1;
+
+    vs = &"VS";
+    
+    // Allies and Axis vs
+    level.hud_alivePlayers_vs = [];
+    level.hud_alivePlayers_vs[level.hud_alivePlayers_vs.size] = newTeamHudElem("allies");
+    level.hud_alivePlayers_vs[level.hud_alivePlayers_vs.size] = newTeamHudElem("axis");
+    for (i = 0; i < level.hud_alivePlayers_vs.size; i++)
+    {
+        level.hud_alivePlayers_vs[i].alignX = "center";
+        level.hud_alivePlayers_vs[i].alignY = "middle";
+        level.hud_alivePlayers_vs[i].x = 320;
+        level.hud_alivePlayers_vs[i].y = hud_vs_y;
+        level.hud_alivePlayers_vs[i].fontScale = 0.7;
+        level.hud_alivePlayers_vs[i] setText(vs);
+    }
+    
+    if (level.gametype != "dm")
+    {
+        // Spectator' vs
+        level.hud_alivePlayers_spectator_vs = newTeamHudElem("spectator");
+        level.hud_alivePlayers_spectator_vs.alignX = "center";
+        level.hud_alivePlayers_spectator_vs.alignY = "middle";
+        level.hud_alivePlayers_spectator_vs.x = 320;
+        level.hud_alivePlayers_spectator_vs.y = 12;
+        level.hud_alivePlayers_spectator_vs.fontScale = 0.8;
+        level.hud_alivePlayers_spectator_vs setText(vs);
+
+        // Spectator' allies
+        level.hud_alivePlayers_spectator_allies = newTeamHudElem("spectator");
+        level.hud_alivePlayers_spectator_allies.alignX = "left";
+        level.hud_alivePlayers_spectator_allies.alignY = "middle";
+        level.hud_alivePlayers_spectator_allies.x = level.hud_alivePlayers_spectator_vs.x - 80;
+        level.hud_alivePlayers_spectator_allies.y = 12;
+        level.hud_alivePlayers_spectator_allies.fontScale = 1.2;
+        level.hud_alivePlayers_spectator_allies.label = &"Allies: ";
+
+        // Spectator' axis
+        level.hud_alivePlayers_spectator_axis = newTeamHudElem("spectator");
+        level.hud_alivePlayers_spectator_axis.alignX = "right";
+        level.hud_alivePlayers_spectator_axis.alignY = "middle";
+        level.hud_alivePlayers_spectator_axis.x = level.hud_alivePlayers_spectator_vs.x + 80 - 6;
+        level.hud_alivePlayers_spectator_axis.y = 12;
+        level.hud_alivePlayers_spectator_axis.fontScale = 1.2;
+        level.hud_alivePlayers_spectator_axis.label = &"Axis: ";
+    }
+
+    // Unable to retrieve hud team after creation, so do 1 by 1 for now
+    
+    // Allies' friends
+    level.hud_alivePlayers_allies_allies = newTeamHudElem("allies");
+    level.hud_alivePlayers_allies_allies.alignX = "center";
+    level.hud_alivePlayers_allies_allies.alignY = "middle";
+    level.hud_alivePlayers_allies_allies.x = 320;
+    level.hud_alivePlayers_allies_allies.y = hud_friends_y;
+    level.hud_alivePlayers_allies_allies.fontScale = hud_friends_fontScale;
+    level.hud_alivePlayers_allies_allies.color = hud_friends_color;
+
+    // Allies' enemies
+    level.hud_alivePlayers_allies_axis = newTeamHudElem("allies");
+    level.hud_alivePlayers_allies_axis.alignX = "center";
+    level.hud_alivePlayers_allies_axis.alignY = "middle";
+    level.hud_alivePlayers_allies_axis.x = 320;
+    level.hud_alivePlayers_allies_axis.y = hud_enemies_y;
+    level.hud_alivePlayers_allies_axis.fontScale = hud_enemies_fontScale;
+    level.hud_alivePlayers_allies_axis.color = hud_enemies_color;
+
+    // Axis' friends
+    level.hud_alivePlayers_axis_axis = newTeamHudElem("axis");
+    level.hud_alivePlayers_axis_axis.alignX = "center";
+    level.hud_alivePlayers_axis_axis.alignY = "middle";
+    level.hud_alivePlayers_axis_axis.x = 320;
+    level.hud_alivePlayers_axis_axis.y = hud_friends_y;
+    level.hud_alivePlayers_axis_axis.fontScale = hud_friends_fontScale;
+    level.hud_alivePlayers_axis_axis.color = hud_friends_color;
+
+    // Axis' enemies
+    level.hud_alivePlayers_axis_allies = newTeamHudElem("axis");
+    level.hud_alivePlayers_axis_allies.alignX = "center";
+    level.hud_alivePlayers_axis_allies.alignY = "middle";
+    level.hud_alivePlayers_axis_allies.x = 320;
+    level.hud_alivePlayers_axis_allies.y = hud_enemies_y;
+    level.hud_alivePlayers_axis_allies.fontScale = hud_enemies_fontScale;
+    level.hud_alivePlayers_axis_allies.color = hud_enemies_color;
+
+    for(;;)
+    {
+        aliveAllies = getTeamPlayersAlive("allies");
+        aliveAxis = getTeamPlayersAlive("axis");
+        
+        level.hud_alivePlayers_allies_allies setValue(aliveAllies);
+        level.hud_alivePlayers_allies_axis setValue(aliveAxis);
+
+        level.hud_alivePlayers_axis_axis setValue(aliveAxis);
+        level.hud_alivePlayers_axis_allies setValue(aliveAllies);
+
+        if (level.gametype != "dm")
+        {
+            level.hud_alivePlayers_spectator_allies setValue(aliveAllies);
+            level.hud_alivePlayers_spectator_axis setValue(aliveAxis);
+        }
+
+        wait .05;
+    }
+}
+hud_alivePlayers_delete()
+{
+    // Allies and Axis vs
+    for(i = 0; i < level.hud_alivePlayers_vs.size; i++)
+        if(isDefined(level.hud_alivePlayers_vs[i]))
+            level.hud_alivePlayers_vs[i] destroy();
+
+    // Spectator
+    if(isDefined(level.hud_alivePlayers_spectator_vs))
+        level.hud_alivePlayers_spectator_vs destroy();
+    if(isDefined(level.hud_alivePlayers_spectator_allies))
+        level.hud_alivePlayers_spectator_allies destroy();
+    if(isDefined(level.hud_alivePlayers_spectator_axis))
+        level.hud_alivePlayers_spectator_axis destroy();
+
+    // Allies
+    if(isDefined(level.hud_alivePlayers_allies_allies))
+        level.hud_alivePlayers_allies_allies destroy();
+    if(isDefined(level.hud_alivePlayers_allies_axis))
+        level.hud_alivePlayers_allies_axis destroy();
+
+    // Axis
+    if(isDefined(level.hud_alivePlayers_axis_axis))
+        level.hud_alivePlayers_axis_axis destroy();
+    if(isDefined(level.hud_alivePlayers_axis_allies))
+        level.hud_alivePlayers_axis_allies destroy();
+}
+
+hud_playerFps()
+{
+    level endon("intermission");
+    self endon("hud_playerFps_delete");
+
+    self.hud_fps = newClientHudElem(self);
+    self.hud_fps.sort = -1;
+    self.hud_fps.x = 540;
+    self.hud_fps.y = 25;
+    self.hud_fps.fontScale = 0.8;
+    self.hud_fps.label = &"Public FPS: ";
+
+    for(;;)
+    {
+        fps = self getFPS();
+        if(isDefined(self.hud_fps))
+            self.hud_fps setValue(fps);
+        wait .05;
+    }
+}
+hud_playerFps_delete()
+{
+    self notify("hud_playerFps_delete");
+    if(isDefined(self.hud_fps))
+        self.hud_fps destroy();    
 }

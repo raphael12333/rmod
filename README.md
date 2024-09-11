@@ -1,10 +1,18 @@
-# Gametype function centralizer for [CoD1](https://en.wikipedia.org/wiki/Call_of_Duty_(video_game))
+## Gametype customizations based on the cod1dev [centralizer](https://github.com/cod1dev/centralizer)
 
-## Centralizing and merging the common and duplicated source code parts of the stock gametypes
+### [libcod1](https://github.com/cod1dev/libcod1) is required for this fork
 
-### No feature modifications, unedited comments: original behaviors preserved
-
-Supported game version: **1.1**
-
-> [!NOTE]  
-> This centralizer aims to be used as a base to make it more convenient to add your modifications & features to all your gametypes, without the need to modify each gametype files.
+Some of the customizations are:
+- enable roundcam in sd gametype
+- mapvote at end of match
+- hitmarker
+- all bolt-action rifles menu (excepted for tdm and bel)
+- 1sk for bolt-action rifles, pistols and melee (excepted for tdm)
+- only 1 bullet in pistol and 1 grenade (excepted for tdm)
+- autobalance (based on the 1.5 game version)
+- drop all weapons when dying
+- sd digital countdown for the bomb
+- sd uses the `announcement` gsc function (excepted for when bomb planted, so it doesn't obstruct view)
+- pistol 1sk kill bullet reward
+- chat commands system (based on [MiscMod](https://github.com/cato-a/CoDaM_MiscMod))
+- alive players counter on screen while playing

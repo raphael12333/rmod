@@ -202,21 +202,7 @@ endMap()
 
 checkTimeLimit()
 {
-    if(level.timelimit <= 0)
-        return;
-    
-    timepassed = (getTime() - level.starttime) / 1000;
-    timepassed = timepassed / 60.0;
-    
-    if(timepassed < game["timeleft"])
-        return;
-    
-    if(level.mapended)
-        return;
-    level.mapended = true;
-
-    iprintln(&"MPSCRIPT_TIME_LIMIT_REACHED");
-    endMap();
+    centralizer::checkTimeLimit();
 }
 
 checkScoreLimit()

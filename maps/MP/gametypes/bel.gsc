@@ -234,6 +234,11 @@ endMap()
     centralizer::endMap();
 }
 
+checkTimeLimit()
+{
+    centralizer::checkTimeLimit();
+}
+
 checkScoreLimit()
 {
     if(level.playerscorelimit <= 0)
@@ -285,7 +290,7 @@ updateScriptCvars()
                     level.clock destroy();
             }
 
-            centralizer::checkTimeLimit();
+            checkTimeLimit();
         }
 
         scorelimit = getCvarInt("scr_bel_scorelimit");

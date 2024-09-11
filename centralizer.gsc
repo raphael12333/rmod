@@ -3138,9 +3138,17 @@ checkTimeLimit()
     
     timepassed = (getTime() - level.starttime) / 1000;
     timepassed = timepassed / 60.0;
-    
-    if(timepassed < level.timelimit)
-        return;
+
+    if (level.gametype == "sd" || level.gametype == "re")
+    {
+        if(timepassed < game["timeleft"])
+            return;
+    }
+    else
+    {
+        if(timepassed < level.timelimit)
+            return;
+    }
     
     if(level.mapended)
         return;

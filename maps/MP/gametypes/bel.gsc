@@ -117,7 +117,7 @@ respawn(noclick, delay)
     {
         if (!isdefined (noclick))
         {
-            if(getcvarint("scr_bel_respawndelay") > 0)
+            if(getCvarInt("scr_bel_respawndelay") > 0)
             {
                 self thread waitForceRespawnTime();
                 self waittill("respawn");
@@ -154,7 +154,7 @@ Respawn_HUD_Timer()
     self endon ("respawn");
     self endon ("end_respawn");
     
-    respawntime = getcvarint("scr_bel_respawndelay");
+    respawntime = getCvarInt("scr_bel_respawndelay");
     wait .1;
     
     if (!isdefined(self.toppart))
@@ -214,7 +214,7 @@ waitForceRespawnTime()
 
     self.respawnwait = true;
     self thread Respawn_HUD_Timer();
-    wait getcvarint("scr_bel_respawndelay");
+    wait getCvarInt("scr_bel_respawndelay");
     self thread waitForceRespawnButton();
 }
 
@@ -254,7 +254,7 @@ updateScriptCvars()
     count = 1;
     for(;;)
     {
-        timelimit = getcvarfloat("scr_bel_timelimit");
+        timelimit = getCvarFloat("scr_bel_timelimit");
         if(level.timelimit != timelimit)
         {
             if(timelimit > 1440)
@@ -288,7 +288,7 @@ updateScriptCvars()
             centralizer::checkTimeLimit();
         }
 
-        scorelimit = getcvarint("scr_bel_scorelimit");
+        scorelimit = getCvarInt("scr_bel_scorelimit");
         if(level.playerscorelimit != scorelimit)
         {
             level.playerscorelimit = scorelimit;
@@ -298,7 +298,7 @@ updateScriptCvars()
                 players[i] checkScoreLimit();
         }
 
-        drawfriend = getcvarfloat("scr_drawfriend");
+        drawfriend = getCvarFloat("scr_drawfriend");
         if(level.drawfriend != drawfriend)
         {
             level.drawfriend = drawfriend;
@@ -338,7 +338,7 @@ updateScriptCvars()
             }
         }
 
-        allowvote = getcvarint("g_allowvote");
+        allowvote = getCvarInt("g_allowvote");
         if(level.allowvote != allowvote)
         {
             level.allowvote = allowvote;
@@ -653,7 +653,7 @@ make_obj_marker()
     count1 = 1;
     count2 = 1;
     
-    if(getcvar("scr_bel_showoncompass") == "1")
+    if(getCvar("scr_bel_showoncompass") == "1")
     {
         objnum = ((self getEntityNumber()) + 1);
         objective_add(objnum, "current", self.origin, "gfx/hud/hud@objective_bel.tga");
@@ -680,7 +680,7 @@ make_obj_marker()
         else
         {
             count1 = 1;
-            if(getcvar("scr_bel_showoncompass") == "1")
+            if(getCvar("scr_bel_showoncompass") == "1")
             {
                 lastobjpos = newobjpos;
                 newobjpos = ( ((lastobjpos[0] + self.origin[0]) * 0.5), ((lastobjpos[1] + self.origin[1]) * 0.5), ((lastobjpos[2] + self.origin[2]) * 0.5) );

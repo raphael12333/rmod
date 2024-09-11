@@ -233,7 +233,7 @@ updateScriptCvars()
 {
     for(;;)
     {
-        timelimit = getcvarfloat("scr_sd_timelimit");
+        timelimit = getCvarFloat("scr_sd_timelimit");
         if(level.timelimit != timelimit)
         {
             if(timelimit > 1440)
@@ -249,7 +249,7 @@ updateScriptCvars()
             checkTimeLimit();
         }
 
-        scorelimit = getcvarint("scr_sd_scorelimit");
+        scorelimit = getCvarInt("scr_sd_scorelimit");
         if(level.scorelimit != scorelimit)
         {
             level.scorelimit = scorelimit;
@@ -258,7 +258,7 @@ updateScriptCvars()
                 checkScoreLimit();
         }
 
-        roundlimit = getcvarint("scr_sd_roundlimit");
+        roundlimit = getCvarInt("scr_sd_roundlimit");
         if(level.roundlimit != roundlimit)
         {
             level.roundlimit = roundlimit;
@@ -267,15 +267,15 @@ updateScriptCvars()
                 checkRoundLimit();
         }
 
-        roundlength = getcvarfloat("scr_sd_roundlength");
+        roundlength = getCvarFloat("scr_sd_roundlength");
         if(roundlength > 10)
             setcvar("scr_sd_roundlength", "10");
 
-        graceperiod = getcvarfloat("scr_sd_graceperiod");
+        graceperiod = getCvarFloat("scr_sd_graceperiod");
         if(graceperiod > 60)
             setcvar("scr_sd_graceperiod", "60");
 
-        drawfriend = getcvarfloat("scr_drawfriend");
+        drawfriend = getCvarFloat("scr_drawfriend");
         if(level.drawfriend != drawfriend)
         {
             level.drawfriend = drawfriend;
@@ -316,7 +316,7 @@ updateScriptCvars()
             }
         }
 
-        allowvote = getcvarint("g_allowvote");
+        allowvote = getCvarInt("g_allowvote");
         if(level.allowvote != allowvote)
         {
             level.allowvote = allowvote;

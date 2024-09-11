@@ -1,6 +1,6 @@
 main()
 {
-    level.gametype = getcvar("g_gametype");
+    level.gametype = getCvar("g_gametype");
     
     level.callbackStartGameType = ::startGameType;
     level.callbackPlayerConnect = ::playerConnect;
@@ -29,43 +29,43 @@ main()
 
     if(level.gametype == "sd")
     {
-        if(getcvar("scr_sd_timelimit") == "")		// Time limit per map
+        if(getCvar("scr_sd_timelimit") == "")		// Time limit per map
             setcvar("scr_sd_timelimit", "0");
-        else if(getcvarfloat("scr_sd_timelimit") > 1440)
+        else if(getCvarFloat("scr_sd_timelimit") > 1440)
             setcvar("scr_sd_timelimit", "1440");
-        level.timelimit = getcvarfloat("scr_sd_timelimit");            
+        level.timelimit = getCvarFloat("scr_sd_timelimit");            
     }
     else if(level.gametype == "re")
     {
-        if(getcvar("scr_re_timelimit") == "")		// Time limit per map
+        if(getCvar("scr_re_timelimit") == "")		// Time limit per map
             setcvar("scr_re_timelimit", "0");
-        else if(getcvarfloat("scr_re_timelimit") > 1440)
+        else if(getCvarFloat("scr_re_timelimit") > 1440)
             setcvar("scr_re_timelimit", "1440");
-        level.timelimit = getcvarfloat("scr_re_timelimit");
+        level.timelimit = getCvarFloat("scr_re_timelimit");
     }
     else if(level.gametype == "dm")
     {
-        if(getcvar("scr_dm_timelimit") == "")		// Time limit per map
+        if(getCvar("scr_dm_timelimit") == "")		// Time limit per map
             setcvar("scr_dm_timelimit", "30");
-        else if(getcvarfloat("scr_dm_timelimit") > 1440)
+        else if(getCvarFloat("scr_dm_timelimit") > 1440)
             setcvar("scr_dm_timelimit", "1440");
-        level.timelimit = getcvarfloat("scr_dm_timelimit");
+        level.timelimit = getCvarFloat("scr_dm_timelimit");
     }
     else if(level.gametype == "tdm")
     {
-        if(getcvar("scr_tdm_timelimit") == "")		// Time limit per map
+        if(getCvar("scr_tdm_timelimit") == "")		// Time limit per map
             setcvar("scr_tdm_timelimit", "30");
-        else if(getcvarfloat("scr_tdm_timelimit") > 1440)
+        else if(getCvarFloat("scr_tdm_timelimit") > 1440)
             setcvar("scr_tdm_timelimit", "1440");
-        level.timelimit = getcvarfloat("scr_tdm_timelimit");
+        level.timelimit = getCvarFloat("scr_tdm_timelimit");
     }
     else if(level.gametype == "bel")
     {
-        if(getcvar("scr_bel_timelimit") == "")
+        if(getCvar("scr_bel_timelimit") == "")
             setcvar("scr_bel_timelimit", "30");
-        else if(getcvarfloat("scr_bel_timelimit") > 1440)
+        else if(getCvarFloat("scr_bel_timelimit") > 1440)
             setcvar("scr_bel_timelimit", "1440");
-        level.timelimit = getcvarfloat("scr_bel_timelimit");
+        level.timelimit = getCvarFloat("scr_bel_timelimit");
     }
 
     if(level.gametype == "sd" || level.gametype == "re")
@@ -76,109 +76,109 @@ main()
     
     if(level.gametype == "sd")
     {
-        if(getcvar("scr_sd_scorelimit") == "")		// Score limit per map
+        if(getCvar("scr_sd_scorelimit") == "")		// Score limit per map
             setcvar("scr_sd_scorelimit", "10");
-        level.scorelimit = getcvarint("scr_sd_scorelimit");
+        level.scorelimit = getCvarInt("scr_sd_scorelimit");
             
-        if(getcvar("scr_sd_roundlimit") == "")		// Round limit per map
+        if(getCvar("scr_sd_roundlimit") == "")		// Round limit per map
             setcvar("scr_sd_roundlimit", "0");
-        level.roundlimit = getcvarint("scr_sd_roundlimit");
+        level.roundlimit = getCvarInt("scr_sd_roundlimit");
 
-        if(getcvar("scr_sd_roundlength") == "")		// Time length of each round
+        if(getCvar("scr_sd_roundlength") == "")		// Time length of each round
             setcvar("scr_sd_roundlength", "4");
-        else if(getcvarfloat("scr_sd_roundlength") > 10)
+        else if(getCvarFloat("scr_sd_roundlength") > 10)
             setcvar("scr_sd_roundlength", "10");
-        level.roundlength = getcvarfloat("scr_sd_roundlength");
+        level.roundlength = getCvarFloat("scr_sd_roundlength");
 
-        if(getcvar("scr_sd_graceperiod") == "")		// Time at round start where spawning and weapon choosing is still allowed
+        if(getCvar("scr_sd_graceperiod") == "")		// Time at round start where spawning and weapon choosing is still allowed
             setcvar("scr_sd_graceperiod", "15");
-        else if(getcvarfloat("scr_sd_graceperiod") > 60)
+        else if(getCvarFloat("scr_sd_graceperiod") > 60)
             setcvar("scr_sd_graceperiod", "60");
-        level.graceperiod = getcvarfloat("scr_sd_graceperiod");
+        level.graceperiod = getCvarFloat("scr_sd_graceperiod");
     }
     else if(level.gametype == "re")
     {
-        if(getcvar("scr_re_scorelimit") == "")		// Score limit per map
+        if(getCvar("scr_re_scorelimit") == "")		// Score limit per map
             setcvar("scr_re_scorelimit", "10");
-        level.scorelimit = getcvarint("scr_re_scorelimit");
+        level.scorelimit = getCvarInt("scr_re_scorelimit");
 
-        if(getcvar("scr_re_roundlimit") == "")		// Round limit per map
+        if(getCvar("scr_re_roundlimit") == "")		// Round limit per map
             setcvar("scr_re_roundlimit", "0");
-        level.roundlimit = getcvarint("scr_re_roundlimit");
+        level.roundlimit = getCvarInt("scr_re_roundlimit");
 
-        if(getcvar("scr_re_roundlength") == "")		// Time length of each round
+        if(getCvar("scr_re_roundlength") == "")		// Time length of each round
             setcvar("scr_re_roundlength", "4");
-        else if(getcvarfloat("scr_re_roundlength") > 10)
+        else if(getCvarFloat("scr_re_roundlength") > 10)
             setcvar("scr_re_roundlength", "10");
-        level.roundlength = getcvarfloat("scr_re_roundlength");
+        level.roundlength = getCvarFloat("scr_re_roundlength");
 
-        if(getcvar("scr_re_graceperiod") == "")		// Time at round start where spawning and weapon choosing is still allowed
+        if(getCvar("scr_re_graceperiod") == "")		// Time at round start where spawning and weapon choosing is still allowed
             setcvar("scr_re_graceperiod", "15");
-        else if(getcvarfloat("scr_re_graceperiod") > 60)
+        else if(getCvarFloat("scr_re_graceperiod") > 60)
             setcvar("scr_re_graceperiod", "60");
-        level.graceperiod = getcvarfloat("scr_re_graceperiod");
+        level.graceperiod = getCvarFloat("scr_re_graceperiod");
     }
     else if(level.gametype == "dm")
     {
-        if(getcvar("scr_dm_scorelimit") == "")		// Score limit per map
+        if(getCvar("scr_dm_scorelimit") == "")		// Score limit per map
             setcvar("scr_dm_scorelimit", "50");
-        level.scorelimit = getcvarint("scr_dm_scorelimit");
+        level.scorelimit = getCvarInt("scr_dm_scorelimit");
     }
     else if(level.gametype == "tdm")
     {
-        if(getcvar("scr_tdm_scorelimit") == "")		// Score limit per map
+        if(getCvar("scr_tdm_scorelimit") == "")		// Score limit per map
             setcvar("scr_tdm_scorelimit", "100");
-        level.scorelimit = getcvarint("scr_tdm_scorelimit");
+        level.scorelimit = getCvarInt("scr_tdm_scorelimit");
     }
     else if(level.gametype == "bel")
     {
-        if(getcvar("scr_bel_scorelimit") == "")
+        if(getCvar("scr_bel_scorelimit") == "")
             setcvar("scr_bel_scorelimit", "50");
-        level.playerscorelimit = getcvarint("scr_bel_scorelimit");
+        level.playerscorelimit = getCvarInt("scr_bel_scorelimit");
     }
 
     if(level.gametype == "bel")
     {
-        if(getcvar("scr_bel_alivepointtime") == "")
+        if(getCvar("scr_bel_alivepointtime") == "")
             setcvar("scr_bel_alivepointtime", "10");
-        level.AlivePointTime = getcvarint("scr_bel_alivepointtime");
+        level.AlivePointTime = getCvarInt("scr_bel_alivepointtime");
 
-        if(getcvar("scr_bel_positiontime") == "")
+        if(getCvar("scr_bel_positiontime") == "")
             setcvar("scr_bel_positiontime", "6");
-        level.PositionUpdateTime = getcvarint("scr_bel_positiontime");
+        level.PositionUpdateTime = getCvarInt("scr_bel_positiontime");
 
-        if(getcvar("scr_bel_respawndelay") == "")
+        if(getCvar("scr_bel_respawndelay") == "")
             setcvar("scr_bel_respawndelay", "0");
 
-        if(getcvar("scr_bel_showoncompass") == "")
+        if(getCvar("scr_bel_showoncompass") == "")
             setcvar("scr_bel_showoncompass", "1");
     }
 
     if(level.gametype == "sd" || level.gametype == "re" || level.gametype == "tdm" || level.gametype == "bel")
     {
-        if(getcvar("scr_friendlyfire") == "")		// Friendly fire
+        if(getCvar("scr_friendlyfire") == "")		// Friendly fire
             setcvar("scr_friendlyfire", "0");
 
         if(level.gametype == "sd" || level.gametype == "re")
         {
-            if(getcvar("scr_roundcam") == "")		// Round Cam On or Off (Default 0 - off)
+            if(getCvar("scr_roundcam") == "")		// Round Cam On or Off (Default 0 - off)
                 setcvar("scr_roundcam", "0");
         }
 
-        if(getcvar("scr_drawfriend") == "")		// Draws a team icon over teammates
+        if(getCvar("scr_drawfriend") == "")		// Draws a team icon over teammates
             setcvar("scr_drawfriend", "0");
-        level.drawfriend = getcvarint("scr_drawfriend");
+        level.drawfriend = getCvarInt("scr_drawfriend");
     }
 
     if(level.gametype == "dm" || level.gametype == "tdm")
     {
-        if(getcvar("scr_forcerespawn") == "")		// Force respawning
+        if(getCvar("scr_forcerespawn") == "")		// Force respawning
             setcvar("scr_forcerespawn", "0");
     }
 
-    if(getcvar("g_allowvote") == "")
+    if(getCvar("g_allowvote") == "")
         setcvar("g_allowvote", "1");
-    level.allowvote = getcvarint("g_allowvote");
+    level.allowvote = getCvarInt("g_allowvote");
     setcvar("scr_allow_vote", level.allowvote);
 
     if(level.gametype == "re")
@@ -188,7 +188,7 @@ main()
         if(!isdefined(game["re_defenders"]))
             game["re_defenders"] = "axis";
 
-        if(getcvar("scr_re_showcarrier") == "")
+        if(getCvar("scr_re_showcarrier") == "")
             setcvar("scr_re_showcarrier", "0");
 
         if(!isdefined(game["re_attackers_obj_text"]))
@@ -356,10 +356,10 @@ startGameType()
         makeCvarServerInfo("scr_layoutimage", "");
 
         // server cvar overrides
-        if(getcvar("scr_allies") != "")
-            game["allies"] = getcvar("scr_allies");	
-        if(getcvar("scr_axis") != "")
-            game["axis"] = getcvar("scr_axis");
+        if(getCvar("scr_allies") != "")
+            game["allies"] = getCvar("scr_allies");	
+        if(getCvar("scr_axis") != "")
+            game["axis"] = getCvar("scr_axis");
         
         if(level.gametype == "bel")
         {
@@ -1852,7 +1852,7 @@ playerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLo
 
     if(level.gametype == "dm" || level.gametype == "tdm")
     {
-        if(getcvarint("scr_forcerespawn") > 0)
+        if(getCvarInt("scr_forcerespawn") > 0)
             doKillcam = false;
     }
 
@@ -2876,7 +2876,7 @@ endRound(roundwinner, timeexpired)
             players[i] playLocalSound("MP_announcer_round_draw");
     }
 
-    if((getcvar("scr_roundcam") == "1") && (!timeexpired) && (game["matchstarted"]))
+    if((getCvar("scr_roundcam") == "1") && (!timeexpired) && (game["matchstarted"]))
     {
         if(level.gametype == "sd" && ((isdefined(level.playercam) || isdefined(level.bombcam)) && roundwinner != "draw" && roundwinner != "reset")
             || level.gametype == "re" && ((isdefined(level.playercam) || isdefined(level.goalcam)) && roundwinner != "draw" && roundwinner != "reset"))

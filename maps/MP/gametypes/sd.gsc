@@ -283,7 +283,7 @@ updateScriptCvars()
             if(level.drawfriend)
             {
                 // for all living players, show the appropriate headicon
-                players = getentarray("player", "classname");
+                players = getEntArray("player", "classname");
                 for(i = 0; i < players.size; i++)
                 {
                     player = players[i];
@@ -305,7 +305,7 @@ updateScriptCvars()
             }
             else
             {
-                players = getentarray("player", "classname");
+                players = getEntArray("player", "classname");
                 for(i = 0; i < players.size; i++)
                 {
                     player = players[i];
@@ -338,7 +338,7 @@ updateTeamStatus()
     level.exist["allies"] = 0;
     level.exist["axis"] = 0;
     
-    players = getentarray("player", "classname");
+    players = getEntArray("player", "classname");
     for(i = 0; i < players.size; i++)
     {
         player = players[i];
@@ -551,7 +551,7 @@ bombzone_think(bombzone_other)
                     
                     level thread hud_announce(&"SD_EXPLOSIVESPLANTED");
                                         
-                    players = getentarray("player", "classname");
+                    players = getEntArray("player", "classname");
                     for(i = 0; i < players.size; i++)
                         players[i] playLocalSound("MP_announcer_bomb_planted");
                     
@@ -701,7 +701,7 @@ bomb_think()
                     lpselfnum = other getEntityNumber();
                     logPrint("A;" + lpselfnum + ";" + game["defenders"] + ";" + other.name + ";" + "bomb_defuse" + "\n");
                     
-                    players = getentarray("player", "classname");
+                    players = getEntArray("player", "classname");
                     for(i = 0; i < players.size; i++)
                         players[i] playLocalSound("MP_announcer_bomb_defused");
                 

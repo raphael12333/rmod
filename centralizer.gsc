@@ -273,7 +273,7 @@ main()
         {
             spawnpointname = "mp_teamdeathmatch_spawn";
         }
-        spawnpoints = getentarray(spawnpointname, "classname");
+        spawnpoints = getEntArray(spawnpointname, "classname");
 
         if(spawnpoints.size > 0)
         {
@@ -293,7 +293,7 @@ main()
         {
             spawnpointname = "mp_retrieval_spawn_allied";
         }
-        spawnpoints = getentarray(spawnpointname, "classname");
+        spawnpoints = getEntArray(spawnpointname, "classname");
 
         if(spawnpoints.size > 0)
         {
@@ -311,7 +311,7 @@ main()
         {
             spawnpointname = "mp_retrieval_spawn_axis";            
         }
-        spawnpoints = getentarray(spawnpointname, "classname");
+        spawnpoints = getEntArray(spawnpointname, "classname");
 
         if(spawnpoints.size > 0)
         {
@@ -324,12 +324,12 @@ main()
 
     if(level.gametype == "re")
     {
-        players = getentarray("player", "classname");
+        players = getEntArray("player", "classname");
         for(i = 0; i < players.size; i++)
             players[i].objs_held = 0;
 
         //get the minefields
-        level.minefield = getentarray("minefield", "targetname");
+        level.minefield = getEntArray("minefield", "targetname");
 
         thread maps\mp\gametypes\re::retrieval();
     }
@@ -800,7 +800,7 @@ playerConnect()
                             numonteam["allies"] = 0;
                             numonteam["axis"] = 0;
 
-                            players = getentarray("player", "classname");
+                            players = getEntArray("player", "classname");
                             for(i = 0; i < players.size; i++)
                             {
                                 player = players[i];
@@ -1954,7 +1954,7 @@ spawnPlayer()
             if(level.gametype == "bel")
             {
                 spawnpointname = "mp_teamdeathmatch_spawn";
-                spawnpoints = getentarray(spawnpointname, "classname");
+                spawnpoints = getEntArray(spawnpointname, "classname");
 
                 spawnpoint = maps\mp\gametypes\_spawnlogic::getSpawnpoint_MiddleThird(spawnpoints);
             }
@@ -1983,21 +1983,21 @@ spawnPlayer()
                     }
                 }
 
-                spawnpoints = getentarray(spawnpointname, "classname");
+                spawnpoints = getEntArray(spawnpointname, "classname");
                 spawnpoint = maps\mp\gametypes\_spawnlogic::getSpawnpoint_Random(spawnpoints);
             }
         }
         else if(level.gametype == "tdm")
         {
             spawnpointname = "mp_teamdeathmatch_spawn";
-            spawnpoints = getentarray(spawnpointname, "classname");
+            spawnpoints = getEntArray(spawnpointname, "classname");
             spawnpoint = maps\mp\gametypes\_spawnlogic::getSpawnpoint_NearTeam(spawnpoints);
         }
     }
     else if(level.gametype == "dm")
     {
         spawnpointname = "mp_deathmatch_spawn";
-        spawnpoints = getentarray(spawnpointname, "classname");
+        spawnpoints = getEntArray(spawnpointname, "classname");
         spawnpoint = maps\mp\gametypes\_spawnlogic::getSpawnpoint_DM(spawnpoints);
     }
     
@@ -2274,7 +2274,7 @@ spawnSpectator(origin, angles)
         {
             spawnpointname = "mp_teamdeathmatch_intermission";
         }
-        spawnpoints = getentarray(spawnpointname, "classname");
+        spawnpoints = getEntArray(spawnpointname, "classname");
         spawnpoint = maps\mp\gametypes\_spawnlogic::getSpawnpoint_Random(spawnpoints);
 
         if(isdefined(spawnpoint))
@@ -2359,7 +2359,7 @@ spawnIntermission()
     {
         spawnpointname = "mp_teamdeathmatch_intermission";
     }
-    spawnpoints = getentarray(spawnpointname, "classname");
+    spawnpoints = getEntArray(spawnpointname, "classname");
     if(level.gametype == "bel")
     {
         spawnpoint = maps\mp\gametypes\_spawnlogic::getSpawnpoint_MiddleThird(spawnpoints);
@@ -2657,7 +2657,7 @@ startRound()
             level.clock.color = (1, 1, 1);
 
             // Players on a team but without a weapon show as dead since they can not get in this round
-            players = getentarray("player", "classname");
+            players = getEntArray("player", "classname");
             for(i = 0; i < players.size; i++)
             {
                 player = players[i];
@@ -2809,7 +2809,7 @@ roundcam(delay, winningteam)
 
 resetScores()
 {
-    players = getentarray("player", "classname");
+    players = getEntArray("player", "classname");
     for(i = 0; i < players.size; i++)
     {
         player = players[i];
@@ -2840,7 +2840,7 @@ endRound(roundwinner, timeexpired)
         game["alliedscore"]++;
         setTeamScore("allies", game["alliedscore"]);
         
-        players = getentarray("player", "classname");
+        players = getEntArray("player", "classname");
         for(i = 0; i < players.size; i++)
         {
             if ( (isdefined (players[i].pers["team"])) && (players[i].pers["team"] == "allies") )
@@ -2857,7 +2857,7 @@ endRound(roundwinner, timeexpired)
         game["axisscore"]++;
         setTeamScore("axis", game["axisscore"]);
 
-        players = getentarray("player", "classname");
+        players = getEntArray("player", "classname");
         for(i = 0; i < players.size; i++)
         {
             if ( (isdefined (players[i].pers["team"])) && (players[i].pers["team"] == "axis") )
@@ -2871,7 +2871,7 @@ endRound(roundwinner, timeexpired)
     }
     else if(roundwinner == "draw")
     {
-        players = getentarray("player", "classname");
+        players = getEntArray("player", "classname");
         for(i = 0; i < players.size; i++)
             players[i] playLocalSound("MP_announcer_round_draw");
     }
@@ -2942,7 +2942,7 @@ endRound(roundwinner, timeexpired)
     level.mapended = true;
 
     // for all living players store their weapons
-    players = getentarray("player", "classname");
+    players = getEntArray("player", "classname");
     for(i = 0; i < players.size; i++)
     {
         player = players[i];
@@ -3024,7 +3024,7 @@ endMap()
     }
     else if(level.gametype == "dm" || level.gametype == "bel")
     {
-        players = getentarray("player", "classname");
+        players = getEntArray("player", "classname");
         for(i = 0; i < players.size; i++)
         {
             player = players[i];
@@ -3082,7 +3082,7 @@ endMap()
         }
     }
 
-    players = getentarray("player", "classname");
+    players = getEntArray("player", "classname");
     for(i = 0; i < players.size; i++)
     {
         player = players[i];

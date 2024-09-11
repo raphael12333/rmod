@@ -274,7 +274,7 @@ updateScriptCvars()
         {
             level.scorelimit = scorelimit;
 
-            players = getentarray("player", "classname");
+            players = getEntArray("player", "classname");
             for(i = 0; i < players.size; i++)
                 players[i] checkScoreLimit();
         }

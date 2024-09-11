@@ -293,7 +293,7 @@ updateScriptCvars()
             if(level.drawfriend)
             {
                 // for all living players, show the appropriate headicon
-                players = getentarray("player", "classname");
+                players = getEntArray("player", "classname");
                 for(i = 0; i < players.size; i++)
                 {
                     player = players[i];
@@ -315,7 +315,7 @@ updateScriptCvars()
             }
             else
             {
-                players = getentarray("player", "classname");
+                players = getEntArray("player", "classname");
                 for(i = 0; i < players.size; i++)
                 {
                     player = players[i];
@@ -348,7 +348,7 @@ updateTeamStatus()
     level.exist["allies"] = 0;
     level.exist["axis"] = 0;
 
-    players = getentarray("player", "classname");
+    players = getEntArray("player", "classname");
     for(i = 0; i < players.size; i++)
     {
         player = players[i];
@@ -389,7 +389,7 @@ updateTeamStatus()
 
 retrieval()
 {
-    level.retrieval_objective = getentarray("retrieval_objective","targetname");
+    level.retrieval_objective = getEntArray("retrieval_objective","targetname");
     for(i = 0; i < level.retrieval_objective.size; i++)
     {
         level.retrieval_objective[i] thread retrieval_spawn_objective();
@@ -433,7 +433,7 @@ objective_think(type)
 
 retrieval_spawn_objective()
 {
-    targeted = getentarray (self.target,"targetname");
+    targeted = getEntArray (self.target,"targetname");
     for (i=0;i<targeted.size;i++)
     {
         if (targeted[i].classname == "mp_retrieval_objective")

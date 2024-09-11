@@ -293,7 +293,7 @@ updateScriptCvars()
         {
             level.playerscorelimit = scorelimit;
 
-            players = getentarray("player", "classname");
+            players = getEntArray("player", "classname");
             for(i = 0; i < players.size; i++)
                 players[i] checkScoreLimit();
         }
@@ -305,7 +305,7 @@ updateScriptCvars()
 
             if(level.drawfriend)
             {
-                players = getentarray("player", "classname");
+                players = getEntArray("player", "classname");
                 for(i = 0; i < players.size; i++)
                 {
                     player = players[i];
@@ -327,7 +327,7 @@ updateScriptCvars()
             }
             else
             {
-                players = getentarray("player", "classname");
+                players = getEntArray("player", "classname");
                 for(i = 0; i < players.size; i++)
                 {
                     player = players[i];
@@ -356,7 +356,7 @@ CheckAllies_andMoveAxis_to_Allies(playertomove, playernottomove)
     numOnTeam["allies"] = 0;
     numOnTeam["axis"] = 0;
     
-    players = getentarray("player", "classname");
+    players = getEntArray("player", "classname");
     for(i = 0; i < players.size; i++)
     {
         if(isdefined(players[i].pers["team"]) && players[i].pers["team"] == "allies")
@@ -441,7 +441,7 @@ move_random_axis_to_allied(playernottoinclude)
 {
     candidates = [];
     axisplayers = [];
-    players = getentarray("player", "classname");
+    players = getEntArray("player", "classname");
     for(i = 0; i < players.size; i++)
     {
         if(isdefined(players[i].pers["team"]) && players[i].pers["team"] == "axis")
@@ -480,7 +480,7 @@ move_random_axis_to_allied(playernottoinclude)
 move_random_allied_to_axis()
 {
     numOnTeam["allies"] = 0;
-    players = getentarray("player", "classname");
+    players = getEntArray("player", "classname");
     for(i = 0; i < players.size; i++)
     {
         if(isdefined(players[i].pers["team"]) && players[i].pers["team"] == "allies")
@@ -791,7 +791,7 @@ blackscreen(didntkill)
 
 Number_On_Team(team)
 {
-    players = getentarray("player", "classname");
+    players = getEntArray("player", "classname");
 
     if (team == "axis")
     {

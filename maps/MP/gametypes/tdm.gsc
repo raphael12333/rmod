@@ -245,7 +245,7 @@ updateScriptCvars()
                     level.clock destroy();
             }
             
-            centralizer::checkTimeLimit();
+            checkTimeLimit();
         }
 
         scorelimit = getCvarInt("scr_tdm_scorelimit");
@@ -301,6 +301,26 @@ updateScriptCvars()
         {
             level.allowvote = allowvote;
             setcvar("scr_allow_vote", allowvote);
+        }
+
+        teambalance = getCvarInt("scr_teambalance");
+        if (level.teambalance != teambalance)
+        {
+            level.teambalance = getCvarInt("scr_teambalance");
+            if (level.teambalance > 0)
+            {
+                level thread maps\mp\gametypes\_teams::TeamBalance_Check();
+                level.teambalancetimer = 0;
+            }
+        }
+        if (level.teambalance > 0)
+        {
+            level.teambalancetimer++;
+            if (level.teambalancetimer >= 60)
+            {
+                level thread maps\mp\gametypes\_teams::TeamBalance_Check();
+                level.teambalancetimer = 0;
+            }
         }
 
         wait 1;

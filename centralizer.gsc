@@ -1662,7 +1662,7 @@ _finishPlayerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWea
     if(self.health - iDamage <= 0)
         victim_will_die = true;
     
-    if(isAlive(eAttacker))
+    if(isAlive(eAttacker) && self != eAttacker)
         eAttacker thread showDamageFeedback(iDamage, victim_will_die);
         
     if(victim_will_die)
@@ -3425,7 +3425,7 @@ endMap()
 
     mapvote::start();
     
-    exitLevel(false); // TODO: add a fix in libcod1 to make exitLevel(true) working
+    exitLevel(true); // TODO: add a fix in libcod1 to make exitLevel(true) working
 }
 
 checkTimeLimit()

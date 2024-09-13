@@ -168,11 +168,6 @@ killcam(attackerNum, delay)
     centralizer::killcam(attackerNum, delay);
 }
 
-roundcam(delay,winningteam)
-{
-    centralizer::roundcam(delay, winningteam);
-}
-
 checkMatchStart()
 {
     oldvalue["teams"] = level.exist["teams"];

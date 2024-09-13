@@ -1538,6 +1538,7 @@ playerDisconnect()
     }
 
     hud_playerFps_delete();
+    hud_playerAirJumps_delete();
 }
 
 playerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc)
@@ -1663,7 +1664,7 @@ _finishPlayerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWea
         victim_will_die = true;
     
     if(isAlive(eAttacker) && self != eAttacker)
-        eAttacker thread showDamageFeedback(iDamage, victim_will_die);
+        eAttacker thread hud_damageFeedback(iDamage, victim_will_die);
         
     if(victim_will_die)
     {
@@ -1707,37 +1708,6 @@ isPistol(sWeapon)
             return true;
     }
     return false;
-}
-
-showDamageFeedback(iDamage, victim_will_die)
-{
-    self endon("spawned");
-    destroyDamageFeedback();
-
-    if(victim_will_die)
-        color = (0, 1, 0);
-    else
-        color = (1, 0, 0);
-
-    self.damageFeedback = newClientHudElem(self);
-    self.damageFeedback.alignX = "center";
-    self.damageFeedback.alignY = "middle";
-    self.damageFeedback.x = 320;
-    self.damageFeedback.y = 240;
-    self.damageFeedback.alpha = 1;
-    self.damageFeedback.color = color;
-    self.damageFeedback setShader("gfx/hud/damage_feedback.dds", 24, 24);
-
-    self.damageFeedback fadeOverTime(1);
-    self.damageFeedback.alpha = 0;
-
-    wait 0.3;
-    destroyDamageFeedback();
-}
-destroyDamageFeedback()
-{
-    if(isDefined(self.damageFeedback))
-        self.damageFeedback destroy();
 }
 
 playerKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc)
@@ -1872,19 +1842,6 @@ playerKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitL
             else
             {
                 doKillcam = false;
-
-                if (!isdefined (self.autobalance))
-                {
-                    if(level.gametype == "dm" || level.gametype == "tdm")
-                    {
-                        eAttacker.score--;
-                    }
-                    else
-                    {
-                        eAttacker.pers["score"]--;
-                        eAttacker.score = eAttacker.pers["score"];
-                    }
-                }
 
                 if(level.gametype == "sd" || level.gametype == "re" || level.gametype == "tdm")
                 {
@@ -2123,6 +2080,13 @@ playerKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitL
         }
     }
 
+    if (isPlayer(eAttacker) && isAlive(eAttacker))
+    {
+        // Air jump reward
+        currentAirJumps = eAttacker getAirJumps();
+        eAttacker setAirJumps(currentAirJumps + 1);
+    }
+
     delay = 2;	// Delay the player becoming a spectator till after he's done dying
     wait delay;	// ?? Also required for Callback_PlayerKilled to complete before killcam can execute
 
@@ -2159,6 +2123,7 @@ playerKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitL
     }
 
     hud_playerFps_delete();
+    hud_playerAirJumps_delete();
 }
 
 spawnPlayer()
@@ -2488,7 +2453,10 @@ spawnPlayer()
         }
     }
 
+    self setAirJumps(0);
+
     thread hud_playerFps();
+    thread hud_playerAirJumps();
 }
 
 spawnSpectator(origin, angles)
@@ -2596,6 +2564,7 @@ spawnSpectator(origin, angles)
     }
 
     hud_playerFps_delete();
+    hud_playerAirJumps_delete();
 }
 
 spawnIntermission()
@@ -2697,7 +2666,7 @@ killcam(attackerNum, delay, option)
 
     self.sessionstate = "spectator";
     self.spectatorclient = attackerNum;
-    self.archivetime = delay + 7;
+    self.archivetime = delay + 4;
 
     // wait till the next server frame to allow code a chance to update archivetime if it needs trimming
     wait 0.05;
@@ -2733,11 +2702,6 @@ killcam(attackerNum, delay, option)
         return;
     }
 
-    if(level.gametype == "sd" || level.gametype == "re")
-    {
-        self.killcam = true;
-    }
-
     if(!isdefined(self.kc_topbar))
     {
         self.kc_topbar = newClientHudElem(self);
@@ -2763,11 +2727,11 @@ killcam(attackerNum, delay, option)
         self.kc_title = newClientHudElem(self);
         self.kc_title.archived = false;
         self.kc_title.x = 320;
-        self.kc_title.y = 40;
+        self.kc_title.y = 60;
         self.kc_title.alignX = "center";
         self.kc_title.alignY = "middle";
         self.kc_title.sort = 1; // force to draw after the bars
-        self.kc_title.fontScale = 3.5;
+        self.kc_title.fontScale = 2.5;
     }
     self.kc_title setText(&"MPSCRIPT_KILLCAM");
 
@@ -2776,7 +2740,7 @@ killcam(attackerNum, delay, option)
         self.kc_skiptext = newClientHudElem(self);
         self.kc_skiptext.archived = false;
         self.kc_skiptext.x = 320;
-        self.kc_skiptext.y = 70;
+        self.kc_skiptext.y = self.kc_title.y + 30;
         self.kc_skiptext.alignX = "center";
         self.kc_skiptext.alignY = "middle";
         self.kc_skiptext.sort = 1; // force to draw after the bars
@@ -2795,10 +2759,10 @@ killcam(attackerNum, delay, option)
         self.kc_timer = newClientHudElem(self);
         self.kc_timer.archived = false;
         self.kc_timer.x = 320;
-        self.kc_timer.y = 428;
+        self.kc_timer.y = 435;
         self.kc_timer.alignX = "center";
         self.kc_timer.alignY = "middle";
-        self.kc_timer.fontScale = 3.5;
+        self.kc_timer.fontScale = 2;
         self.kc_timer.sort = 1;
     }
     self.kc_timer setTenthsTimer(self.archivetime - delay);
@@ -2812,10 +2776,6 @@ killcam(attackerNum, delay, option)
 
     self.spectatorclient = -1;
     self.archivetime = 0;
-    if(level.gametype == "sd" || level.gametype == "re")
-    {
-        self.killcam = undefined;
-    }
     if(level.gametype == "dm" || level.gametype == "tdm")
     {
         self.sessionstate = "dead";
@@ -2995,20 +2955,96 @@ createClock()
     }
 }
 
-roundcam(delay, winningteam)
+roundcam_level(delay, winningteam)
 {
-    self endon("spawned");
+    archivetime = delay + 4.5;
 
+    // wait till the next server frame to give the player the kill-cam huddraw elements
+    wait 0.05;
+
+    if (!isdefined(level.kc_topbar))
+    {
+        level.kc_topbar = newHudElem();
+        level.kc_topbar.archived = false;
+        level.kc_topbar.x = 0;
+        level.kc_topbar.y = 0;
+        level.kc_topbar.alpha = 0.5;
+        level.kc_topbar setShader("black", 640, 112);
+    }
+
+    if (!isdefined(level.kc_bottombar))
+    {
+        level.kc_bottombar = newHudElem();
+        level.kc_bottombar.archived = false;
+        level.kc_bottombar.x = 0;
+        level.kc_bottombar.y = 368;
+        level.kc_bottombar.alpha = 0.5;
+        level.kc_bottombar setShader("black", 640, 112);
+    }
+
+    if (!isdefined(level.kc_title))
+    {
+        level.kc_title = newHudElem();
+        level.kc_title.archived = false;
+        level.kc_title.x = 320;
+        level.kc_title.y = 60;
+        level.kc_title.alignX = "center";
+        level.kc_title.alignY = "middle";
+        level.kc_title.sort = 1; // force to draw after the bars
+        level.kc_title.fontScale = 2.5;
+    }
+
+    if(winningteam == "allies")
+        level.kc_title setText(&"MPSCRIPT_ALLIES_WIN");
+    else if(winningteam == "axis")
+        level.kc_title setText(&"MPSCRIPT_AXIS_WIN");
+    else
+        level.kc_title setText(&"MPSCRIPT_ROUNDCAM");
+    
+    if (!isdefined(level.kc_skiptext))
+    {
+        level.kc_skiptext = newHudElem();
+        level.kc_skiptext.archived = false;
+        level.kc_skiptext.x = 320;
+        level.kc_skiptext.y = level.kc_title.y + 30;
+        level.kc_skiptext.alignX = "center";
+        level.kc_skiptext.alignY = "middle";
+        level.kc_skiptext.sort = 1; // force to draw after the bars
+    }
+    if(game["alliedscore"] < level.scorelimit && game["axisscore"] < level.scorelimit)
+        level.kc_skiptext setText(&"MPSCRIPT_STARTING_NEW_ROUND");
+
+    if (!isdefined(level.kc_timer))
+    {
+        level.kc_timer = newHudElem();
+        level.kc_timer.archived = false;
+        level.kc_timer.x = 320;
+        level.kc_timer.y = 435;
+        level.kc_timer.alignX = "center";
+        level.kc_timer.alignY = "middle";
+        level.kc_timer.fontScale = 2;
+        level.kc_timer.sort = 1;
+    }
+    level.kc_timer setTenthsTimer(archivetime - delay);
+
+    level thread spawnedKillcamCleanup_rc();
+    wait (archivetime - 0.05);
+    level removeKillcamElements_rc();
+
+    level notify("roundcam_ended");
+}
+roundcam_client(delay)
+{
     spawnSpectator();
 
-    if(level.gametype == "sd")
+    if (level.gametype == "sd")
     {
         if(isdefined(level.bombcam))
             self thread spawnSpectator(level.bombcam.origin, level.bombcam.angles);
         else
-            self.spectatorclient = level.playercam;            
+            self.spectatorclient = level.playercam;
     }
-    else if(level.gametype == "re")
+    else if (level.gametype == "re")
     {
         if(isdefined(level.goalcam))
             self thread spawnSpectator(level.goalcam.origin, level.goalcam.angles);
@@ -3016,84 +3052,28 @@ roundcam(delay, winningteam)
             self.spectatorclient = level.playercam;
     }
 
-    self.archivetime = delay + 7;
-
-    // wait till the next server frame to give the player the kill-cam huddraw elements
-    wait 0.05;
-
-    if (!isdefined(self.kc_topbar))
-    {
-        self.kc_topbar = newClientHudElem(self);
-        self.kc_topbar.archived = false;
-        self.kc_topbar.x = 0;
-        self.kc_topbar.y = 0;
-        self.kc_topbar.alpha = 0.5;
-        self.kc_topbar setShader("black", 640, 112);
-    }
-
-    if (!isdefined(self.kc_bottombar))
-    {
-        self.kc_bottombar = newClientHudElem(self);
-        self.kc_bottombar.archived = false;
-        self.kc_bottombar.x = 0;
-        self.kc_bottombar.y = 368;
-        self.kc_bottombar.alpha = 0.5;
-        self.kc_bottombar setShader("black", 640, 112);
-    }
-
-    if(!isdefined(self.kc_title))
-    {
-        self.kc_title = newClientHudElem(self);
-        self.kc_title.archived = false;
-        self.kc_title.x = 320;
-        self.kc_title.y = 40;
-        self.kc_title.alignX = "center";
-        self.kc_title.alignY = "middle";
-        self.kc_title.sort = 1; // force to draw after the bars
-        self.kc_title.fontScale = 3.5;
-    }
-
-    if(winningteam == "allies")
-        self.kc_title setText(&"MPSCRIPT_ALLIES_WIN");
-    else if(winningteam == "axis")
-        self.kc_title setText(&"MPSCRIPT_AXIS_WIN");
-    else
-        self.kc_title setText(&"MPSCRIPT_ROUNDCAM");
-    
-    if(!isdefined(self.kc_skiptext))
-    {
-        self.kc_skiptext = newClientHudElem(self);
-        self.kc_skiptext.archived = false;
-        self.kc_skiptext.x = 320;
-        self.kc_skiptext.y = 70;
-        self.kc_skiptext.alignX = "center";
-        self.kc_skiptext.alignY = "middle";
-        self.kc_skiptext.sort = 1; // force to draw after the bars
-    }
-    self.kc_skiptext setText(&"MPSCRIPT_STARTING_NEW_ROUND");
-
-    if(!isdefined(self.kc_timer))
-    {
-        self.kc_timer = newClientHudElem(self);
-        self.kc_timer.archived = false;
-        self.kc_timer.x = 320;
-        self.kc_timer.y = 428;
-        self.kc_timer.alignX = "center";
-        self.kc_timer.alignY = "middle";
-        self.kc_timer.fontScale = 3.5;
-        self.kc_timer.sort = 1;
-    }
-    self.kc_timer setTimer(self.archivetime - 1.05);
-
-    self thread spawnedKillcamCleanup();
-    self thread waitSkipKillcamButton();
+    self.archivetime = delay + 4.5;
     wait (self.archivetime - 0.05);
-    self removeKillcamElements();
-
     self.spectatorclient = -1;
     self.archivetime = 0;
-    
-    level notify("roundcam_ended");
+}
+removeKillcamElements_rc()
+{
+    if(isdefined(level.kc_topbar))
+        level.kc_topbar destroy();
+    if(isdefined(level.kc_bottombar))
+        level.kc_bottombar destroy();
+    if(isdefined(level.kc_title))
+        level.kc_title destroy();
+    if(isdefined(level.kc_skiptext))
+        level.kc_skiptext destroy();
+    if(isdefined(level.kc_timer))
+        level.kc_timer destroy();
+}
+spawnedKillcamCleanup_rc()
+{
+    level waittill("roundcam_ended");
+    level removeKillcamElements();
 }
 
 resetScores()
@@ -3172,22 +3152,21 @@ endRound(roundwinner, timeexpired)
         {
             delay = 2;	// Delay the player becoming a spectator
             wait delay;
-
-            viewers = 0;
-            for(i = 0; i < players.size; i++)
+            
+            if (players.size > 0)
             {
-                player = players[i];
-                if(!isdefined(player.killcam))
+                //time = delay + 7;
+                level thread roundcam_level(delay, roundwinner);
+                for(i = 0; i < players.size; i++)
                 {
-                    player thread roundcam(delay, roundwinner);
-                    viewers++;
+                    players[i] thread roundcam_client(delay);
                 }
-            }
-
-            if(viewers)
                 level waittill("roundcam_ended");
+            }
             else
+            {
                 wait 7;
+            }
         }
         else
         {
@@ -3298,8 +3277,11 @@ endMap()
 
     hud_alivePlayers_delete();
     players = getEntArray("player", "classname");
-    for(i = 0; i < players.size; i++)
+    for (i = 0; i < players.size; i++)
+    {
         players[i] hud_playerFps_delete();
+        players[i] hud_playerAirJumps_delete();
+    }
 
     if(level.gametype == "sd" || level.gametype == "re")
     {
@@ -3425,7 +3407,7 @@ endMap()
 
     mapvote::start();
     
-    exitLevel(true); // TODO: add a fix in libcod1 to make exitLevel(true) working
+    exitLevel(false);
 }
 
 checkTimeLimit()
@@ -3506,19 +3488,50 @@ hud_scoreLimit()
         level.hudScoreLimit = newHudElem();
         level.hudScoreLimit.sort = -1;
         level.hudScoreLimit.alignX = "left";
-        level.hudScoreLimit.x = 372;
-        level.hudScoreLimit.y = 466;
-        level.hudScoreLimit.fontScale = 0.95;
+        level.hudScoreLimit.x = 368;
+        level.hudScoreLimit.y = 465;
+        level.hudScoreLimit.fontScale = 0.85;
         level.hudScoreLimit.label = &"Score limit: ";
         level.hudScoreLimit setValue(scorelimitCvar);
 
-        thread waitDestroyScoreLimit();
+        thread hud_scoreLimit_waitDestroy();
     }
 }
-waitDestroyScoreLimit()
+hud_scoreLimit_waitDestroy()
 {
     level waittill("intermission");
     level.hudScoreLimit destroy();
+}
+
+hud_playerFps()
+{
+    if(isDefined(self.hud_fps))
+        return;
+
+    level endon("intermission");
+    self endon("hud_playerFps_delete");
+
+    self.hud_fps = newClientHudElem(self);
+    self.hud_fps.sort = -1;
+    self.hud_fps.alignX = "left";
+    self.hud_fps.x = 543;
+    self.hud_fps.y = 25;
+    self.hud_fps.fontScale = 0.85;
+    self.hud_fps.label = &"Public FPS: ";
+
+    for(;;)
+    {
+        fps = self getFPS();
+        if(isDefined(self.hud_fps))
+            self.hud_fps setValue(fps);
+        wait .05;
+    }
+}
+hud_playerFps_delete()
+{
+    self notify("hud_playerFps_delete");
+    if(isDefined(self.hud_fps))
+        self.hud_fps destroy();    
 }
 
 hud_alivePlayers()
@@ -3668,33 +3681,64 @@ hud_alivePlayers_delete()
         level.hud_alivePlayers_axis_allies destroy();
 }
 
-hud_playerFps()
+hud_damageFeedback(iDamage, victim_will_die)
 {
-    if(isDefined(self.hud_fps))
+    self endon("spawned");
+    hud_damageFeedback_destroy();
+
+    if(victim_will_die)
+        color = (0, 1, 0);
+    else
+        color = (1, 0, 0);
+
+    self.hud_damageFeedback = newClientHudElem(self);
+    self.hud_damageFeedback.alignX = "center";
+    self.hud_damageFeedback.alignY = "middle";
+    self.hud_damageFeedback.x = 320;
+    self.hud_damageFeedback.y = 240;
+    self.hud_damageFeedback.alpha = 1;
+    self.hud_damageFeedback.color = color;
+    self.hud_damageFeedback setShader("gfx/hud/damage_feedback.dds", 24, 24);
+
+    self.hud_damageFeedback fadeOverTime(1);
+    self.hud_damageFeedback.alpha = 0;
+
+    wait 0.3;
+    hud_damageFeedback_destroy();
+}
+hud_damageFeedback_destroy()
+{
+    if(isDefined(self.hud_damageFeedback))
+        self.hud_damageFeedback destroy();
+}
+
+hud_playerAirJumps()
+{
+    if(isDefined(self.hud_airJumps))
         return;
-
+    
     level endon("intermission");
-    self endon("hud_playerFps_delete");
+    self endon("hud_playerAirJumps_delete");
 
-    self.hud_fps = newClientHudElem(self);
-    self.hud_fps.sort = -1;
-    self.hud_fps.alignX = "left";
-    self.hud_fps.x = 538;
-    self.hud_fps.y = 25;
-    self.hud_fps.fontScale = 0.85;
-    self.hud_fps.label = &"Public FPS: ";
+    self.hud_airJumps = newClientHudElem(self);
+    self.hud_airJumps.sort = -1;
+    self.hud_airJumps.alignX = "left";
+    self.hud_airJumps.x = 143;
+    self.hud_airJumps.y = 461;
+    self.hud_airJumps.fontScale = 0.95;
+    self.hud_airJumps.label = &"Air jumps: ";
 
     for(;;)
     {
-        fps = self getFPS();
-        if(isDefined(self.hud_fps))
-            self.hud_fps setValue(fps);
+        airJumpsAvailable = self getAirJumps();
+        if(isDefined(self.hud_airJumps))
+            self.hud_airJumps setValue(airJumpsAvailable);
         wait .05;
     }
 }
-hud_playerFps_delete()
+hud_playerAirJumps_delete()
 {
-    self notify("hud_playerFps_delete");
-    if(isDefined(self.hud_fps))
-        self.hud_fps destroy();    
+    self notify("hud_playerAirJumps_delete");
+    if(isDefined(self.hud_airJumps))
+        self.hud_airJumps destroy();    
 }

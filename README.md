@@ -19,3 +19,6 @@ Some of the modifications are:
 - score limit indicator
 - player fps indicator
 - sound for air jumps
+- suicide doesn't decrease score
+- 1 kill = 1 air jump reward
+- improved killcams UI

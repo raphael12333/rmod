@@ -1,6 +1,6 @@
 ## Stock gametypes modifications + extras
 ### Using the cod1dev [centralizer](https://github.com/cod1dev/centralizer)
-### [libcod1](https://github.com/cod1dev/libcod1) required
+### [libcod1](https://github.com/cod1dev/libcod1) is required
 
 Some of the modifications are:
 - enable roundcam in sd gametype

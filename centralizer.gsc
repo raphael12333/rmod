@@ -662,7 +662,7 @@ startGameType()
 
     hud_scoreLimit();
 
-    if(level.gametype != "dm" && game["matchstarted"])
+    if((level.gametype != "dm" && level.gametype != "tdm" && level.gametype != "bel") && game["matchstarted"])
         thread hud_alivePlayers();
 }
 

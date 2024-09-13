@@ -41,14 +41,6 @@ init()
     command_register(10,    "movespec", ::cmd_movespec,     "Move a player to spectator.",  "<client number>");
     command_register(11,    "endmap",   ::cmd_endmap);
     command_register(12,    "fov",      ::cmd_fov,          "Change field of view.",        "<value number>");
-
-
-    command_register(13,    "test",     ::cmd_test);
-    
-
-
-
-
 }
 command_register(permId, name, function, description, usage)
 {
@@ -539,16 +531,4 @@ cmd_fov(args)
     self.pers["fov"] = value;
 
     self iPrintLn("FOV changed to " + value);
-}
-
-cmd_test(args)
-{
-    //self setJumpHeight(120.0);
-
-
-    self setAirJumps(3);
-
-
-
-
 }

@@ -2768,10 +2768,10 @@ killcam(attackerNum, delay, option)
 
     self.spectatorclient = -1;
     self.archivetime = 0;
-    if(level.gametype == "dm" || level.gametype == "tdm")
-    {
-        self.sessionstate = "dead";
-    }
+    //if(level.gametype == "dm" || level.gametype == "tdm")
+    //{
+        //self.sessionstate = "dead";
+    //}
 
     if(level.gametype == "dm")
     {

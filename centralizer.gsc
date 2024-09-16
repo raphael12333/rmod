@@ -620,15 +620,6 @@ startGameType()
         game["gamestarted"] = true;
     }
 
-    if(level.gametype == "sd" || level.gametype == "re")
-    {
-        setClientNameMode("manual_change");
-    }
-    else if(level.gametype == "dm" || level.gametype == "tdm" || level.gametype == "bel")
-    {
-        setClientNameMode("auto_change");
-    }
-
     if(level.gametype == "sd")
     {
         thread maps\mp\gametypes\sd::bombzones();
@@ -1803,7 +1794,8 @@ playerKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitL
     attackerNum = -1;
     if(level.gametype == "sd" || level.gametype == "re")
     {
-        level.playercam = eAttacker getEntityNumber();
+        if(isPlayerNumber(eAttacker getEntityNumber()))
+            level.playercam = eAttacker getEntityNumber();
     }
 
     if(isPlayer(eAttacker))
@@ -2955,13 +2947,8 @@ createClock()
     }
 }
 
-roundcam_level(delay, winningteam)
+roundcam_level(timeWaitedBeforeRoundcam, winningteam, videoDurationBeforeKill)
 {
-    archivetime = delay + 4.5;
-
-    // wait till the next server frame to give the player the kill-cam huddraw elements
-    wait 0.05;
-
     if (!isdefined(level.kc_topbar))
     {
         level.kc_topbar = newHudElem();
@@ -3025,15 +3012,15 @@ roundcam_level(delay, winningteam)
         level.kc_timer.fontScale = 2;
         level.kc_timer.sort = 1;
     }
-    level.kc_timer setTenthsTimer(archivetime - delay);
+    level.kc_timer setTenthsTimer(videoDurationBeforeKill);
 
     level thread spawnedKillcamCleanup_rc();
-    wait (archivetime - 0.05);
+    wait (timeWaitedBeforeRoundcam + videoDurationBeforeKill);
     level removeKillcamElements_rc();
 
     level notify("roundcam_ended");
 }
-roundcam_client(delay)
+roundcam_client(timeWaitedBeforeRoundcam, videoDurationBeforeKill)
 {
     spawnSpectator();
 
@@ -3052,8 +3039,8 @@ roundcam_client(delay)
             self.spectatorclient = level.playercam;
     }
 
-    self.archivetime = delay + 4.5;
-    wait (self.archivetime - 0.05);
+    self.archivetime = timeWaitedBeforeRoundcam + videoDurationBeforeKill;
+    wait (self.archivetime);
     self.spectatorclient = -1;
     self.archivetime = 0;
 }
@@ -3145,6 +3132,10 @@ endRound(roundwinner, timeexpired)
             players[i] playLocalSound("MP_announcer_round_draw");
     }
 
+    if(roundwinner == "reset")
+        if(isDefined(level.clock))
+            level.clock destroy();
+
     if((getCvar("scr_roundcam") == "1") && (!timeexpired) && (game["matchstarted"]))
     {
         if(level.gametype == "sd" && ((isdefined(level.playercam) || isdefined(level.bombcam)) && roundwinner != "draw" && roundwinner != "reset")
@@ -3152,14 +3143,23 @@ endRound(roundwinner, timeexpired)
         {
             delay = 2;	// Delay the player becoming a spectator
             wait delay;
+
+            delay_additional = 1;
+            wait delay_additional;
+            delay += delay_additional;
+
+
+            timeWaitedBeforeRoundcam = delay;
+            videoDurationBeforeKill = 5;
             
+            players = getEntArray("player", "classname");
             if (players.size > 0)
             {
-                //time = delay + 7;
-                level thread roundcam_level(delay, roundwinner);
-                for(i = 0; i < players.size; i++)
+                savePlayerWeapons();
+                level thread roundcam_level(timeWaitedBeforeRoundcam, roundwinner, videoDurationBeforeKill);
+                for (i = 0; i < players.size; i++)
                 {
-                    players[i] thread roundcam_client(delay);
+                    players[i] thread roundcam_client(timeWaitedBeforeRoundcam, videoDurationBeforeKill);
                 }
                 level waittill("roundcam_ended");
             }
@@ -3196,28 +3196,46 @@ endRound(roundwinner, timeexpired)
         return;
     level.mapended = true;
 
+    if(level.timelimit > 0)
+    {
+        timepassed = (getTime() - level.starttime) / 1000;
+        timepassed = timepassed / 60.0;
+
+        game["timeleft"] = level.timelimit - timepassed;
+    }
+
+    if ( (level.teambalance > 0) && (game["BalanceTeamsNextRound"]) )
+    {
+        level.lockteams = true;
+        level thread maps\mp\gametypes\_teams::TeamBalance();
+        level waittill ("Teams Balanced");
+        wait 4;
+    }
+    map_restart(true);
+}
+savePlayerWeapons()
+{
     // for all living players store their weapons
     players = getEntArray("player", "classname");
-    for(i = 0; i < players.size; i++)
+    for (i = 0; i < players.size; i++)
     {
         player = players[i];
-        
-        if(isdefined(player.pers["team"]) && player.pers["team"] != "spectator" && player.sessionstate == "playing")
+        if (isdefined(player.pers["team"]) && player.pers["team"] != "spectator" && player.sessionstate == "playing")
         {
             primary = player getWeaponSlotWeapon("primary");
             primaryb = player getWeaponSlotWeapon("primaryb");
 
             // If a menu selection was made
-            if(isdefined(player.oldweapon))
+            if (isdefined(player.oldweapon))
             {
                 // If a new weapon has since been picked up (this fails when a player picks up a weapon the same as his original)
-                if(player.oldweapon != primary && player.oldweapon != primaryb && primary != "none")
+                if (player.oldweapon != primary && player.oldweapon != primaryb && primary != "none")
                 {
                     player.pers["weapon1"] = primary;
                     player.pers["weapon2"] = primaryb;
                     player.pers["spawnweapon"] = player getCurrentWeapon();
                 } // If the player's menu chosen weapon is the same as what is in the primaryb slot, swap the slots
-                else if(player.pers["weapon"] == primaryb)
+                else if (player.pers["weapon"] == primaryb)
                 {
                     player.pers["weapon1"] = primaryb;
                     player.pers["weapon2"] = primary;
@@ -3247,23 +3265,6 @@ endRound(roundwinner, timeexpired)
             }
         }
     }
-
-    if(level.timelimit > 0)
-    {
-        timepassed = (getTime() - level.starttime) / 1000;
-        timepassed = timepassed / 60.0;
-
-        game["timeleft"] = level.timelimit - timepassed;
-    }
-
-    if ( (level.teambalance > 0) && (game["BalanceTeamsNextRound"]) )
-    {
-        level.lockteams = true;
-        level thread maps\mp\gametypes\_teams::TeamBalance();
-        level waittill ("Teams Balanced");
-        wait 4;
-    }
-    map_restart(true);
 }
 
 endMap()

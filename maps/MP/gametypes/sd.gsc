@@ -509,7 +509,8 @@ bombzone_think(bombzone_other)
                     other.progressbackground destroy();
                     other.progressbar destroy();
 
-                    level.bombcam = getent(self.target, "targetname");
+                    if(isDefined(self.target))
+                        level.bombcam = getent(self.target, "targetname");
                     level.bombexploder = self.script_noteworthy;
                     
                     bombzone_A = getent("bombzone_A", "targetname");

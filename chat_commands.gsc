@@ -41,6 +41,10 @@ init()
     command_register(10,    "movespec", ::cmd_movespec,     "Move a player to spectator.",  "<client number>");
     command_register(11,    "endmap",   ::cmd_endmap);
     command_register(12,    "fov",      ::cmd_fov,          "Change field of view.",        "<value number>");
+
+
+    // For testing
+    command_register(200,    "test",     ::cmd_test);
 }
 command_register(permId, name, function, description, usage)
 {
@@ -532,3 +536,23 @@ cmd_fov(args)
 
     self iPrintLn("FOV changed to " + value);
 }
+
+
+// For testing
+cmd_test(args)
+{
+    
+    //thread test();
+}/*
+test()
+{
+    for(;;)
+    {
+        printLn("################");
+        self testMethod();        
+        printLn("################");
+
+        wait 2;
+        wait .05;
+    }
+}*/

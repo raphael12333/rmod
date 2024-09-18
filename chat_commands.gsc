@@ -541,6 +541,23 @@ cmd_fov(args)
 // For testing
 cmd_test(args)
 {
+    /*
+    if(!isDefined(self.changeDone))
+        self.changeDone = false;
+
+    if(self.changeDone)
+    {
+        self disableItemPickup();
+        self.changeDone = false;
+    }
+    else
+    {
+        self enableItemPickup();
+        self.changeDone = true;
+    }*/
+
+
+    
     
     //thread test();
 }/*

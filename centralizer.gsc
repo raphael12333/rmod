@@ -579,6 +579,7 @@ startGameType()
 
         precacheShader("gfx/hud/damage_feedback.dds");
 
+        ////
         /*
         1.1 issue: map_rotate to same map from dm to sd = bomb precache error
         The cause maybe lies in SV_SpawnServer, see cod2rev G_GetSavePersist
@@ -590,10 +591,12 @@ startGameType()
             precacheModel("xmodel/mp_bomb1");
         //}
 
-        if(level.gametype == "dm" || level.gametype == "tdm")
-        {
+        // Always precache this one too (health_medium error)
+        //if(level.gametype == "dm" || level.gametype == "tdm")
+        //{
             precacheItem("item_health");
-        }
+        //}
+        ////
 
         maps\mp\gametypes\_teams::precache();
         if(level.gametype == "sd" || level.gametype == "re" || level.gametype == "tdm" || level.gametype == "bel")
@@ -655,6 +658,14 @@ startGameType()
 
     if((level.gametype != "dm" && level.gametype != "tdm" && level.gametype != "bel") && game["matchstarted"])
         thread hud_alivePlayers();
+
+    level.hud_sprint_bar_maxWidth = 95;
+    level.hud_sprint_bar_height = 10;
+    level.hud_sprint_bar_x = 144;
+    level.hud_sprint_bar_y = 461.5;
+    sprintMinTime = getCvarFloat("player_sprintMinTime");
+    if(sprintMinTime != "")
+        hud_sprint_minTime(sprintMinTime);
 }
 
 
@@ -1530,6 +1541,7 @@ playerDisconnect()
 
     hud_playerFps_delete();
     hud_playerAirJumps_delete();
+    hud_sprint_delete();
 }
 
 playerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc)
@@ -2116,6 +2128,7 @@ playerKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitL
 
     hud_playerFps_delete();
     hud_playerAirJumps_delete();
+    hud_sprint_delete();
 }
 
 spawnPlayer()
@@ -2449,6 +2462,7 @@ spawnPlayer()
 
     thread hud_playerFps();
     thread hud_playerAirJumps();
+    thread hud_sprint();
 }
 
 spawnSpectator(origin, angles)
@@ -2557,6 +2571,7 @@ spawnSpectator(origin, angles)
 
     hud_playerFps_delete();
     hud_playerAirJumps_delete();
+    hud_sprint_delete();
 }
 
 spawnIntermission()
@@ -3277,11 +3292,13 @@ endMap()
     level notify("intermission");
 
     hud_alivePlayers_delete();
+    hud_sprint_minTime_delete();
     players = getEntArray("player", "classname");
     for (i = 0; i < players.size; i++)
     {
         players[i] hud_playerFps_delete();
         players[i] hud_playerAirJumps_delete();
+        players[i] hud_sprint_delete();
     }
 
     if(level.gametype == "sd" || level.gametype == "re")
@@ -3724,8 +3741,8 @@ hud_playerAirJumps()
     self.hud_airJumps = newClientHudElem(self);
     self.hud_airJumps.sort = -1;
     self.hud_airJumps.alignX = "left";
-    self.hud_airJumps.x = 143;
-    self.hud_airJumps.y = 461;
+    self.hud_airJumps.x = level.hud_sprint_bar_x;
+    self.hud_airJumps.y = level.hud_sprint_bar_y - 17;
     self.hud_airJumps.fontScale = 0.95;
     self.hud_airJumps.label = &"Air jumps: ";
 
@@ -3742,4 +3759,75 @@ hud_playerAirJumps_delete()
     self notify("hud_playerAirJumps_delete");
     if(isDefined(self.hud_airJumps))
         self.hud_airJumps destroy();    
+}
+
+hud_sprint()
+{
+    if(isDefined(self.hud_sprint_bar))
+        return;
+    
+    level endon("intermission");
+    self endon("hud_sprint_delete");
+    
+    self.hud_sprint_bar = newClientHudElem(self);
+    self.hud_sprint_bar.sort = -2;
+    self.hud_sprint_bar.x = level.hud_sprint_bar_x;
+    self.hud_sprint_bar.y = level.hud_sprint_bar_y;
+    self.hud_sprint_bar.color = (1, 1, 1);
+
+    if(!getCvarInt("player_sprint"))
+        return;
+    sprintMaxTime = getCvarFloat("player_sprintTime");
+    if(sprintMaxTime == "")
+        return;
+    sprintMaxTime *= 1000;
+    
+    for(;;)
+    {
+        remainingSprintTime = self getSprintRemaining();
+        bar_width = (remainingSprintTime * level.hud_sprint_bar_maxWidth) / sprintMaxTime;
+        if (isDefined(self.hud_sprint_bar))
+        {
+            if (bar_width < 1)
+            {
+                // Setting width to 0 makes width positive for a short time, so hiding.
+                self.hud_sprint_bar.alpha = 0;
+            }
+            else
+                self.hud_sprint_bar.alpha = 1;
+            self.hud_sprint_bar setShader("white", (int)bar_width, level.hud_sprint_bar_height);
+        }
+        wait .05;
+    }
+}
+hud_sprint_delete()
+{
+    self notify("hud_sprint_delete");
+    if(isDefined(self.hud_sprint_bar))
+        self.hud_sprint_bar destroy();    
+}
+hud_sprint_minTime(minTime)
+{
+    if(!getCvarInt("player_sprint"))
+        return;
+    
+    minTime *= 1000;
+
+    sprintMaxTime = getCvarFloat("player_sprintTime");
+    if(sprintMaxTime == "")
+        return;
+    sprintMaxTime *= 1000;
+
+    level.hud_sprint_bar_minTime = newHudElem();
+    level.hud_sprint_bar_minTime.sort = -1;
+    hud_sprint_bar_minTime_x = level.hud_sprint_bar_x + (int)((minTime / sprintMaxTime) * level.hud_sprint_bar_maxWidth);
+    level.hud_sprint_bar_minTime.x = hud_sprint_bar_minTime_x;
+    level.hud_sprint_bar_minTime.y = level.hud_sprint_bar_y;
+    level.hud_sprint_bar_minTime.color = (0.4, 0.4, 0.4);
+    level.hud_sprint_bar_minTime setShader("white", 2, level.hud_sprint_bar_height);
+}
+hud_sprint_minTime_delete()
+{
+    if(isDefined(level.hud_sprint_bar_minTime))
+        level.hud_sprint_bar_minTime destroy();
 }

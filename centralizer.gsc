@@ -3819,7 +3819,7 @@ hud_serverInfo()
     if(isDefined(restartedOn))
         topLeft_text += "Restarted on: " + restartedOn;
 
-    contact = getCvar("contact");
+    contact = getCvar("scr_contact");
     if (contact != "")
     {
         if(topLeft_text != "")

@@ -541,22 +541,12 @@ cmd_fov(args)
 // For testing
 cmd_test(args)
 {
-    /*
-    if(!isDefined(self.changeDone))
-        self.changeDone = false;
-
-    if(self.changeDone)
-    {
-        self disableItemPickup();
-        self.changeDone = false;
-    }
-    else
-    {
-        self enableItemPickup();
-        self.changeDone = true;
-    }*/
-
-
+    /*if (args.size != 2)
+        return;
+    if(!isPositiveInt(args[1]))
+        return;
+        
+    self playScriptAnimation((int)args[1], 0, 1);*/
     
     
     //thread test();

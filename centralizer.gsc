@@ -3844,7 +3844,7 @@ hud_serverInfo_create()
         level.hud_serverInfo_underCompass = newHudElem();
         level.hud_serverInfo_underCompass.sort = -1;
         level.hud_serverInfo_underCompass.x = 1;
-        level.hud_serverInfo_underCompass.y = 473;
+        level.hud_serverInfo_underCompass.y = 474;
         level.hud_serverInfo_underCompass.fontScale = 0.52;
         underCompass_text_localized = makeLocalizedString(underCompass_text);
         level.hud_serverInfo_underCompass setText(underCompass_text_localized);

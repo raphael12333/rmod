@@ -1538,7 +1538,7 @@ playerDisconnect()
         }
     }
 
-    hud_playerFps_destroy();
+    hud_playerPublicFPS_destroy();
     hud_playerAirJumps_destroy();
     hud_sprintBar_destroy();
 }
@@ -2131,7 +2131,7 @@ playerKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitL
         }
     }
 
-    hud_playerFps_destroy();
+    hud_playerPublicFPS_destroy();
     hud_playerAirJumps_destroy();
     hud_sprintBar_destroy();
 }
@@ -2471,7 +2471,7 @@ spawnPlayer()
 
     self setAirJumps(0);
 
-    thread hud_playerFps_create();
+    thread hud_playerPublicFPS_create();
     thread hud_playerAirJumps_create();
     thread hud_sprintBar_create();
 }
@@ -2580,7 +2580,7 @@ spawnSpectator(origin, angles)
         self setClientCvar("cg_objectiveText", &"BEL_SPECTATOR_OBJS");
     }
 
-    hud_playerFps_destroy();
+    hud_playerPublicFPS_destroy();
     hud_playerAirJumps_destroy();
     hud_sprintBar_destroy();
 }
@@ -3308,7 +3308,7 @@ endMap()
     players = getEntArray("player", "classname");
     for (i = 0; i < players.size; i++)
     {
-        players[i] hud_playerFps_destroy();
+        players[i] hud_playerPublicFPS_destroy();
         players[i] hud_playerAirJumps_destroy();
         players[i] hud_sprintBar_destroy();
     }
@@ -3510,20 +3510,20 @@ printJoinedTeam(team)
         iprintln(&"MPSCRIPT_JOINED_AXIS", self);
 }
 
-//// hud_playerFps
-hud_playerFps_create()
+//// hud_playerPublicFPS
+hud_playerPublicFPS_create()
 {
     if(isDefined(self.hud_fps))
         return;
 
     level endon("intermission");
-    self endon("hud_playerFps_destroy");
+    self endon("hud_playerPublicFPS_destroy");
 
     self.hud_fps = newClientHudElem(self);
     self.hud_fps.sort = -1;
     self.hud_fps.alignX = "left";
-    self.hud_fps.x = 543;
-    self.hud_fps.y = 25;
+    self.hud_fps.x = 555;
+    self.hud_fps.y = 90;
     self.hud_fps.fontScale = 0.85;
     self.hud_fps.label = &"Public FPS: ";
 
@@ -3535,9 +3535,9 @@ hud_playerFps_create()
         wait .05;
     }
 }
-hud_playerFps_destroy()
+hud_playerPublicFPS_destroy()
 {
-    self notify("hud_playerFps_destroy");
+    self notify("hud_playerPublicFPS_destroy");
     if(isDefined(self.hud_fps))
         self.hud_fps destroy();    
 }
@@ -3858,26 +3858,26 @@ hud_serverInfo_create()
         level.hud_serverInfo_underHealth.sort = -1;
         level.hud_serverInfo_underHealth.alignX = "right";
         level.hud_serverInfo_underHealth.x = 631;
-        level.hud_serverInfo_underHealth.y = 472.5;
+        level.hud_serverInfo_underHealth.y = 473;
         level.hud_serverInfo_underHealth.fontScale = 0.6;
         underHealth_text_localized = makeLocalizedString(underHealth_text);
         level.hud_serverInfo_underHealth setText(underHealth_text_localized);
     }
     
-    //// Above lagometer
-    level.hud_serverInfo_aboveLago_background = newHudElem();
-    level.hud_serverInfo_aboveLago_background.sort = -2;
-    level.hud_serverInfo_aboveLago_background.x = 544;
-    level.hud_serverInfo_aboveLago_background.y = 270;
-    level.hud_serverInfo_aboveLago_background.color = (0.2, 0.2, 0.2);
-    level.hud_serverInfo_aboveLago_background.alpha = 0.4;
-    level.hud_serverInfo_aboveLago_background setShader("white", 89, 60);
+    //// Below local FPS
+    level.hud_serverInfo_belowLocalFPS_background = newHudElem();
+    level.hud_serverInfo_belowLocalFPS_background.sort = -2;
+    level.hud_serverInfo_belowLocalFPS_background.x = 547;
+    level.hud_serverInfo_belowLocalFPS_background.y = 25;
+    level.hud_serverInfo_belowLocalFPS_background.color = (0.2, 0.2, 0.2);
+    level.hud_serverInfo_belowLocalFPS_background.alpha = 0.4;
+    level.hud_serverInfo_belowLocalFPS_background setShader("white", 89, 60);
     
-    level.hud_serverInfo_aboveLago_text = newHudElem();
-    level.hud_serverInfo_aboveLago_text.sort = -1;
-    level.hud_serverInfo_aboveLago_text.x = level.hud_serverInfo_aboveLago_background.x + 5;
-    level.hud_serverInfo_aboveLago_text.y = level.hud_serverInfo_aboveLago_background.y + 5;
-    level.hud_serverInfo_aboveLago_text.fontScale = 0.85;
+    level.hud_serverInfo_belowLocalFPS_text = newHudElem();
+    level.hud_serverInfo_belowLocalFPS_text.sort = -1;
+    level.hud_serverInfo_belowLocalFPS_text.x = level.hud_serverInfo_belowLocalFPS_background.x + 5;
+    level.hud_serverInfo_belowLocalFPS_text.y = level.hud_serverInfo_belowLocalFPS_background.y + 5;
+    level.hud_serverInfo_belowLocalFPS_text.fontScale = 0.85;
 
     g_speed = getCvar("g_speed");
     player_sprintSpeedScale = getCvarFloat("player_sprintSpeedScale");
@@ -3935,7 +3935,7 @@ hud_serverInfo_setText(g_speed, player_sprintSpeedScale, g_gravity, jump_height)
         aboveLago_text += "\n" + "Jump height: " + level.jump_height_backup;
     
     hud_text_localized = makeLocalizedString(aboveLago_text);
-    level.hud_serverInfo_aboveLago_text setText(hud_text_localized);
+    level.hud_serverInfo_belowLocalFPS_text setText(hud_text_localized);
 }
 hud_serverInfo_destroy()
 {
@@ -3945,9 +3945,9 @@ hud_serverInfo_destroy()
     if(isDefined(level.hud_serverInfo_underHealth))
         level.hud_serverInfo_underHealth destroy();
     
-    if(isDefined(level.hud_serverInfo_aboveLago_background))
-        level.hud_serverInfo_aboveLago_background destroy();
-    if(isDefined(level.hud_serverInfo_aboveLago_text))
-        level.hud_serverInfo_aboveLago_text destroy();
+    if(isDefined(level.hud_serverInfo_belowLocalFPS_background))
+        level.hud_serverInfo_belowLocalFPS_background destroy();
+    if(isDefined(level.hud_serverInfo_belowLocalFPS_text))
+        level.hud_serverInfo_belowLocalFPS_text destroy();
 }
 ////

@@ -654,10 +654,10 @@ startGameType()
         thread maps\mp\gametypes\bel::updateScriptCvars();            
     }
 
-    hud_serverInfo();
+    hud_serverInfo_create();
 
     if((level.gametype != "dm" && level.gametype != "tdm" && level.gametype != "bel") && game["matchstarted"])
-        thread hud_alivePlayers();
+        thread hud_alivePlayers_create();
 
     level.hud_sprint_bar_maxWidth = 95;
     level.hud_sprint_bar_height = 10;
@@ -842,11 +842,10 @@ playerConnect()
         spawnSpectator();
     }
 
-    if (isDefined(self.pers["fov"]))
-    {
+    if(isDefined(self.pers["fov"]))
         self setClientCvar("cg_fov", self.pers["fov"]);
-        return;
-    }
+    
+    self disableItemAutoPickup();
 
     for(;;)
     {
@@ -1667,7 +1666,7 @@ _finishPlayerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWea
         victim_will_die = true;
     
     if(isAlive(eAttacker) && self != eAttacker)
-        eAttacker thread hud_damageFeedback(iDamage, victim_will_die);
+        eAttacker thread hud_damageFeedback_create(iDamage, victim_will_die);
         
     if(victim_will_die)
     {
@@ -2094,6 +2093,12 @@ playerKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitL
     delay = 2;	// Delay the player becoming a spectator till after he's done dying
     wait delay;	// ?? Also required for Callback_PlayerKilled to complete before killcam can execute
 
+    if (self isBot())
+    {
+        respawnBot();
+        return;
+    }
+
     if(level.gametype == "dm" || level.gametype == "tdm")
     {
         if(getCvarInt("scr_forcerespawn") > 0)
@@ -2129,6 +2134,12 @@ playerKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitL
     hud_playerFps_destroy();
     hud_playerAirJumps_destroy();
     hud_sprintBar_destroy();
+}
+respawnBot()
+{
+    self.pers["team"] = "allies";
+    self.pers["weapon"] = "mosin_nagant_mp";
+    self spawnPlayer();
 }
 
 spawnPlayer()
@@ -2460,9 +2471,9 @@ spawnPlayer()
 
     self setAirJumps(0);
 
-    thread hud_playerFps();
-    thread hud_playerAirJumps();
-    thread hud_sprintBar();
+    thread hud_playerFps_create();
+    thread hud_playerAirJumps_create();
+    thread hud_sprintBar_create();
 }
 
 spawnSpectator(origin, angles)
@@ -3499,7 +3510,8 @@ printJoinedTeam(team)
         iprintln(&"MPSCRIPT_JOINED_AXIS", self);
 }
 
-hud_playerFps()
+//// hud_playerFps
+hud_playerFps_create()
 {
     if(isDefined(self.hud_fps))
         return;
@@ -3529,8 +3541,10 @@ hud_playerFps_destroy()
     if(isDefined(self.hud_fps))
         self.hud_fps destroy();    
 }
+////
 
-hud_alivePlayers()
+//// hud_alivePlayers
+hud_alivePlayers_create()
 {
     level endon("intermission");
     
@@ -3676,8 +3690,10 @@ hud_alivePlayers_destroy()
     if(isDefined(level.hud_alivePlayers_axis_allies))
         level.hud_alivePlayers_axis_allies destroy();
 }
+////
 
-hud_damageFeedback(iDamage, victim_will_die)
+//// hud_damageFeedback
+hud_damageFeedback_create(iDamage, victim_will_die)
 {
     self endon("spawned");
     hud_damageFeedback_destroy();
@@ -3707,8 +3723,10 @@ hud_damageFeedback_destroy()
     if(isDefined(self.hud_damageFeedback))
         self.hud_damageFeedback destroy();
 }
+////
 
-hud_playerAirJumps()
+//// hud_playerAirJumps
+hud_playerAirJumps_create()
 {
     if(isDefined(self.hud_airJumps))
         return;
@@ -3738,8 +3756,10 @@ hud_playerAirJumps_destroy()
     if(isDefined(self.hud_airJumps))
         self.hud_airJumps destroy();    
 }
+////
 
-hud_sprintBar()
+//// hud_sprint
+hud_sprintBar_create()
 {
     if(isDefined(self.hud_sprint_bar))
         return;
@@ -3809,92 +3829,125 @@ hud_sprint_minTime_destroy()
     if(isDefined(level.hud_sprint_bar_minTime))
         level.hud_sprint_bar_minTime destroy();
 }
+////
 
-hud_serverInfo()
+//// hud_serverInfo
+hud_serverInfo_create()
 {
-    topLeft_text = "";
+    // id Tech 3 base resolution = 640*480
 
     serverStartTime = getServerStartTime();
-    restartedOn = strftime(serverStartTime, "utc", "%m/%d/%Y %I:%M %p");
-    if(isDefined(restartedOn))
-        topLeft_text += "Restarted on: " + restartedOn;
+    restartedOn = strftime(serverStartTime, "utc", "%m/%d/%Y %I:%M %p %Z");
+    if (isDefined(restartedOn))
+    {
+        underCompass_text = "Last reboot: " + restartedOn;
+        level.hud_serverInfo_underCompass = newHudElem();
+        level.hud_serverInfo_underCompass.sort = -1;
+        level.hud_serverInfo_underCompass.x = 1;
+        level.hud_serverInfo_underCompass.y = 473;
+        level.hud_serverInfo_underCompass.fontScale = 0.52;
+        underCompass_text_localized = makeLocalizedString(underCompass_text);
+        level.hud_serverInfo_underCompass setText(underCompass_text_localized);
+    }
 
     contact = getCvar("scr_contact");
     if (contact != "")
     {
-        if(topLeft_text != "")
-            topLeft_text += "\n";
-        topLeft_text += "Contact: " + contact;
-    }
-    if (topLeft_text != "")
-    {
-        level.hud_serverInfo_topleft_background = newHudElem();
-        level.hud_serverInfo_topleft_background.sort = -2;
-        level.hud_serverInfo_topleft_background.x = 2;
-        level.hud_serverInfo_topleft_background.y = 3;
-        level.hud_serverInfo_topleft_background.color = (0.2, 0.2, 0.2);
-        level.hud_serverInfo_topleft_background.alpha = 0.5;
-        level.hud_serverInfo_topleft_background setShader("white", 178, 26);
-
-        level.hud_serverInfo_topleft_text = newHudElem();
-        level.hud_serverInfo_topleft_text.sort = -1;
-        level.hud_serverInfo_topleft_text.x = level.hud_serverInfo_topleft_background.x + 2;
-        level.hud_serverInfo_topleft_text.y = level.hud_serverInfo_topleft_background.y + 3;
-        level.hud_serverInfo_topleft_text.fontScale = 0.85;
-        topLeft_text_localized = makeLocalizedString(topLeft_text);
-        level.hud_serverInfo_topleft_text setText(topLeft_text_localized);
+        underHealth_text = "Contact: " + contact;
+        level.hud_serverInfo_underHealth = newHudElem();
+        level.hud_serverInfo_underHealth.sort = -1;
+        level.hud_serverInfo_underHealth.alignX = "right";
+        level.hud_serverInfo_underHealth.x = 631;
+        level.hud_serverInfo_underHealth.y = 472.5;
+        level.hud_serverInfo_underHealth.fontScale = 0.6;
+        underHealth_text_localized = makeLocalizedString(underHealth_text);
+        level.hud_serverInfo_underHealth setText(underHealth_text_localized);
     }
     
-    bottomRight_text = "";
-
-    scorelimit = getCvar("scr_" + level.gametype + "_scorelimit");
-    if (scorelimit != "")
-    {
-        scorelimit = "Score limit: " + scorelimit;
-        bottomRight_text = scorelimit;
-    }
+    //// Above lagometer
+    level.hud_serverInfo_aboveLago_background = newHudElem();
+    level.hud_serverInfo_aboveLago_background.sort = -2;
+    level.hud_serverInfo_aboveLago_background.x = 544;
+    level.hud_serverInfo_aboveLago_background.y = 270;
+    level.hud_serverInfo_aboveLago_background.color = (0.2, 0.2, 0.2);
+    level.hud_serverInfo_aboveLago_background.alpha = 0.4;
+    level.hud_serverInfo_aboveLago_background setShader("white", 89, 60);
     
+    level.hud_serverInfo_aboveLago_text = newHudElem();
+    level.hud_serverInfo_aboveLago_text.sort = -1;
+    level.hud_serverInfo_aboveLago_text.x = level.hud_serverInfo_aboveLago_background.x + 5;
+    level.hud_serverInfo_aboveLago_text.y = level.hud_serverInfo_aboveLago_background.y + 5;
+    level.hud_serverInfo_aboveLago_text.fontScale = 0.85;
+
     g_speed = getCvar("g_speed");
-    if(bottomRight_text != "")
-        bottomRight_text += "\n";
-    bottomRight_text += "Speed: " + g_speed;
-
     player_sprintSpeedScale = getCvarFloat("player_sprintSpeedScale");
-    if(player_sprintSpeedScale != "")
-        bottomRight_text += "\n" + "Sprint scale: " + player_sprintSpeedScale;
-    
     g_gravity = getCvar("g_gravity");
-    if(g_gravity != "")
-        bottomRight_text += "\n" + "Gravity: " + g_gravity;
-
     jump_height = getCvarFloat("jump_height");
+
+    hud_serverInfo_setText(g_speed, player_sprintSpeedScale, g_gravity, jump_height);
+    thread hud_serverInfo_update();
+    ////
+}
+hud_serverInfo_update()
+{
+    level endon("intermission");
+
+    for(;;)
+    {
+        g_speed = getCvar("g_speed");
+        player_sprintSpeedScale = getCvarFloat("player_sprintSpeedScale");
+        g_gravity = getCvar("g_gravity");
+        jump_height = getCvarFloat("jump_height");
+
+        if (level.scorelimit_backup != level.scorelimit
+            || level.g_speed_backup != g_speed
+            || level.player_sprintSpeedScale_backup != player_sprintSpeedScale
+            || level.g_gravity_backup != g_gravity
+            || level.jump_height_backup != jump_height)
+        {
+            hud_serverInfo_setText(g_speed, player_sprintSpeedScale, g_gravity, jump_height);
+        }
+
+        wait 1;
+        wait .05;
+    }
+}
+hud_serverInfo_setText(g_speed, player_sprintSpeedScale, g_gravity, jump_height)
+{
+    aboveLago_text = "";
+
+    level.scorelimit_backup = level.scorelimit;
+    scorelimit = "Score limit: " + level.scorelimit_backup;
+    aboveLago_text = scorelimit;
+
+    level.g_speed_backup = g_speed;
+    aboveLago_text += "\n" + "Speed: " + level.g_speed_backup;
+
+    level.player_sprintSpeedScale_backup = player_sprintSpeedScale;
+    if(level.player_sprintSpeedScale_backup != "")
+        aboveLago_text += "\n" + "Sprint scale: " + level.player_sprintSpeedScale_backup;
+    
+    level.g_gravity_backup = g_gravity;
+    aboveLago_text += "\n" + "Gravity: " + level.g_gravity_backup;
+
+    level.jump_height_backup = jump_height;
     if(jump_height != "")
-        bottomRight_text += "\n" + "Jump height: " + jump_height;
+        aboveLago_text += "\n" + "Jump height: " + level.jump_height_backup;
     
-    level.hud_serverInfo_bottomRight_background = newHudElem();
-    level.hud_serverInfo_bottomRight_background.sort = -2;
-    level.hud_serverInfo_bottomRight_background.x = 540;
-    level.hud_serverInfo_bottomRight_background.y = 365;
-    level.hud_serverInfo_bottomRight_background.color = (0.2, 0.2, 0.2);
-    level.hud_serverInfo_bottomRight_background.alpha = 0.4;
-    level.hud_serverInfo_bottomRight_background setShader("white", 89, 60);
-    
-    level.hud_serverInfo_bottomRight_text = newHudElem();
-    level.hud_serverInfo_bottomRight_text.sort = -1;
-    level.hud_serverInfo_bottomRight_text.x = level.hud_serverInfo_bottomRight_background.x + 5;
-    level.hud_serverInfo_bottomRight_text.y = level.hud_serverInfo_bottomRight_background.y + 5;
-    level.hud_serverInfo_bottomRight_text.fontScale = 0.85;
-    hud_text_localized = makeLocalizedString(bottomRight_text);
-    level.hud_serverInfo_bottomRight_text setText(hud_text_localized);
+    hud_text_localized = makeLocalizedString(aboveLago_text);
+    level.hud_serverInfo_aboveLago_text setText(hud_text_localized);
 }
 hud_serverInfo_destroy()
 {
-    if(isDefined(level.hud_serverInfo_topleft_background))
-        level.hud_serverInfo_topleft_background destroy();
-    if(isDefined(level.hud_serverInfo_topleft_text))
-        level.hud_serverInfo_topleft_text destroy();
-    if(isDefined(level.hud_serverInfo_bottomRight_background))
-        level.hud_serverInfo_bottomRight_background destroy();
-    if(isDefined(level.hud_serverInfo_bottomRight_text))
-        level.hud_serverInfo_bottomRight_text destroy();
+    if(isDefined(level.hud_serverInfo_underCompass))
+        level.hud_serverInfo_underCompass destroy();
+
+    if(isDefined(level.hud_serverInfo_underHealth))
+        level.hud_serverInfo_underHealth destroy();
+    
+    if(isDefined(level.hud_serverInfo_aboveLago_background))
+        level.hud_serverInfo_aboveLago_background destroy();
+    if(isDefined(level.hud_serverInfo_aboveLago_text))
+        level.hud_serverInfo_aboveLago_text destroy();
 }
+////

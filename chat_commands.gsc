@@ -541,12 +541,14 @@ cmd_fov(args)
 // For testing
 cmd_test(args)
 {
-    /*if (args.size != 2)
-        return;
-    if(!isPositiveInt(args[1]))
-        return;
+    if(!isDefined(self.changeDone))
+        self.changeDone = false;
         
-    self playScriptAnimation((int)args[1], 0, 1);*/
+
+
+        
+
+
     
     
     //thread test();

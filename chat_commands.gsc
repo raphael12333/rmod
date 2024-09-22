@@ -541,16 +541,17 @@ cmd_fov(args)
 // For testing
 cmd_test(args)
 {
-    if(!isDefined(self.changeDone))
-        self.changeDone = false;
+    //if(!isDefined(self.changeDone))
+        //self.changeDone = false;
+    
+    //if(!isPositiveInt(args[1]))
+        //return;
+        
         
 
 
-        
 
 
-    
-    
     //thread test();
 }/*
 test()

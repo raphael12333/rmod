@@ -9,16 +9,21 @@ Some of the modifications are:
 - all bolt-action rifles menu (except for tdm and bel)
 - 1sk for bolt-action rifles, pistols and melee (except for tdm)
 - only 1 bullet in pistol and 1 grenade (except for tdm)
-- autobalance (based on the 1.5 game version)
+- autobalance (based on version used in 1.5 patch)
 - drop all weapons when dying
 - sd digital countdown for the bomb
 - sd uses the `announcement` gsc function (except for when bomb planted, so it doesn't obstruct the view)
 - pistol 1sk kill bullet reward
-- chat commands system (based on [MiscMod](https://github.com/cato-a/CoDaM_MiscMod))
+- chat command system
 - alive players counter hud
-- score limit indicator
 - player fps indicator
 - sound for air jumps
 - suicide doesn't decrease score
 - 1 kill = 1 air jump reward
-- improved killcams
+- improved killcam code and UI
+- sprint bar
+- server info hud
+
+#### References
+- [MiscMod](https://github.com/cato-a/CoDaM_MiscMod)
+- CoDaM by hammer@iwnation.com

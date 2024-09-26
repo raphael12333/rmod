@@ -2952,6 +2952,9 @@ startRound()
 
     if (level.gametype == "sd")
     {
+        if(level.bombplanted)
+            return;
+
         if(!level.exist[game["attackers"]] || !level.exist[game["defenders"]])
         {
             level thread maps\mp\gametypes\sd::hud_announce(&"SD_TIMEHASEXPIRED");

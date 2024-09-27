@@ -530,7 +530,8 @@ bombzone_think(bombzone_other)
                     bombtrigger = getent("bombtrigger", "targetname");
                     bombtrigger.origin = level.bombmodel.origin;
 
-                    level.bombcam.angles = vectortoangles(level.bombmodel.origin - level.bombcam.origin);
+                    if(isdefined(level.bombcam))
+                        level.bombcam.angles = vectortoangles(level.bombmodel.origin - level.bombcam.origin);
                     
                     objective_add(0, "current", bombtrigger.origin, "gfx/hud/hud@bombplanted.tga");
         

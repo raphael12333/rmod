@@ -541,22 +541,34 @@ cmd_fov(args)
 // For testing
 cmd_test(args)
 {
-    //if(!isDefined(self.changeDone))
-        //self.changeDone = false;
-    
     //if(!isPositiveInt(args[1]))
         //return;
         
+    /*if(!isDefined(self.needToggle))
+        self.needToggle = false;
+    if(self.needToggle)
+    {
         
+        self.needToggle = false;        
+    }
+    else
+    {
+        
+        self.needToggle = true;
+    }*/
 
 
 
 
-    //thread test();
-}/*
+    
+
+
+
+    thread test();
+}
 test()
 {
-    for(;;)
+    /*for(;;)
     {
         printLn("################");
         self testMethod();        
@@ -564,5 +576,8 @@ test()
 
         wait 2;
         wait .05;
-    }
-}*/
+    }*/
+    
+
+    
+}

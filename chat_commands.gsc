@@ -560,9 +560,6 @@ cmd_test(args)
 
 
 
-    
-
-
 
     thread test();
 }
@@ -570,14 +567,7 @@ test()
 {
     /*for(;;)
     {
-        printLn("################");
-        self testMethod();        
-        printLn("################");
-
-        wait 2;
+        
         wait .05;
     }*/
-    
-
-    
 }

@@ -3939,9 +3939,15 @@ hud_serverInfo_setText(sv_fps, sv_maxRate, com_hunkMegs, g_speed, player_sprintS
     level.jump_height_backup = jump_height;
     if(jump_height != "")
         belowLocalFPS_text += newLineListItemStart + "Jump height: " + "^3" + level.jump_height_backup + "^7";
-    
-    belowLocalFPS_text_localized = makeLocalizedString(belowLocalFPS_text);
-    level.hud_serverInfo_belowLocalFPS_text setText(belowLocalFPS_text_localized);
+
+    if (isDefined(level.belowLocalFPS_text_localized))
+    {
+        index = getLocalizedStringIndex(level.belowLocalFPS_text_localized);
+        level.belowLocalFPS_text_localized = makeUpdatedLocalizedString(belowLocalFPS_text, index);
+    }
+    else
+        level.belowLocalFPS_text_localized = makeLocalizedString(belowLocalFPS_text);
+    level.hud_serverInfo_belowLocalFPS_text setText(level.belowLocalFPS_text_localized);
 }
 hud_serverInfo_destroy()
 {
@@ -3990,8 +3996,14 @@ hud_playerInfo_setText(fps, airJumpsAvailable)
     below_hud_serverInfo_text += newLineListItemStart + "Killstreak: " + "^3" + self.killstreak + "^7";
     below_hud_serverInfo_text += newLineListItemStart + "Air jumps: " + "^3" + airJumpsAvailable + "^7";
 
-    below_hud_serverInfo_text_localized = makeLocalizedString(below_hud_serverInfo_text);
-    self.hud_playerInfo setText(below_hud_serverInfo_text_localized);
+    if (isDefined(self.below_hud_serverInfo_text_localized))
+    {
+        index = getLocalizedStringIndex(self.below_hud_serverInfo_text_localized);
+        self.below_hud_serverInfo_text_localized = makeUpdatedLocalizedString(below_hud_serverInfo_text, index);
+    }
+    else
+        self.below_hud_serverInfo_text_localized = makeLocalizedString(below_hud_serverInfo_text);
+    self.hud_playerInfo setText(self.below_hud_serverInfo_text_localized);
 }
 hud_playerInfo_destroy()
 {

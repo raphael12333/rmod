@@ -3824,7 +3824,7 @@ hud_info_background_create()
     level.hud_info_background.y = 35;
     level.hud_info_background.color = (0.2, 0.2, 0.2);
     level.hud_info_background.alpha = 0.45;
-    level.hud_info_background setShader("white", 90, 118);
+    level.hud_info_background setShader("white", 90, 105);
 }
 hud_info_background_destroy()
 {
@@ -3882,7 +3882,6 @@ hud_serverInfo_update()
     for(;;)
     {
         sv_fps = getCvar("sv_fps");
-        sv_maxRate = getCvar("sv_maxRate");
         com_hunkMegs = getCvar("com_hunkMegs");
         g_speed = getCvar("g_speed");
         player_sprintSpeedScale = getCvarFloat("player_sprintSpeedScale");
@@ -3892,14 +3891,13 @@ hud_serverInfo_update()
         if (!initDone
             || level.scorelimit_backup != level.scorelimit
             || level.sv_fps_backup != sv_fps
-            || level.sv_maxRate_backup != sv_maxRate
             || level.com_hunkMegs_backup != com_hunkMegs
             || level.g_speed_backup != g_speed
             || level.player_sprintSpeedScale_backup != player_sprintSpeedScale
             || level.g_gravity_backup != g_gravity
             || level.jump_height_backup != jump_height)
         {
-            hud_serverInfo_setText(sv_fps, sv_maxRate, com_hunkMegs, g_speed, player_sprintSpeedScale, g_gravity, jump_height);
+            hud_serverInfo_setText(sv_fps, com_hunkMegs, g_speed, player_sprintSpeedScale, g_gravity, jump_height);
             if(!initDone)
                 initDone = true;
         }
@@ -3908,7 +3906,7 @@ hud_serverInfo_update()
         wait .05;
     }
 }
-hud_serverInfo_setText(sv_fps, sv_maxRate, com_hunkMegs, g_speed, player_sprintSpeedScale, g_gravity, jump_height)
+hud_serverInfo_setText(sv_fps, com_hunkMegs, g_speed, player_sprintSpeedScale, g_gravity, jump_height)
 {
     newLineListItemStart = "\n - ";
     belowLocalFPS_text = "Server info:";
@@ -3922,9 +3920,6 @@ hud_serverInfo_setText(sv_fps, sv_maxRate, com_hunkMegs, g_speed, player_sprintS
 
     level.com_hunkMegs_backup = com_hunkMegs;
     belowLocalFPS_text += newLineListItemStart + "com_hunkMegs: " + "^3" + level.com_hunkMegs_backup + "^7";
-
-    level.sv_maxRate_backup = sv_maxRate;
-    belowLocalFPS_text += newLineListItemStart + "sv_maxRate: " + "^3" + level.sv_maxRate_backup + "^7";
 
     level.g_speed_backup = g_speed;
     belowLocalFPS_text += newLineListItemStart + "g_speed: " + "^3" + level.g_speed_backup + "^7";
@@ -3969,7 +3964,7 @@ hud_playerInfo_create()
     self.hud_playerInfo = newClientHudElem(self);
     self.hud_playerInfo.sort = -1;
     self.hud_playerInfo.x = level.hud_info_background.x - 88;
-    self.hud_playerInfo.y = level.hud_info_background.y + 81;
+    self.hud_playerInfo.y = level.hud_info_background.y + 70;
     self.hud_playerInfo.fontScale = 0.7;
     
     thread hud_playerInfo_update();

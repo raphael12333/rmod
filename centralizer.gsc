@@ -358,6 +358,8 @@ main()
     mapvote::init();
 
     thread resetMapGametype_ifEmpty();
+
+    level.quickMessageDelay = 0.75;
 }
 resetMapGametype_ifEmpty()
 {
@@ -730,8 +732,7 @@ playerConnect()
     execute_async_create(arg, ::vpnCheckerResult);
     self thread vpnCheckerResult_thread();*/
     
-
-
+    
     
     
     
@@ -3821,10 +3822,10 @@ hud_info_background_create()
     level.hud_info_background.sort = -2;
     level.hud_info_background.alignX = "right";
     level.hud_info_background.x = 640;
-    level.hud_info_background.y = 35;
+    level.hud_info_background.y = 315;
     level.hud_info_background.color = (0.2, 0.2, 0.2);
     level.hud_info_background.alpha = 0.45;
-    level.hud_info_background setShader("white", 90, 105);
+    level.hud_info_background setShader("white", 147, 110);
 }
 hud_info_background_destroy()
 {
@@ -3864,12 +3865,12 @@ hud_serverInfo_create()
         level.hud_serverInfo_underHealth setText(underHealth_text_localized);
     }
     
-    level.hud_serverInfo_belowLocalFPS_text = newHudElem();
-    level.hud_serverInfo_belowLocalFPS_text.sort = -1;
-    level.hud_serverInfo_belowLocalFPS_text.alignX = "right";
-    level.hud_serverInfo_belowLocalFPS_text.x = level.hud_info_background.x - 3;
-    level.hud_serverInfo_belowLocalFPS_text.y = level.hud_info_background.y + 4;
-    level.hud_serverInfo_belowLocalFPS_text.fontScale = 0.7;
+    level.hud_serverInfo_serverInfo_text = newHudElem();
+    level.hud_serverInfo_serverInfo_text.sort = -1;
+    level.hud_serverInfo_serverInfo_text.x = level.hud_info_background.x - 144;
+    level.hud_serverInfo_serverInfo_text.y = level.hud_info_background.y - 3;
+    level.hud_serverInfo_serverInfo_text.font = "smallfixed";
+    level.hud_serverInfo_serverInfo_text.fontScale = 0.5;
     
     thread hud_serverInfo_update();
 }
@@ -3908,41 +3909,41 @@ hud_serverInfo_update()
 }
 hud_serverInfo_setText(sv_fps, com_hunkMegs, g_speed, player_sprintSpeedScale, g_gravity, jump_height)
 {
-    newLineListItemStart = "\n - ";
-    belowLocalFPS_text = "Server info:";
+    newLineListItemStart = "\n -";
+    serverInfo_text = "Server info:";
 
     level.scorelimit_backup = level.scorelimit;
-    scorelimit = "Score limit: " + "^3" + level.scorelimit_backup + "^7";
-    belowLocalFPS_text += newLineListItemStart + scorelimit;
+    scorelimit = "Score limit:" + "^3" + level.scorelimit_backup + "^7";
+    serverInfo_text += newLineListItemStart + scorelimit;
 
     level.sv_fps_backup = sv_fps;
-    belowLocalFPS_text += newLineListItemStart + "sv_fps: " + "^3" + level.sv_fps_backup + "^7";
+    serverInfo_text += newLineListItemStart + "sv_fps:" + "^3" + level.sv_fps_backup + "^7";
 
     level.com_hunkMegs_backup = com_hunkMegs;
-    belowLocalFPS_text += newLineListItemStart + "com_hunkMegs: " + "^3" + level.com_hunkMegs_backup + "^7";
+    serverInfo_text += newLineListItemStart + "com_hunkMegs:" + "^3" + level.com_hunkMegs_backup + "^7";
 
     level.g_speed_backup = g_speed;
-    belowLocalFPS_text += newLineListItemStart + "g_speed: " + "^3" + level.g_speed_backup + "^7";
+    serverInfo_text += newLineListItemStart + "g_speed:" + "^3" + level.g_speed_backup + "^7";
 
     level.player_sprintSpeedScale_backup = player_sprintSpeedScale;
     if(level.player_sprintSpeedScale_backup != "")
-        belowLocalFPS_text += newLineListItemStart + "Sprint scale: " + "^3" + level.player_sprintSpeedScale_backup + "^7";
+        serverInfo_text += newLineListItemStart + "Sprint scale:" + "^3" + level.player_sprintSpeedScale_backup + "^7";
     
     level.g_gravity_backup = g_gravity;
-    belowLocalFPS_text += newLineListItemStart + "g_gravity: " + "^3" + level.g_gravity_backup + "^7";
+    serverInfo_text += newLineListItemStart + "g_gravity:" + "^3" + level.g_gravity_backup + "^7";
 
     level.jump_height_backup = jump_height;
     if(jump_height != "")
-        belowLocalFPS_text += newLineListItemStart + "Jump height: " + "^3" + level.jump_height_backup + "^7";
+        serverInfo_text += newLineListItemStart + "Jump height:" + "^3" + level.jump_height_backup + "^7";
 
-    if (isDefined(level.belowLocalFPS_text_localized))
+    if (isDefined(level.serverInfo_text_localized))
     {
-        index = getLocalizedStringIndex(level.belowLocalFPS_text_localized);
-        level.belowLocalFPS_text_localized = makeUpdatedLocalizedString(belowLocalFPS_text, index);
+        index = getLocalizedStringIndex(level.serverInfo_text_localized);
+        level.serverInfo_text_localized = makeUpdatedLocalizedString(serverInfo_text, index);
     }
     else
-        level.belowLocalFPS_text_localized = makeLocalizedString(belowLocalFPS_text);
-    level.hud_serverInfo_belowLocalFPS_text setText(level.belowLocalFPS_text_localized);
+        level.serverInfo_text_localized = makeLocalizedString(serverInfo_text);
+    level.hud_serverInfo_serverInfo_text setText(level.serverInfo_text_localized);
 }
 hud_serverInfo_destroy()
 {
@@ -3950,8 +3951,8 @@ hud_serverInfo_destroy()
         level.hud_serverInfo_underCompass destroy();
     if(isDefined(level.hud_serverInfo_underHealth))
         level.hud_serverInfo_underHealth destroy();
-    if(isDefined(level.hud_serverInfo_belowLocalFPS_text))
-        level.hud_serverInfo_belowLocalFPS_text destroy();
+    if(isDefined(level.hud_serverInfo_serverInfo_text))
+        level.hud_serverInfo_serverInfo_text destroy();
 }
 ////
 
@@ -3963,9 +3964,10 @@ hud_playerInfo_create()
 
     self.hud_playerInfo = newClientHudElem(self);
     self.hud_playerInfo.sort = -1;
-    self.hud_playerInfo.x = level.hud_info_background.x - 88;
-    self.hud_playerInfo.y = level.hud_info_background.y + 70;
-    self.hud_playerInfo.fontScale = 0.7;
+    self.hud_playerInfo.x = level.hud_serverInfo_serverInfo_text.x;
+    self.hud_playerInfo.y = level.hud_info_background.y + 66;
+    self.hud_playerInfo.font = "smallfixed";
+    self.hud_playerInfo.fontScale = level.hud_serverInfo_serverInfo_text.fontScale;
     
     thread hud_playerInfo_update();
 }
@@ -3984,12 +3986,12 @@ hud_playerInfo_update()
 }
 hud_playerInfo_setText(fps, airJumpsAvailable)
 {
-    newLineListItemStart = "\n - ";
+    newLineListItemStart = "\n -";
     below_hud_serverInfo_text = "Player info:";
 
-    below_hud_serverInfo_text += newLineListItemStart + "FPS: " + "^3" + fps + "^7";
-    below_hud_serverInfo_text += newLineListItemStart + "Killstreak: " + "^3" + self.killstreak + "^7";
-    below_hud_serverInfo_text += newLineListItemStart + "Air jumps: " + "^3" + airJumpsAvailable + "^7";
+    below_hud_serverInfo_text += newLineListItemStart + "FPS:" + "^3" + fps + "^7";
+    below_hud_serverInfo_text += newLineListItemStart + "Killstreak:" + "^3" + self.killstreak + "^7";
+    below_hud_serverInfo_text += newLineListItemStart + "Air jumps:" + "^3" + airJumpsAvailable + "^7";
 
     if (isDefined(self.below_hud_serverInfo_text_localized))
     {

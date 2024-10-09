@@ -1180,7 +1180,7 @@ quickcommands(response)
     self saveHeadIcon();
     self doQuickMessage(soundalias, saytext);
 
-    wait 2;
+    wait level.quickMessageDelay;
     self.spamdelay = undefined;
     self restoreHeadIcon();	
 }
@@ -1418,7 +1418,7 @@ quickstatements(response)
     self saveHeadIcon();
     self doQuickMessage(soundalias, saytext);
 
-    wait 2;
+    wait level.quickMessageDelay;
     self.spamdelay = undefined;
     self restoreHeadIcon();
 }
@@ -1649,7 +1649,7 @@ quickresponses(response)
     self saveHeadIcon();
     self doQuickMessage(soundalias, saytext);
 
-    wait 2;
+    wait level.quickMessageDelay;
     self.spamdelay = undefined;
     self restoreHeadIcon();
 }

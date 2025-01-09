@@ -1,4 +1,4 @@
-## Stock gametypes modifications + extras
+## Stock gametypes modifications
 ### Using the cod1dev [centralizer](https://github.com/cod1dev/centralizer)
 ### [libcod1](https://github.com/cod1dev/libcod1) is required
 

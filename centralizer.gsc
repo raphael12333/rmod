@@ -677,19 +677,15 @@ startGameType()
         thread maps\mp\gametypes\bel::updateScriptCvars();            
     }
 
-    hud_info_background_create();
+    level.hud_sprint_bar_maxWidth = 95;
+    level.hud_sprint_bar_height = 10;
+    level.hud_sprint_bar_x = 153;
+    level.hud_sprint_bar_y = 458;
+
     hud_serverInfo_create();
 
     if((level.gametype != "dm" && level.gametype != "tdm" && level.gametype != "bel") && game["matchstarted"])
         thread hud_alivePlayers_create();
-
-    level.hud_sprint_bar_maxWidth = 95;
-    level.hud_sprint_bar_height = 10;
-    level.hud_sprint_bar_x = 144;
-    level.hud_sprint_bar_y = 461.5;
-    sprintMinTime = getCvarFloat("player_sprintMinTime");
-    if(sprintMinTime != "")
-        hud_sprint_info(sprintMinTime);
 }
 
 
@@ -3332,9 +3328,7 @@ endMap()
     level notify("intermission");
 
     hud_alivePlayers_destroy();
-    hud_sprint_info_destroy();
     hud_serverInfo_destroy();
-    hud_info_background_destroy();
     players = getEntArray("player", "classname");
     for (i = 0; i < players.size; i++)
     {
@@ -3539,6 +3533,92 @@ printJoinedTeam(team)
         iprintln(&"MPSCRIPT_JOINED_AXIS", self);
 }
 
+//// hud_serverInfo
+hud_serverInfo_create()
+{
+    serverStartTime = getServerStartTime();
+    rebootDate = strftime(serverStartTime, "utc", "%m/%d/%Y %I:%M %p %Z");
+    underCompass_text = "Last reboot: " + rebootDate;
+    level.hud_serverInfo_rebootDate = newHudElem();
+    level.hud_serverInfo_rebootDate.sort = -1;
+    level.hud_serverInfo_rebootDate.x = 2;
+    level.hud_serverInfo_rebootDate.y = 473;
+    level.hud_serverInfo_rebootDate.fontScale = 0.62;
+    underCompass_text_localized = makeLocalizedString(underCompass_text);
+    level.hud_serverInfo_rebootDate setText(underCompass_text_localized);
+
+    level.hud_serverInfo_g_speed = newHudElem();
+    level.hud_serverInfo_g_speed.sort = -1;
+    level.hud_serverInfo_g_speed.x = level.hud_sprint_bar_x;
+    level.hud_serverInfo_g_speed.y = 470;
+    level.hud_serverInfo_g_speed.fontScale = 0.7;
+    level.hud_serverInfo_g_speed.label = &"g_speed: ";
+
+    level.hud_serverInfo_sprint_scale = newHudElem();
+    level.hud_serverInfo_sprint_scale.sort = -1;
+    level.hud_serverInfo_sprint_scale.x = level.hud_serverInfo_g_speed.x + 60;
+    level.hud_serverInfo_sprint_scale.y = level.hud_serverInfo_g_speed.y;
+    level.hud_serverInfo_sprint_scale.fontScale = 0.7;
+    level.hud_serverInfo_sprint_scale.label = &"Sprint scale: ";
+
+    level.hud_serverInfo_score_limit = newHudElem();
+    level.hud_serverInfo_score_limit.sort = -1;
+    level.hud_serverInfo_score_limit.x = level.clock.x + 60;
+    level.hud_serverInfo_score_limit.y = level.hud_serverInfo_g_speed.y;
+    level.hud_serverInfo_score_limit.fontScale = 0.7;
+    level.hud_serverInfo_score_limit.label = &"Score limit: ";
+    
+    thread hud_serverInfo_update();
+}
+hud_serverInfo_update()
+{
+    level endon("intermission");
+
+    initDone = false;
+
+    for(;;)
+    {
+        g_speed = getCvar("g_speed");
+        player_sprintSpeedScale = getCvarFloat("player_sprintSpeedScale");
+
+        if (!initDone
+            || level.g_speed_backup != g_speed
+            || level.player_sprintSpeedScale_backup != player_sprintSpeedScale
+            || level.scorelimit_backup != level.scorelimit)
+        {
+            hud_serverInfo_setText(g_speed, player_sprintSpeedScale);
+            if(!initDone)
+                initDone = true;
+        }
+
+        wait .75;
+        wait .05;
+    }
+}
+hud_serverInfo_setText(g_speed, player_sprintSpeedScale)
+{
+    level.g_speed_backup = g_speed;
+    level.hud_serverInfo_g_speed setValue(level.g_speed_backup);
+
+    level.player_sprintSpeedScale_backup = player_sprintSpeedScale;
+    level.hud_serverInfo_sprint_scale setValue(level.player_sprintSpeedScale_backup);
+
+    level.scorelimit_backup = level.scorelimit;
+    level.hud_serverInfo_score_limit setValue(level.scorelimit_backup);
+}
+hud_serverInfo_destroy()
+{
+    if(isDefined(level.hud_serverInfo_rebootDate))
+        level.hud_serverInfo_rebootDate destroy();
+    if(isDefined(level.hud_serverInfo_g_speed))
+        level.hud_serverInfo_g_speed destroy();
+    if(isDefined(level.hud_serverInfo_sprint_scale))
+        level.hud_serverInfo_sprint_scale destroy();
+    if(isDefined(level.hud_serverInfo_score_limit))
+        level.hud_serverInfo_score_limit destroy();
+}
+////
+
 //// hud_alivePlayers
 hud_alivePlayers_create()
 {
@@ -3688,97 +3768,6 @@ hud_alivePlayers_destroy()
 }
 ////
 
-//// hud_sprint
-hud_sprintBar_create()
-{
-    if(isDefined(self.hud_sprint_bar))
-        return;
-    
-    level endon("intermission");
-    self endon("hud_sprintBar_destroy");
-    
-    self.hud_sprint_bar = newClientHudElem(self);
-    self.hud_sprint_bar.sort = -1;
-    self.hud_sprint_bar.x = level.hud_sprint_bar_x;
-    self.hud_sprint_bar.y = level.hud_sprint_bar_y;
-    self.hud_sprint_bar.color = (1, 1, 1);
-
-    if(!getCvarInt("player_sprint"))
-        return;
-    sprintMaxTime = getCvarFloat("player_sprintTime");
-    if(sprintMaxTime == "")
-        return;
-    sprintMaxTime *= 1000;
-    
-    for(;;)
-    {
-        remainingSprintTime = self getSprintRemaining();
-        bar_width = (remainingSprintTime * level.hud_sprint_bar_maxWidth) / sprintMaxTime;
-        if (isDefined(self.hud_sprint_bar))
-        {
-            if (bar_width < 1)
-            {
-                // Setting width to 0 makes width positive for a short time, so hiding.
-                self.hud_sprint_bar.alpha = 0;
-            }
-            else
-                self.hud_sprint_bar.alpha = 0.85;
-            self.hud_sprint_bar setShader("white", (int)bar_width, level.hud_sprint_bar_height);
-        }
-        wait .05;
-    }
-}
-hud_sprintBar_destroy()
-{
-    self notify("hud_sprintBar_destroy");
-    if(isDefined(self.hud_sprint_bar))
-        self.hud_sprint_bar destroy();
-}
-hud_sprint_info(minTime)
-{
-    if(!getCvarInt("player_sprint"))
-        return;
-        
-    level.hud_sprint_bind_info = newHudElem();
-    level.hud_sprint_bind_info.sort = -1;
-    level.hud_sprint_bind_info.x = level.hud_sprint_bar_x;
-    level.hud_sprint_bind_info.y = level.hud_sprint_bar_y - 14;
-    level.hud_sprint_bind_info.fontScale = 0.85;
-    level.hud_sprint_bind_info.label = &"/bind x sprint";
-    
-    level.hud_sprint_bar_background = newHudElem();
-    level.hud_sprint_bar_background.sort = -3;
-    level.hud_sprint_bar_background.x = level.hud_sprint_bar_x;
-    level.hud_sprint_bar_background.y = level.hud_sprint_bar_y;
-    level.hud_sprint_bar_background.color = (0, 0, 0);
-    level.hud_sprint_bar_background.alpha = 0.45;
-    level.hud_sprint_bar_background setShader("white", level.hud_sprint_bar_maxWidth, level.hud_sprint_bar_height);
-    
-    sprintMaxTime = getCvarFloat("player_sprintTime");
-    if(sprintMaxTime == "")
-        return;
-    sprintMaxTime *= 1000;
-    minTime *= 1000;
-    level.hud_sprint_bar_minTime = newHudElem();
-    level.hud_sprint_bar_minTime.sort = -1;
-    level.hud_sprint_bar_minTime.alpha = 0.85; // Didn't manage to make it disappear under hud_sprint_bar
-    hud_sprint_bar_minTime_x = level.hud_sprint_bar_x + (int)((minTime / sprintMaxTime) * level.hud_sprint_bar_maxWidth);
-    level.hud_sprint_bar_minTime.x = hud_sprint_bar_minTime_x;
-    level.hud_sprint_bar_minTime.y = level.hud_sprint_bar_y;
-    level.hud_sprint_bar_minTime.color = (1, 1, 1);
-    level.hud_sprint_bar_minTime setShader("white", 2, level.hud_sprint_bar_height);
-}
-hud_sprint_info_destroy()
-{
-    if(isDefined(level.hud_sprint_bar_background))
-        level.hud_sprint_bar_background destroy();
-    if(isDefined(level.hud_sprint_bar_minTime))
-        level.hud_sprint_bar_minTime destroy();
-    if(isDefined(level.hud_sprint_bind_info))
-        level.hud_sprint_bind_info destroy();
-}
-////
-
 //// hud_damageFeedback
 hud_damageFeedback_create(iDamage, victim_will_die)
 {
@@ -3812,162 +3801,26 @@ hud_damageFeedback_destroy()
 }
 ////
 
-//// hud_info_background
-hud_info_background_create()
-{
-    // id Tech 3 base resolution = 640*480
-
-    // Below local FPS
-    level.hud_info_background = newHudElem();
-    level.hud_info_background.sort = -2;
-    level.hud_info_background.alignX = "right";
-    level.hud_info_background.x = 640;
-    level.hud_info_background.y = 315;
-    level.hud_info_background.color = (0.2, 0.2, 0.2);
-    level.hud_info_background.alpha = 0.45;
-    level.hud_info_background setShader("white", 147, 110);
-}
-hud_info_background_destroy()
-{
-    if(isDefined(level.hud_info_background))
-        level.hud_info_background destroy();
-}
-////
-
-//// hud_serverInfo
-hud_serverInfo_create()
-{
-    serverStartTime = getServerStartTime();
-    restartedOn = strftime(serverStartTime, "utc", "%m/%d/%Y %I:%M %p %Z");
-    if (isDefined(restartedOn))
-    {
-        underCompass_text = "Last reboot: " + restartedOn;
-        level.hud_serverInfo_underCompass = newHudElem();
-        level.hud_serverInfo_underCompass.sort = -1;
-        level.hud_serverInfo_underCompass.x = 2;
-        level.hud_serverInfo_underCompass.y = 474;
-        level.hud_serverInfo_underCompass.fontScale = 0.52;
-        underCompass_text_localized = makeLocalizedString(underCompass_text);
-        level.hud_serverInfo_underCompass setText(underCompass_text_localized);
-    }
-
-    contact = getCvar("scr_contact");
-    if (contact != "")
-    {
-        underHealth_text = "Contact: " + contact;
-        level.hud_serverInfo_underHealth = newHudElem();
-        level.hud_serverInfo_underHealth.sort = -1;
-        level.hud_serverInfo_underHealth.alignX = "right";
-        level.hud_serverInfo_underHealth.x = 638;
-        level.hud_serverInfo_underHealth.y = 473;
-        level.hud_serverInfo_underHealth.fontScale = 0.6;
-        underHealth_text_localized = makeLocalizedString(underHealth_text);
-        level.hud_serverInfo_underHealth setText(underHealth_text_localized);
-    }
-    
-    level.hud_serverInfo_serverInfo_text = newHudElem();
-    level.hud_serverInfo_serverInfo_text.sort = -1;
-    level.hud_serverInfo_serverInfo_text.x = level.hud_info_background.x - 144;
-    level.hud_serverInfo_serverInfo_text.y = level.hud_info_background.y - 3;
-    level.hud_serverInfo_serverInfo_text.font = "smallfixed";
-    level.hud_serverInfo_serverInfo_text.fontScale = 0.5;
-    
-    thread hud_serverInfo_update();
-}
-hud_serverInfo_update()
-{
-    level endon("intermission");
-
-    initDone = false;
-
-    for(;;)
-    {
-        sv_fps = getCvar("sv_fps");
-        com_hunkMegs = getCvar("com_hunkMegs");
-        g_speed = getCvar("g_speed");
-        player_sprintSpeedScale = getCvarFloat("player_sprintSpeedScale");
-        g_gravity = getCvar("g_gravity");
-        jump_height = getCvarFloat("jump_height");
-
-        if (!initDone
-            || level.scorelimit_backup != level.scorelimit
-            || level.sv_fps_backup != sv_fps
-            || level.com_hunkMegs_backup != com_hunkMegs
-            || level.g_speed_backup != g_speed
-            || level.player_sprintSpeedScale_backup != player_sprintSpeedScale
-            || level.g_gravity_backup != g_gravity
-            || level.jump_height_backup != jump_height)
-        {
-            hud_serverInfo_setText(sv_fps, com_hunkMegs, g_speed, player_sprintSpeedScale, g_gravity, jump_height);
-            if(!initDone)
-                initDone = true;
-        }
-
-        wait 1;
-        wait .05;
-    }
-}
-hud_serverInfo_setText(sv_fps, com_hunkMegs, g_speed, player_sprintSpeedScale, g_gravity, jump_height)
-{
-    newLineListItemStart = "\n -";
-    serverInfo_text = "Server info:";
-
-    level.scorelimit_backup = level.scorelimit;
-    scorelimit = "Score limit:" + "^3" + level.scorelimit_backup + "^7";
-    serverInfo_text += newLineListItemStart + scorelimit;
-
-    level.sv_fps_backup = sv_fps;
-    serverInfo_text += newLineListItemStart + "sv_fps:" + "^3" + level.sv_fps_backup + "^7";
-
-    level.com_hunkMegs_backup = com_hunkMegs;
-    serverInfo_text += newLineListItemStart + "com_hunkMegs:" + "^3" + level.com_hunkMegs_backup + "^7";
-
-    level.g_speed_backup = g_speed;
-    serverInfo_text += newLineListItemStart + "g_speed:" + "^3" + level.g_speed_backup + "^7";
-
-    level.player_sprintSpeedScale_backup = player_sprintSpeedScale;
-    if(level.player_sprintSpeedScale_backup != "")
-        serverInfo_text += newLineListItemStart + "Sprint scale:" + "^3" + level.player_sprintSpeedScale_backup + "^7";
-    
-    level.g_gravity_backup = g_gravity;
-    serverInfo_text += newLineListItemStart + "g_gravity:" + "^3" + level.g_gravity_backup + "^7";
-
-    level.jump_height_backup = jump_height;
-    if(jump_height != "")
-        serverInfo_text += newLineListItemStart + "Jump height:" + "^3" + level.jump_height_backup + "^7";
-
-    if (isDefined(level.serverInfo_text_localized))
-    {
-        index = getLocalizedStringIndex(level.serverInfo_text_localized);
-        level.serverInfo_text_localized = makeUpdatedLocalizedString(serverInfo_text, index);
-    }
-    else
-        level.serverInfo_text_localized = makeLocalizedString(serverInfo_text);
-    level.hud_serverInfo_serverInfo_text setText(level.serverInfo_text_localized);
-}
-hud_serverInfo_destroy()
-{
-    if(isDefined(level.hud_serverInfo_underCompass))
-        level.hud_serverInfo_underCompass destroy();
-    if(isDefined(level.hud_serverInfo_underHealth))
-        level.hud_serverInfo_underHealth destroy();
-    if(isDefined(level.hud_serverInfo_serverInfo_text))
-        level.hud_serverInfo_serverInfo_text destroy();
-}
-////
-
 //// hud_playerInfo
 hud_playerInfo_create()
 {
-    if(isDefined(self.hud_playerInfo))
+    if(isDefined(self.hud_playerInfo_created))
         return;
+    self.hud_playerInfo_created = true;
 
-    self.hud_playerInfo = newClientHudElem(self);
-    self.hud_playerInfo.sort = -1;
-    self.hud_playerInfo.x = level.hud_serverInfo_serverInfo_text.x;
-    self.hud_playerInfo.y = level.hud_info_background.y + 66;
-    self.hud_playerInfo.font = "smallfixed";
-    self.hud_playerInfo.fontScale = level.hud_serverInfo_serverInfo_text.fontScale;
+    self.hud_playerInfo_fps = newClientHudElem(self);
+    self.hud_playerInfo_fps.sort = -1;
+    self.hud_playerInfo_fps.x = 573;
+    self.hud_playerInfo_fps.y = 30;
+    self.hud_playerInfo_fps.fontScale = 0.8;
+    self.hud_playerInfo_fps.label = &"FPS: ";
+
+    self.hud_playerInfo_killstreak = newClientHudElem(self);
+    self.hud_playerInfo_killstreak.sort = self.hud_playerInfo_fps.sort;
+    self.hud_playerInfo_killstreak.x = self.hud_playerInfo_fps.x;
+    self.hud_playerInfo_killstreak.y = self.hud_playerInfo_fps.y + 15;
+    self.hud_playerInfo_killstreak.label = &"Killstreak: ";
+    self.hud_playerInfo_killstreak.fontScale = self.hud_playerInfo_fps.fontScale;
     
     thread hud_playerInfo_update();
 }
@@ -3979,33 +3832,97 @@ hud_playerInfo_update()
     for(;;)
     {
         fps = self getFPS();
-        airJumpsAvailable = self getAirJumps();
-        hud_playerInfo_setText(fps, airJumpsAvailable);
+        hud_playerInfo_setText(fps);
         wait .05;
     }
 }
-hud_playerInfo_setText(fps, airJumpsAvailable)
+hud_playerInfo_setText(fps)
 {
-    newLineListItemStart = "\n -";
-    below_hud_serverInfo_text = "Player info:";
-
-    below_hud_serverInfo_text += newLineListItemStart + "FPS:" + "^3" + fps + "^7";
-    below_hud_serverInfo_text += newLineListItemStart + "Killstreak:" + "^3" + self.killstreak + "^7";
-    below_hud_serverInfo_text += newLineListItemStart + "Air jumps:" + "^3" + airJumpsAvailable + "^7";
-
-    if (isDefined(self.below_hud_serverInfo_text_localized))
-    {
-        index = getLocalizedStringIndex(self.below_hud_serverInfo_text_localized);
-        self.below_hud_serverInfo_text_localized = makeUpdatedLocalizedString(below_hud_serverInfo_text, index);
-    }
-    else
-        self.below_hud_serverInfo_text_localized = makeLocalizedString(below_hud_serverInfo_text);
-    self.hud_playerInfo setText(self.below_hud_serverInfo_text_localized);
+    self.hud_playerInfo_fps setValue(fps);
+    self.hud_playerInfo_killstreak setValue(self.killstreak);
 }
 hud_playerInfo_destroy()
 {
     self notify("hud_playerInfo_destroy");
-    if(isDefined(self.hud_playerInfo))
-        self.hud_playerInfo destroy();
+    if(isDefined(self.hud_playerInfo_fps))
+        self.hud_playerInfo_fps destroy();
+    if(isDefined(self.hud_playerInfo_killstreak))
+        self.hud_playerInfo_killstreak destroy();
+}
+////
+
+//// hud_sprint
+hud_sprintBar_create()
+{
+    if(!getCvarInt("player_sprint"))
+        return;
+
+    level endon("intermission");
+    self endon("hud_sprintBar_destroy");
+        
+    self.hud_sprint_bind_info = newClientHudElem(self);
+    self.hud_sprint_bind_info.sort = -1;
+    self.hud_sprint_bind_info.x = level.hud_sprint_bar_x;
+    self.hud_sprint_bind_info.y = level.hud_sprint_bar_y - 14;
+    self.hud_sprint_bind_info.fontScale = 0.85;
+    self.hud_sprint_bind_info.label = &"/bind z sprint";
+    
+    self.hud_sprint_bar_background = newClientHudElem(self);
+    self.hud_sprint_bar_background.sort = -3;
+    self.hud_sprint_bar_background.x = level.hud_sprint_bar_x;
+    self.hud_sprint_bar_background.y = level.hud_sprint_bar_y;
+    self.hud_sprint_bar_background.color = (0, 0, 0);
+    self.hud_sprint_bar_background.alpha = 0.45;
+    self.hud_sprint_bar_background setShader("white", level.hud_sprint_bar_maxWidth, level.hud_sprint_bar_height);
+    
+    sprintMaxTime = getCvarFloat("player_sprintTime");
+    sprintMaxTime *= 1000;
+    sprintMinTime = getCvarFloat("player_sprintMinTime");
+    sprintMinTime *= 1000;
+    self.hud_sprint_bar_minTime = newClientHudElem(self);
+    self.hud_sprint_bar_minTime.sort = -1;
+    self.hud_sprint_bar_minTime.alpha = 0.85; // Didn't manage to make it disappear under hud_sprint_bar
+    hud_sprint_bar_minTime_x = level.hud_sprint_bar_x + (int)((sprintMinTime / sprintMaxTime) * level.hud_sprint_bar_maxWidth);
+    self.hud_sprint_bar_minTime.x = hud_sprint_bar_minTime_x;
+    self.hud_sprint_bar_minTime.y = level.hud_sprint_bar_y;
+    self.hud_sprint_bar_minTime.color = (1, 1, 1);
+    self.hud_sprint_bar_minTime setShader("white", 2, level.hud_sprint_bar_height);
+    
+    self.hud_sprint_bar = newClientHudElem(self);
+    self.hud_sprint_bar.sort = -1;
+    self.hud_sprint_bar.x = level.hud_sprint_bar_x;
+    self.hud_sprint_bar.y = level.hud_sprint_bar_y;
+    self.hud_sprint_bar.color = (1, 1, 1);
+    
+    for(;;)
+    {
+        remainingSprintTime = self getSprintRemaining();
+        bar_width = (remainingSprintTime * level.hud_sprint_bar_maxWidth) / sprintMaxTime;
+        if (isDefined(self.hud_sprint_bar))
+        {
+            if (bar_width < 1)
+            {
+                // Setting width to 0 makes width positive for a short time, so hiding.
+                self.hud_sprint_bar.alpha = 0;
+            }
+            else
+                self.hud_sprint_bar.alpha = 0.85;
+            self.hud_sprint_bar setShader("white", (int)bar_width, level.hud_sprint_bar_height);
+        }
+        wait .05;
+    }
+}
+hud_sprintBar_destroy()
+{
+    self notify("hud_sprintBar_destroy");
+
+    if(isDefined(self.hud_sprint_bar))
+        self.hud_sprint_bar destroy();
+    if(isDefined(self.hud_sprint_bar_background))
+        self.hud_sprint_bar_background destroy();
+    if(isDefined(self.hud_sprint_bar_minTime))
+        self.hud_sprint_bar_minTime destroy();
+    if(isDefined(self.hud_sprint_bind_info))
+        self.hud_sprint_bind_info destroy();
 }
 ////

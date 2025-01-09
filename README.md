@@ -17,9 +17,7 @@ Some of the modifications are:
 - chat command system
 - alive players counter hud
 - player fps indicator
-- sound for air jumps
 - suicide doesn't decrease score
-- 1 kill = 1 air jump reward
 - improved killcam code and UI
 - sprint bar
 - server info hud

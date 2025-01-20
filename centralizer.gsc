@@ -363,21 +363,26 @@ main()
 }
 resetMapGametype_ifEmpty()
 {
-    wait 30; // After this time, at least a player should have finished loading map, to prevent the function from executing.
-    players = getEntArray("player", "classname");
-    if (players.size == 0)
+    for (;;)
     {
-        currentMap = getCvar("mapname");
-        currentGametype = getCvar("g_gametype");
-
-        gametypeMapCurrent = "gametype" + " " + currentGametype + " " + "map" + " " + currentMap;
-        gametypeMapEmpty = getCvar("scr_gametypeMapEmpty"); // E.g.: "gametype dm map mp_harbor"
-
-        if (gametypeMapEmpty != "" && (gametypeMapCurrent != gametypeMapEmpty))
+        wait 30; // After this time, at least a player should have finished loading map, to prevent the function from executing.
+        players = getEntArray("player", "classname");
+        if (players.size == 0)
         {
-            setCvar("sv_mapRotationCurrent", gametypeMapEmpty);
-            exitLevel(false);
+            currentMap = getCvar("mapname");
+            currentGametype = getCvar("g_gametype");
+
+            gametypeMapCurrent = "gametype" + " " + currentGametype + " " + "map" + " " + currentMap;
+            gametypeMapEmpty = getCvar("scr_gametypeMapEmpty"); // E.g.: "gametype dm map mp_harbor"
+
+            if (gametypeMapEmpty != "" && (gametypeMapCurrent != gametypeMapEmpty))
+            {
+                setCvar("sv_mapRotationCurrent", gametypeMapEmpty);
+                exitLevel(false);
+            }
         }
+
+        wait .05;
     }
 }
 

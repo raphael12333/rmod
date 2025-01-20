@@ -3779,18 +3779,30 @@ hud_damageFeedback_create(iDamage, victim_will_die)
     self endon("spawned");
     hud_damageFeedback_destroy();
 
-    if(victim_will_die)
-        color = (0, 1, 0);
+    if (victim_will_die)
+    {
+        color = (0.38, 1, 0.4);
+    }
     else
-        color = (1, 0, 0);
-
+    {
+        self.hud_damageFeedback_value = newClientHudElem(self);
+        self.hud_damageFeedback_value.x = 335;
+        self.hud_damageFeedback_value.y = 225;
+        self.hud_damageFeedback_value.alpha = 1;
+        self.hud_damageFeedback_value.color = (0.98, 0.69, 0);
+        self.hud_damageFeedback_value setValue(iDamage);
+        self.hud_damageFeedback_value fadeOverTime(1);
+        self.hud_damageFeedback_value.alpha = 0;
+    }
+    
     self.hud_damageFeedback = newClientHudElem(self);
     self.hud_damageFeedback.alignX = "center";
     self.hud_damageFeedback.alignY = "middle";
     self.hud_damageFeedback.x = 320;
     self.hud_damageFeedback.y = 240;
     self.hud_damageFeedback.alpha = 1;
-    self.hud_damageFeedback.color = color;
+    if(victim_will_die)
+        self.hud_damageFeedback.color = color;
     self.hud_damageFeedback setShader("gfx/hud/damage_feedback.dds", 24, 24);
 
     self.hud_damageFeedback fadeOverTime(1);
@@ -3803,6 +3815,8 @@ hud_damageFeedback_destroy()
 {
     if(isDefined(self.hud_damageFeedback))
         self.hud_damageFeedback destroy();
+    if(isDefined(self.hud_damageFeedback_value))
+        self.hud_damageFeedback_value destroy();
 }
 ////
 

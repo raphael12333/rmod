@@ -868,8 +868,9 @@ playerConnect()
 
     if(isDefined(self.pers["fov"]))
         self setClientCvar("cg_fov", self.pers["fov"]);
-    
-    self disableItemAutoPickup();
+
+    if(level.gametype == "sd")
+        self disableItemAutoPickup();
 
     for(;;)
     {
